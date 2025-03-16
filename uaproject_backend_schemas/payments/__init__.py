@@ -21,6 +21,7 @@ from .purchases import (
     PurchasedItemFilterParams,
     PurchasedItemResponse,
     PurchasedItemSort,
+    PurchasedItemStatus,
     PurchasedItemUpdate,
 )
 from .services import (
@@ -65,6 +66,7 @@ __all__ = [
     "DonationResponse",
     "PurchasedItem",
     "PurchasedItemSort",
+    "PurchasedItemStatus",
     "PurchasedItemFilterParams",
     "PurchasedItemBase",
     "PurchasedItemCreate",

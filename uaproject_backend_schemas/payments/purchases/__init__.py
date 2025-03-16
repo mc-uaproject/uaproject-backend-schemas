@@ -5,6 +5,7 @@ from .schemas import (
     PurchasedItemFilterParams,
     PurchasedItemResponse,
     PurchasedItemSort,
+    PurchasedItemStatus,
     PurchasedItemUpdate,
 )
 
@@ -16,4 +17,5 @@ __all__ = [
     "PurchasedItemCreate",
     "PurchasedItemUpdate",
     "PurchasedItemResponse",
+    "PurchasedItemStatus",
 ]
