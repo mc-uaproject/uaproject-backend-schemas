@@ -11,7 +11,7 @@ from uaproject_backend_schemas.webhooks.models import *  # noqa: F403
 __all__ = [
     "Application",  # noqa: F405
     "Balance",  # noqa: F405
-    "RoleToken",  # noqa: F405
+    "Token",  # noqa: F405
     "User",  # noqa: F405
     "UserRoles",  # noqa: F405
     "Webhook",  # noqa: F405
