@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from uaproject_backend_schemas.applications import Application
     from uaproject_backend_schemas.payments import Balance, Transaction
 
-__all__ = ["Role", "UserRoles", "User", "Token"]
+__all__ = ["User", "Token"]
 
 
 class User(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):

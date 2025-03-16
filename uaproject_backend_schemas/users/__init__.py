@@ -1,4 +1,5 @@
-from .models import Role, Token, User, UserRoles
+from .models import Token, User
+from .roles import Role, RoleCreate, RoleResponse, RoleSort, RoleUpdate, UserRoles
 from .schemas import (
     TokenResponse,
     UserCreate,
@@ -21,4 +22,10 @@ __all__ = [
     "UserFilterParams",
     "UserSort",
     "UserTokenResponse",
+    "Role",
+    "UserRoles",
+    "RoleSort",
+    "RoleCreate",
+    "RoleUpdate",
+    "RoleResponse",
 ]
