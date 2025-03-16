@@ -5,11 +5,11 @@ from typing import TYPE_CHECKING, List, Optional
 from pydantic import model_validator
 from sqlalchemy import BigInteger, Column
 from sqlmodel import Field, Relationship
-from webhooks.mixins import WebhookPayloadMixin
-from webhooks.schemas import WebhookStage
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.users.roles.models import Role, UserRoles
+from uaproject_backend_schemas.webhooks.mixins import WebhookPayloadMixin
+from uaproject_backend_schemas.webhooks.schemas import WebhookStage
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.applications import Application

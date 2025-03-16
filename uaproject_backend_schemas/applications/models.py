@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING, ClassVar, List, Optional
 from pydantic import model_validator
 from sqlalchemy import ARRAY, Column, Enum, String
 from sqlmodel import Field, Relationship
-from webhooks.mixins import WebhookPayloadMixin
-from webhooks.schemas import WebhookStage
 
-from applications.schemas import ApplicationStatus
+from uaproject_backend_schemas.applications.schemas import ApplicationStatus
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
+from uaproject_backend_schemas.webhooks.mixins import WebhookPayloadMixin
+from uaproject_backend_schemas.webhooks.schemas import WebhookStage
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.users.models import User

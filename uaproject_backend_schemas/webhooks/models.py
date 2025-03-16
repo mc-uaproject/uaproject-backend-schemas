@@ -7,8 +7,8 @@ from sqlalchemy import Enum as SQLAlchemyEnum
 from sqlmodel import Field
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
-from webhooks.mixins import WebhookPayloadMixin
-from webhooks.schemas import WebhookStatus
+from uaproject_backend_schemas.webhooks.mixins import WebhookPayloadMixin
+from uaproject_backend_schemas.webhooks.schemas import WebhookStatus
 
 __all__ = ["Webhook"]
 logger = logging.getLogger(__name__)
