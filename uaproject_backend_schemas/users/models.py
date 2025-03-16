@@ -3,33 +3,19 @@ import uuid
 from typing import TYPE_CHECKING, List, Optional
 
 from pydantic import model_validator
-from sqlalchemy import JSON, BigInteger, Column
+from sqlalchemy import BigInteger, Column
 from sqlmodel import Field, Relationship
 from webhooks.mixins import WebhookPayloadMixin
 from webhooks.schemas import WebhookStage
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
+from uaproject_backend_schemas.users.roles.models import Role, UserRoles
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.applications import Application
     from uaproject_backend_schemas.payments import Balance, Transaction
 
 __all__ = ["Role", "UserRoles", "User", "Token"]
-
-
-class Role(Base, IDMixin, TimestampsMixin, table=True):
-    __tablename__ = "roles"
-
-    name: str = Field(unique=True, index=True)
-    display_name: str | None = Field(default=None, nullable=True)
-    permissions: List[str] = Field(sa_column=Column(JSON))
-    weight: int = Field(default=0, index=True)
-
-
-class UserRoles(Base, table=True):
-    __tablename__ = "user_roles"
-    user_id: int = Field(foreign_key="users.id", primary_key=True)
-    role_id: int = Field(foreign_key="roles.id", primary_key=True)
 
 
 class User(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
