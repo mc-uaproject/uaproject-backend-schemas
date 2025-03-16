@@ -1,0 +1,34 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Poetry virtual environment
+.venv/
+.env/
+.env.local
+
+# Poetry lock file (if you want to exclude it)
+poetry.lock
+
+# Editor and IDE settings
+.vscode/
+.idea/
+*.iml
+
+# Logs and databases
+*.log
+*.sqlite3
+*.db
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ruff & Vulture exclusions (already in config, but adding here just in case)
+versions/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
