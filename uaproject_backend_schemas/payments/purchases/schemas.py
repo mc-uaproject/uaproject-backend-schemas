@@ -6,9 +6,9 @@ from pydantic import BaseModel, Field
 
 from uaproject_backend_schemas.schemas import UserDefaultSort
 
-__all__ = ["PurchaseStatus", "PurchasedItemSort", "PurchasedItemBase", "PurchasedItemCreate", "PurchasedItemUpdate", "PurchasedItemResponse", "PurchasedItemFilterParams"]
+__all__ = ["PurchasedItemStatus", "PurchasedItemSort", "PurchasedItemBase", "PurchasedItemCreate", "PurchasedItemUpdate", "PurchasedItemResponse", "PurchasedItemFilterParams"]
 
-class PurchaseStatus(StrEnum):
+class PurchasedItemStatus(StrEnum):
     ACTIVE = "active"
     SUSPENDED = "suspended"
     EXPIRED = "expired"
@@ -25,7 +25,7 @@ class PurchasedItemSort(StrEnum):
 
 class PurchasedItemBase(BaseModel):
     service_id: int
-    status: PurchaseStatus = PurchaseStatus.ACTIVE
+    status: PurchasedItemStatus = PurchasedItemStatus.ACTIVE
     quantity: int = Field(default=1, ge=1)
     time_spent: int = 0
     transaction_id: int
@@ -36,7 +36,7 @@ class PurchasedItemCreate(PurchasedItemBase):
 
 
 class PurchasedItemUpdate(BaseModel):
-    status: Optional[PurchaseStatus] = None
+    status: Optional[PurchasedItemStatus] = None
     quantity: Optional[int] = None
     time_spent: Optional[int] = None
 
@@ -52,7 +52,7 @@ class PurchasedItemResponse(PurchasedItemBase):
 
 
 class PurchasedItemFilterParams(BaseModel):
-    status: Optional[PurchaseStatus] = None
+    status: Optional[PurchasedItemStatus] = None
     service_id: Optional[int] = None
     min_quantity: Optional[int] = None
     max_quantity: Optional[int] = None
