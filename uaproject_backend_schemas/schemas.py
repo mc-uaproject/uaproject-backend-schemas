@@ -1,5 +1,7 @@
 from enum import StrEnum
 
+from pydantic import BaseModel
+
 __all__ = ["SortOrder", "DefaultSort", "UserDefaultSort"]
 
 
@@ -19,3 +21,7 @@ class UserDefaultSort(StrEnum):
     CREATED_AT = DefaultSort.CREATED_AT
     UPDATED_AT = DefaultSort.UPDATED_AT
     USER_ID = "user_id"
+
+
+class RedirectUrlResponse(BaseModel):
+    url: str
