@@ -6,6 +6,7 @@ from uaproject_backend_schemas.payments.services.models import *  # noqa: F403
 from uaproject_backend_schemas.payments.transactions.models import *  # noqa: F403
 from uaproject_backend_schemas.punishments.models import *  # noqa: F403
 from uaproject_backend_schemas.users.models import *  # noqa: F403
+from uaproject_backend_schemas.users.roles.models import *  # noqa: F403
 from uaproject_backend_schemas.webhooks.models import *  # noqa: F403
 
 __all__ = [
