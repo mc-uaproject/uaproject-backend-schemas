@@ -1,0 +1,34 @@
+[tool.poetry]
+name = "new-backend-schemas"
+version = "0.1.0"
+description = ""
+authors = ["THEROER <theroer09@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pydantic = {extras = ["email"], version = "^2.10.6"}
+ruff = {extras = ["fix"], version = "^0.11.0"}
+vulture = "^2.14"
+sqlmodel = "^0.0.24"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+select = ["E", "F", "W", "C", "I", "N", "YTT"]
+exclude = ["venv", "__pycache__", "versions"]
+ignore = ["E501", "B010", "B022", "B028", "B904", "N805"]
+line-length = 100
+
+[tool.vulture]
+exclude = ["*.ini", "Dockerfile", "*.lock", "*.toml"]
+ignore_decorators = []
+ignore_names = ["model_config"]
+# make_whitelist = true
+min_confidence = 80
+paths = ["*"]
+sort_by_size = true
+# verbose = true
