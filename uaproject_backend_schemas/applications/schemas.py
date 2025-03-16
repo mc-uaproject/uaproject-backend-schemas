@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import List, Optional
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from uaproject_backend_schemas.schemas import UserDefaultSort
 
@@ -42,23 +42,20 @@ class ApplicationBase(BaseModel):
     conflict_reaction: Optional[str] = Field(None, max_length=1024)
     quiz_answer: Optional[str] = Field(None, max_length=1024)
 
-    @model_validator(mode="before")
+    @field_validator(
+        "launcher",
+        "server_source",
+        "private_server_experience",
+        "useful_skills",
+        "conflict_reaction",
+        "quiz_answer",
+        mode="before",
+    )
     @classmethod
-    def truncate_fields(cls, values):
-        max_lengths = {
-            "launcher": 32,
-            "server_source": 512,
-            "private_server_experience": 1024,
-            "useful_skills": 1024,
-            "conflict_reaction": 1024,
-            "quiz_answer": 1024,
-        }
-
-        for field, max_length in max_lengths.items():
-            if field in values and values[field] and isinstance(values[field], str):
-                values[field] = values[field][:max_length]
-
-        return values
+    def truncate_field(cls, v, field):
+        if isinstance(v, str) and field.field_info.max_length:
+            return v[: field.field_info.max_length]
+        return v
 
 
 class ApplicationCreate(ApplicationBase):
@@ -78,8 +75,7 @@ class ApplicationResponse(ApplicationBase):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ApplicationFilterParams(BaseModel):
