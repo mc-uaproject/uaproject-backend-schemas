@@ -2,7 +2,7 @@ from enum import StrEnum
 
 from pydantic import BaseModel
 
-__all__ = ["SortOrder", "DefaultSort", "UserDefaultSort"]
+__all__ = ["SortOrder", "DefaultSort", "UserDefaultSort", "RedirectUrlResponse"]
 
 
 class SortOrder(StrEnum):
