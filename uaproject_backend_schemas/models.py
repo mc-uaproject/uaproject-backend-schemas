@@ -20,6 +20,6 @@ __all__ = [
     "Service",  # noqa: F405
     "Transaction",  # noqa: F405
     "Donation",  # noqa: F405
-    "Punishments",  # noqa: F405
-    "PunishmentsConfig",  # noqa: F405
+    "Punishment",  # noqa: F405
+    "PunishmentConfig",  # noqa: F405
 ]
