@@ -1,10 +1,16 @@
 from typing import List
 
-from sqlmodel import JSON, Column, Field
+from sqlmodel import JSON, Column, Field, Relationship
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 
 __all__ = ["Role", "UserRoles"]
+
+
+class UserRoles(Base, table=True):
+    __tablename__ = "user_roles"
+    user_id: int = Field(foreign_key="users.id", primary_key=True)
+    role_id: int = Field(foreign_key="roles.id", primary_key=True)
 
 
 class Role(Base, IDMixin, TimestampsMixin, table=True):
@@ -15,8 +21,4 @@ class Role(Base, IDMixin, TimestampsMixin, table=True):
     permissions: List[str] = Field(sa_column=Column(JSON))
     weight: int = Field(default=0, index=True)
 
-
-class UserRoles(Base, table=True):
-    __tablename__ = "user_roles"
-    user_id: int = Field(foreign_key="users.id", primary_key=True)
-    role_id: int = Field(foreign_key="roles.id", primary_key=True)
+    roles: List["Role"] = Relationship(sa_relationship_kwargs={"secondary": UserRoles})

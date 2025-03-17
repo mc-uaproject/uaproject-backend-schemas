@@ -38,9 +38,9 @@ class Application(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=Tru
 
     status: ApplicationStatus = Field(
         sa_column=Column(
-            Enum(ApplicationStatus),
-            default=ApplicationStatus.NOT_SENT,
-            server_default=ApplicationStatus.NOT_SENT,
+            Enum(ApplicationStatus, native_enum=False),
+            default=ApplicationStatus.NOT_SENT.value,
+            server_default=ApplicationStatus.NOT_SENT.value,
         )
     )
 

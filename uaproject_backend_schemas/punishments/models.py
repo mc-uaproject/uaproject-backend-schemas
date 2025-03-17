@@ -69,7 +69,11 @@ class Punishment(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True
     admin_id: Optional[int] = Field(foreign_key="users.id", nullable=True)
     type: PunishmentType = Field(sa_column=Column(Enum(PunishmentType, native_enum=False)))
     status: PunishmentStatus = Field(
-        sa_column=Column(Enum(PunishmentStatus, native_enum=False), default=PunishmentStatus.ACTIVE)
+        sa_column=Column(
+            Enum(PunishmentStatus, native_enum=False),
+            default=PunishmentStatus.ACTIVE.value,
+            server_default=PunishmentStatus.ACTIVE.value,
+        )
     )
     reason: Optional[str] = Field(default=None)
     expires_at: Optional[datetime] = Field(sa_column=Column(DateTime, nullable=True))

@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Optional
 
-from sqlmodel import Field, Relationship
+from sqlalchemy import Enum
+from sqlmodel import Column, Field, Relationship
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.payments.purchases.schemas import PurchasedItemStatus
@@ -22,7 +23,13 @@ class PurchasedItem(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=T
     user_id: int = Field(foreign_key="users.id", nullable=False)
     service_id: int = Field(foreign_key="services.id", nullable=False)
     transaction_id: int = Field(foreign_key="transactions.id", nullable=False)
-    status: PurchasedItemStatus = Field(max_length=20, default=PurchasedItemStatus.ACTIVE)
+    status: PurchasedItemStatus = Field(
+        sa_column=Column(
+            Enum(PurchasedItemStatus, native_enum=False),
+            default=PurchasedItemStatus.ACTIVE.value,
+            server_default=PurchasedItemStatus.ACTIVE.value,
+        )
+    )
     quantity: int = Field(default=1, ge=1)
     time_spent: int = Field(default=0, ge=0)
 
