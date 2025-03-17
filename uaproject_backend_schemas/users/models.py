@@ -30,7 +30,7 @@ class User(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
     )
     is_superuser: Optional[bool] = Field(default=False, nullable=True)
 
-    roles: List["Role"] = Relationship(sa_relationship_kwargs={"secondary": UserRoles})
+    roles: List["Role"] = Relationship(sa_relationship_kwargs={"secondary": UserRoles.__table__})
 
     token: Optional["Token"] = Relationship(
         back_populates="user",
