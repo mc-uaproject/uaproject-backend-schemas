@@ -1,8 +1,11 @@
 from datetime import UTC, datetime
+from typing import Any, Literal
 
 from pydantic import BaseModel
 from sqlalchemy import Column, DateTime
 from sqlmodel import Field, SQLModel
+
+PayloadBoth = Literal["before", "after"]
 
 
 class Base(SQLModel): ...
@@ -22,6 +25,23 @@ class IDMixin(BaseModel):
         return f"<{self.__class__.__name__} id={self.id}>"
 
 
+class UsersIDMixin(IDMixin):
+    user_id: int
+
+
 class TimestampsMixin:
     created_at = Column(DateTime, default=utcnow, nullable=True)
     updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=True)
+
+
+class PayloadBaseModel(BaseModel):
+    action: str
+    scope: str
+    payload: dict[str, Any]
+
+
+class BothPayloadBaseModel(BaseModel):
+    payload: dict[Literal["before", "after"], dict[str, Any]]
+
+
+PayloadModels = PayloadBaseModel | BothPayloadBaseModel
