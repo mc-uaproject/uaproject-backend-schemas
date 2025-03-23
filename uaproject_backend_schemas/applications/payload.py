@@ -1,7 +1,5 @@
-
-
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -13,6 +11,15 @@ from uaproject_backend_schemas.base import (
     TimestampsMixin,
     UsersIDMixin,
 )
+
+__all__ = [
+    "ApplicationStatusPayload",
+    "ApplicationFormPayload",
+    "ApplicationFormPayloadFull",
+    "ApplicationFullMixins",
+    "ApplicationFieldEditableResponse",
+    "ApplicationStatusPayloadFull",
+]
 
 
 class ApplicationStatusPayload(UsersIDMixin):
@@ -49,12 +56,6 @@ class ApplicationFullMixins(ApplicationFormPayload, TimestampsMixin):
     """Mixin combining form payload with timestamp"""
 
     pass
-
-
-class EditableFieldsResponse(BaseModel):
-    """Response for retrieving editable fields"""
-
-    editable_fields: List[str]
 
 
 class ApplicationFieldEditableResponse(BaseModel):

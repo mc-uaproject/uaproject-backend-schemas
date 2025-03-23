@@ -14,6 +14,7 @@ __all__ = [
     "ApplicationUpdate",
     "ApplicationResponse",
     "ApplicationFilterParams",
+    "EditableFieldsResponse",
 ]
 
 
@@ -85,3 +86,9 @@ class ApplicationFilterParams(BaseModel):
     max_created_at: Optional[datetime] = None
     min_updated_at: Optional[datetime] = None
     max_updated_at: Optional[datetime] = None
+
+
+class EditableFieldsResponse(BaseModel):
+    """Response for retrieving editable fields"""
+
+    editable_fields: List[str]
