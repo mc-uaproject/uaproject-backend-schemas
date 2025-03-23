@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
 
 from uaproject_backend_schemas.schemas import UserDefaultSort
 
@@ -53,9 +53,9 @@ class ApplicationBase(BaseModel):
         mode="before",
     )
     @classmethod
-    def truncate_field(cls, v, field):
-        if isinstance(v, str) and field.field_info.max_length:
-            return v[: field.field_info.max_length]
+    def truncate_field(cls, v: Optional[str], info: ValidationInfo) -> Optional[str]:
+        if isinstance(v, str) and info.data.get("max_length"):
+            return v[: info.data["max_length"]]
         return v
 
 
