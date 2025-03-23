@@ -1,4 +1,17 @@
 from .models import Token, User
+from .payload import (
+    BaseUserPayload,
+    DiscordIdPayload,
+    DiscordIdPayloadFull,
+    MinecraftNicknamePayload,
+    MinecraftNicknamePayloadFull,
+    UserCreatedPayload,
+    UserCreatedPayloadFull,
+    UserRolesPayload,
+    UserRolesPayloadFull,
+    UserUpdatedPayload,
+    UserUpdatedPayloadFull,
+)
 from .roles import Role, RoleCreate, RoleResponse, RoleSort, RoleUpdate, UserRoles
 from .schemas import (
     TokenResponse,
@@ -28,4 +41,15 @@ __all__ = [
     "RoleCreate",
     "RoleUpdate",
     "RoleResponse",
+    "BaseUserPayload",
+    "UserCreatedPayload",
+    "UserUpdatedPayload",
+    "UserRolesPayload",
+    "UserCreatedPayloadFull",
+    "UserUpdatedPayloadFull",
+    "UserRolesPayloadFull",
+    "MinecraftNicknamePayload",
+    "DiscordIdPayload",
+    "MinecraftNicknamePayloadFull",
+    "DiscordIdPayloadFull",
 ]
