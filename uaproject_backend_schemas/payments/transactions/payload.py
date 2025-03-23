@@ -8,7 +8,8 @@ from uaproject_backend_schemas.base import (
     TimestampsMixin,
     UsersIDMixin,
 )
-from uaproject_backend_schemas.payments import TransactionType
+
+from .payload import TransactionType
 
 __all__ = [
     "TransactionBasePayload",
