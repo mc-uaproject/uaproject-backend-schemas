@@ -10,7 +10,6 @@ packages = [{ include = "uaproject_backend_schemas", from = "." }]
 python = "^3.12"
 pydantic = { extras = ["email"], version = "^2.10.6" }
 ruff = { extras = ["fix"], version = "^0.11.0" }
-vulture = "^2.14"
 sqlmodel = "^0.0.24"
 
 
