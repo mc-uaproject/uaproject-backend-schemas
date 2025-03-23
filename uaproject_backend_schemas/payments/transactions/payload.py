@@ -9,7 +9,7 @@ from uaproject_backend_schemas.base import (
     UsersIDMixin,
 )
 
-from .payload import TransactionType
+from .schemas import TransactionType
 
 __all__ = [
     "TransactionBasePayload",
