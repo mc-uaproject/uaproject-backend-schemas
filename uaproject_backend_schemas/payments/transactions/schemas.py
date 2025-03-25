@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Any, Dict, Optional
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 from uaproject_backend_schemas.schemas import SerializableDecimal, UserDefaultSort
 
@@ -36,7 +36,7 @@ class TransactionType(StrEnum):
 
 
 class TransactionBase(BaseModel):
-    amount: SerializableDecimal
+    amount: Optional[SerializableDecimal]
     recipient_id: int
     type: TransactionType
     description: Optional[str] = None
@@ -86,6 +86,7 @@ class TransferTransaction(TransactionBase):
 class PurchaseTransaction(TransactionBase):
     type: TransactionType = TransactionType.PURCHASE
     service_id: int
+    amount: Optional[SerializableDecimal] = Field(None, exclude=True)
 
     @field_validator("type")
     @classmethod
