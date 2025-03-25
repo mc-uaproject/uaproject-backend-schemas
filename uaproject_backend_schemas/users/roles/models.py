@@ -24,6 +24,6 @@ class Role(Base, IDMixin, TimestampsMixin, table=True):
     permissions: List[str] = Field(sa_column=Column(JSON))
     weight: int = Field(default=0, index=True)
 
-    roles: List["User"] = Relationship(
-        sa_relationship_kwargs={"secondary": UserRoles.__table__}, back_populates="roles"
+    users: List["User"] = Relationship(
+        back_populates="roles", sa_relationship_kwargs={"secondary": UserRoles.__table__}
     )
