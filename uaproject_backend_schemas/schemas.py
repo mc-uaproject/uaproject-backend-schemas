@@ -4,7 +4,14 @@ from typing import Any
 
 from pydantic import BaseModel, HttpUrl
 
-__all__ = ["SortOrder", "DefaultSort", "UserDefaultSort", "RedirectUrlResponse", "SerializableHttpUrl", "SerializableDecimal"]
+__all__ = [
+    "SortOrder",
+    "DefaultSort",
+    "UserDefaultSort",
+    "RedirectUrlResponse",
+    "SerializableHttpUrl",
+    "SerializableDecimal",
+]
 
 
 class SortOrder(StrEnum):
@@ -39,6 +46,13 @@ class SerializableHttpUrl(HttpUrl):
             return cls(value)
         return super().parse_obj(value)
 
+    @classmethod
+    def __get_pydantic_core_schema__(cls, handler):
+        return {
+            "type": "string",
+            "format": "httpurl",
+        }
+
 
 class SerializableDecimal(Decimal):
     def __str__(self):
@@ -49,3 +63,10 @@ class SerializableDecimal(Decimal):
         if isinstance(value, str):
             return cls(value)
         return super().parse_obj(value)
+
+    @classmethod
+    def __get_pydantic_core_schema__(cls, handler):
+        return {
+            "type": "string",
+            "format": "decimal",
+        }
