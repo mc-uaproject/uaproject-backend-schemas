@@ -86,7 +86,7 @@ class TransferTransaction(TransactionBase):
 class PurchaseTransaction(TransactionBase):
     type: TransactionType = TransactionType.PURCHASE
     service_id: int
-    amount: Optional[SerializableDecimal] = Field(None, exclude=True)
+    amount: Optional[SerializableDecimal] = None
 
     @field_validator("type")
     @classmethod
