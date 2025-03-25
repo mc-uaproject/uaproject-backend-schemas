@@ -47,7 +47,7 @@ class SerializableHttpUrl(HttpUrl):
         return super().parse_obj(value)
 
     @classmethod
-    def __get_pydantic_core_schema__(cls, handler):
+    def __get_pydantic_core_schema__(cls, source_type: Any, handler):
         return {
             "type": "string",
             "format": "httpurl",
@@ -65,7 +65,7 @@ class SerializableDecimal(Decimal):
         return super().parse_obj(value)
 
     @classmethod
-    def __get_pydantic_core_schema__(cls, handler):
+    def __get_pydantic_core_schema__(cls, source_type: Any, handler):
         return {
             "type": "string",
             "format": "decimal",
