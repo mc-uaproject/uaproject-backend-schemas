@@ -2,8 +2,8 @@ from decimal import Decimal
 from enum import StrEnum
 from typing import Any
 
-from pydantic import BaseModel, HttpUrl
-from pydantic_core import core_schema
+from pydantic import BaseModel, GetCoreSchemaHandler, GetJsonSchemaHandler, HttpUrl
+from pydantic_core import CoreSchema, core_schema
 
 __all__ = ["SortOrder", "DefaultSort", "UserDefaultSort", "RedirectUrlResponse"]
 
@@ -31,41 +31,22 @@ class RedirectUrlResponse(BaseModel):
 
 
 class SerializableHttpUrl(HttpUrl):
+    def __str__(self):
+        return str(self)
+
     @classmethod
-    def __get_pydantic_core_schema__(cls, source_type: Any, handler) -> core_schema.CoreSchema:
-        return core_schema.json_or_python_schema(
-            json_schema=core_schema.str_schema(),
-            python_schema=core_schema.union_schema(
-                [
-                    core_schema.is_instance_schema(cls),
-                    core_schema.no_info_plain_validator_function(
-                        lambda value: super().__new__(cls, str(value))
-                    ),
-                ]
-            ),
-            serialization=core_schema.plain_serializer_function_ser_schema(
-                lambda instance: str(instance), return_schema=core_schema.str_schema()
-            ),
-        )
+    def parse_obj(cls, value: Any) -> "SerializableHttpUrl":
+        if isinstance(value, str):
+            return cls(value)
+        return super().parse_obj(value)
 
 
 class SerializableDecimal(Decimal):
-    @classmethod
-    def __get_pydantic_core_schema__(cls, source_type: Any, handler) -> core_schema.CoreSchema:
-        return core_schema.json_or_python_schema(
-            json_schema=core_schema.str_schema(),
-            python_schema=core_schema.union_schema(
-                [
-                    core_schema.is_instance_schema(cls),
-                    core_schema.no_info_plain_validator_function(
-                        lambda value: super().__new__(cls, str(value))
-                    ),
-                ]
-            ),
-            serialization=core_schema.plain_serializer_function_ser_schema(
-                lambda instance: str(instance), return_schema=core_schema.str_schema()
-            ),
-        )
+    def __str__(self):
+        return str(self)
 
-    def __repr__(self):
-        return f"SerializableDecimal('{self}')"
+    @classmethod
+    def parse_obj(cls, value: Any) -> "SerializableDecimal":
+        if isinstance(value, str):
+            return cls(value)
+        return super().parse_obj(value)
