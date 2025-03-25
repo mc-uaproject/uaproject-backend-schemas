@@ -1,4 +1,3 @@
-from decimal import Decimal
 from typing import Any, Dict, Optional
 
 from uaproject_backend_schemas.base import (
@@ -8,6 +7,7 @@ from uaproject_backend_schemas.base import (
     TimestampsMixin,
     UsersIDMixin,
 )
+from uaproject_backend_schemas.schemas import SerializableDecimal
 
 from .schemas import TransactionType
 
@@ -26,7 +26,7 @@ __all__ = [
 class TransactionBasePayload(UsersIDMixin):
     """Base payload for transactions"""
 
-    amount: Decimal
+    amount: SerializableDecimal
     type: TransactionType
     description: Optional[str] = None
 
@@ -46,7 +46,7 @@ class TransactionTypePayload(TransactionBasePayload):
 
     id: int
     user_id: int
-    amount: Decimal
+    amount: SerializableDecimal
     type: TransactionType
     description: Optional[str] = None
 
@@ -56,7 +56,7 @@ class TransactionAmountPayload(TransactionBasePayload):
 
     id: int
     user_id: int
-    amount: Decimal
+    amount: SerializableDecimal
     type: TransactionType
     description: Optional[str] = None
 

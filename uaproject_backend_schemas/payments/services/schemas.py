@@ -1,11 +1,10 @@
 from datetime import datetime
-from decimal import Decimal
 from enum import StrEnum
 from typing import Optional
 
 from pydantic import BaseModel
 
-from uaproject_backend_schemas.schemas import UserDefaultSort
+from uaproject_backend_schemas.schemas import SerializableDecimal, UserDefaultSort
 
 __all__ = [
     "ServiceSort",
@@ -26,7 +25,7 @@ class ServiceSort(StrEnum):
 class ServiceBase(BaseModel):
     name: str
     description: Optional[str] = None
-    price: Decimal
+    price: SerializableDecimal
     currency: str = "UAH"
     is_active: bool = True
     category: Optional[str] = None
@@ -39,7 +38,7 @@ class ServiceCreate(ServiceBase):
 class ServiceUpdate(ServiceBase):
     name: Optional[str] = None
     description: Optional[str] = None
-    price: Optional[Decimal] = None
+    price: Optional[SerializableDecimal] = None
     currency: Optional[str] = None
     is_active: Optional[bool] = None
     category: Optional[str] = None

@@ -1,3 +1,4 @@
+from decimal import Decimal
 from enum import StrEnum
 from typing import Any
 
@@ -51,3 +52,33 @@ class SerializableHttpUrl(HttpUrl):
             return value
 
         return cls(value)
+
+
+class SerializableDecimal(Decimal):
+    @classmethod
+    def __get_pydantic_core_schema__(cls, _source_type: Any, _handler) -> core_schema.CoreSchema:
+        return core_schema.json_or_python_schema(
+            json_schema=core_schema.str_schema(),
+            python_schema=core_schema.union_schema(
+                [
+                    core_schema.is_instance_schema(cls),
+                    core_schema.no_info_plain_validator_function(cls.validate),
+                ]
+            ),
+            serialization=core_schema.plain_serializer_function_ser_schema(
+                lambda instance: str(instance), return_schema=core_schema.str_schema()
+            ),
+        )
+
+    @classmethod
+    def validate(cls, value: Any) -> "SerializableDecimal":
+        if isinstance(value, cls):
+            return value
+
+        try:
+            return cls(value)
+        except (TypeError, ValueError):
+            raise ValueError(f"Cannot convert {value} to Decimal")
+
+    def __repr__(self):
+        return f"SerializableDecimal('{self}')"

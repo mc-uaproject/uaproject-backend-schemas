@@ -1,25 +1,24 @@
 from datetime import datetime
-from decimal import Decimal
 from enum import StrEnum
 from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
 
-from uaproject_backend_schemas.schemas import UserDefaultSort
+from uaproject_backend_schemas.schemas import SerializableDecimal, UserDefaultSort
 
 __all__ = ["BalanceUpdate", "BalanceResponse", "BalanceFilterParams", "BalanceSort"]
 
 
 class BalanceUpdate(BaseModel):
-    amount: Optional[Decimal] = None
+    amount: Optional[SerializableDecimal] = None
 
 
 class BalanceResponse(BaseModel):
     id: int
     user_id: int
     identifier: UUID
-    amount: Decimal
+    amount: SerializableDecimal
     created_at: datetime
     updated_at: datetime
 
@@ -30,8 +29,8 @@ class BalanceResponse(BaseModel):
 
 class BalanceFilterParams(BaseModel):
     user_id: Optional[int] = None
-    min_amount: Optional[Decimal] = None
-    max_amount: Optional[Decimal] = None
+    min_amount: Optional[SerializableDecimal] = None
+    max_amount: Optional[SerializableDecimal] = None
 
 
 class BalanceSort(StrEnum):

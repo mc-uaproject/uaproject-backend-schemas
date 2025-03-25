@@ -1,9 +1,9 @@
-from decimal import Decimal
 from typing import Optional
 
 from sqlmodel import DECIMAL, Column, Field
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
+from uaproject_backend_schemas.schemas import SerializableDecimal
 from uaproject_backend_schemas.webhooks.mixins import WebhookPayloadMixin
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
 
@@ -16,7 +16,7 @@ class Donation(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True):
 
     user_id: int = Field(foreign_key="users.id", nullable=False)
     balance_id: int = Field(foreign_key="balances.id", nullable=False)
-    amount: Decimal = Field(sa_column=Column(DECIMAL(10, 2), nullable=False))
+    amount: SerializableDecimal = Field(sa_column=Column(DECIMAL(10, 2), nullable=False))
     currency: str = Field(max_length=3)
     donor_name: str = Field(max_length=255)
     donor_email: Optional[str] = Field(max_length=255, nullable=True)

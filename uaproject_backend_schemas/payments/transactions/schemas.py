@@ -1,11 +1,10 @@
 from datetime import datetime
-from decimal import Decimal
 from enum import StrEnum
 from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, field_validator
 
-from uaproject_backend_schemas.schemas import UserDefaultSort
+from uaproject_backend_schemas.schemas import SerializableDecimal, UserDefaultSort
 
 __all__ = [
     "TransactionType",
@@ -37,7 +36,7 @@ class TransactionType(StrEnum):
 
 
 class TransactionBase(BaseModel):
-    amount: Decimal
+    amount: SerializableDecimal
     recipient_id: int
     type: TransactionType
     description: Optional[str] = None
@@ -48,8 +47,8 @@ class TransactionBase(BaseModel):
 class TransactionFilterParams(BaseModel):
     user_id: Optional[int] = None
     type: Optional[TransactionType] = None
-    min_amount: Optional[Decimal] = None
-    max_amount: Optional[Decimal] = None
+    min_amount: Optional[SerializableDecimal] = None
+    max_amount: Optional[SerializableDecimal] = None
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
 
@@ -130,11 +129,11 @@ class DonationTransaction(TransactionBase):
     donor_email: Optional[str] = None
     source: Optional[str] = None
     original_currency: Optional[str] = None
-    original_amount: Optional[Decimal] = None
+    original_amount: Optional[SerializableDecimal] = None
 
 
 class TransactionUpdate(BaseModel):
-    amount: Optional[Decimal] = None
+    amount: Optional[SerializableDecimal] = None
     type: Optional[TransactionType] = None
     description: Optional[str] = None
     service_id: Optional[int] = None

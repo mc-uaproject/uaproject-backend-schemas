@@ -1,12 +1,11 @@
 from datetime import datetime
-from decimal import Decimal
 from enum import StrEnum
 from typing import Optional
 
 from pydantic import BaseModel, EmailStr, field_validator
 from pydantic import Field as PydanticField
 
-from uaproject_backend_schemas.schemas import UserDefaultSort
+from uaproject_backend_schemas.schemas import SerializableDecimal, UserDefaultSort
 
 __all__ = ["DonationSort", "DonationFilterParams", "DonationBase", "DonationCreate", "DonationUpdate", "DonationResponse"]
 
@@ -20,8 +19,8 @@ class DonationSort(StrEnum):
 
 class DonationFilterParams(BaseModel):
     user_id: Optional[int] = None
-    min_amount: Optional[Decimal] = None
-    max_amount: Optional[Decimal] = None
+    min_amount: Optional[SerializableDecimal] = None
+    max_amount: Optional[SerializableDecimal] = None
     currency: Optional[str] = PydanticField(None, min_length=3, max_length=3)
     source: Optional[str] = PydanticField(None, max_length=50)
 
@@ -40,7 +39,7 @@ class DonationFilterParams(BaseModel):
 
 
 class DonationBase(BaseModel):
-    amount: Decimal = PydanticField(..., gt=0)
+    amount: SerializableDecimal = PydanticField(..., gt=0)
     currency: str = PydanticField(..., min_length=3, max_length=3)
     donor_name: str = PydanticField(..., max_length=255)
     donor_email: EmailStr
@@ -55,7 +54,7 @@ class DonationCreate(DonationBase):
 
 
 class DonationUpdate(BaseModel):
-    amount: Optional[Decimal] = None
+    amount: Optional[SerializableDecimal] = None
     currency: Optional[str] = None
     donor_name: Optional[str] = None
     donor_email: Optional[EmailStr] = None

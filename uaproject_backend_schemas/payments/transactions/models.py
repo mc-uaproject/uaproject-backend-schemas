@@ -1,10 +1,10 @@
-from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from sqlmodel import DECIMAL, JSON, Column, Enum, Field, Relationship
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.payments.transactions.schemas import TransactionType
+from uaproject_backend_schemas.schemas import SerializableDecimal
 from uaproject_backend_schemas.users.models import User
 from uaproject_backend_schemas.webhooks.mixins import WebhookPayloadMixin
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
@@ -21,7 +21,7 @@ class Transaction(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=Tru
     __scope_prefix__ = "transaction"
 
     user_id: int = Field(foreign_key="users.id", nullable=False)
-    amount: Decimal = Field(sa_column=Column(DECIMAL(10, 2), nullable=False))
+    amount: SerializableDecimal = Field(sa_column=Column(DECIMAL(10, 2), nullable=False))
     type: TransactionType = Field(sa_column=Column(Enum(TransactionType, native_enum=False)))
     description: Optional[str] = Field(max_length=255, nullable=True)
     recipient_id: int = Field(foreign_key="users.id", nullable=False)
