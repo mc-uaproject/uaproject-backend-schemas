@@ -30,9 +30,9 @@ class RedirectUrlResponse(BaseModel):
     url: str
 
 
-class SerializableHttpUrl(HttpUrl):
+class SerializableHttpUrl(str, HttpUrl):
     @classmethod
-    def __get_pydantic_core_schema__(cls, _source_type: Any, _handler) -> core_schema.CoreSchema:
+    def __get_pydantic_core_schema__(cls, source_type: Any, handler) -> core_schema.CoreSchema:
         return core_schema.json_or_python_schema(
             json_schema=core_schema.str_schema(),
             python_schema=core_schema.union_schema(
@@ -47,9 +47,9 @@ class SerializableHttpUrl(HttpUrl):
         )
 
 
-class SerializableDecimal(Decimal):
+class SerializableDecimal(str, Decimal):
     @classmethod
-    def __get_pydantic_core_schema__(cls, _source_type: Any, _handler) -> core_schema.CoreSchema:
+    def __get_pydantic_core_schema__(cls, source_type: Any, handler) -> core_schema.CoreSchema:
         return core_schema.json_or_python_schema(
             json_schema=core_schema.str_schema(),
             python_schema=core_schema.union_schema(
