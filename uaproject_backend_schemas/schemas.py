@@ -38,20 +38,13 @@ class SerializableHttpUrl(HttpUrl):
             python_schema=core_schema.union_schema(
                 [
                     core_schema.is_instance_schema(cls),
-                    core_schema.no_info_plain_validator_function(cls.validate),
+                    core_schema.no_info_plain_validator_function(lambda value: cls(str(value))),
                 ]
             ),
             serialization=core_schema.plain_serializer_function_ser_schema(
                 lambda instance: str(instance), return_schema=core_schema.str_schema()
             ),
         )
-
-    @classmethod
-    def validate(cls, value: Any):
-        if isinstance(value, cls):
-            return value
-
-        return cls(value)
 
 
 class SerializableDecimal(Decimal):
@@ -62,23 +55,13 @@ class SerializableDecimal(Decimal):
             python_schema=core_schema.union_schema(
                 [
                     core_schema.is_instance_schema(cls),
-                    core_schema.no_info_plain_validator_function(cls.validate),
+                    core_schema.no_info_plain_validator_function(lambda value: cls(str(value))),
                 ]
             ),
             serialization=core_schema.plain_serializer_function_ser_schema(
                 lambda instance: str(instance), return_schema=core_schema.str_schema()
             ),
         )
-
-    @classmethod
-    def validate(cls, value: Any) -> "SerializableDecimal":
-        if isinstance(value, cls):
-            return value
-
-        try:
-            return cls(value)
-        except (TypeError, ValueError):
-            raise ValueError(f"Cannot convert {value} to Decimal")
 
     def __repr__(self):
         return f"SerializableDecimal('{self}')"
