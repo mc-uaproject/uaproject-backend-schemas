@@ -1,12 +1,12 @@
 import logging
 from typing import Dict
 
-from pydantic import HttpUrl
 from sqlalchemy import JSON, Column
 from sqlalchemy import Enum as SQLAlchemyEnum
 from sqlmodel import Field
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
+from uaproject_backend_schemas.schemas import SerializableHttpUrl
 from uaproject_backend_schemas.webhooks.mixins import WebhookPayloadMixin
 from uaproject_backend_schemas.webhooks.schemas import WebhookStatus
 
@@ -18,7 +18,7 @@ class Webhook(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
     __tablename__ = "webhooks"
     __scope_prefix__ = "webhook"
 
-    endpoint: HttpUrl = Field(sa_column=Column(JSON, nullable=False))
+    endpoint: SerializableHttpUrl = Field(sa_column=Column(JSON, nullable=False))
 
     status: WebhookStatus = Field(
         sa_column=Column(

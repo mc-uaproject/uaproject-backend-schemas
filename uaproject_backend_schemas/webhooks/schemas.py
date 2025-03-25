@@ -2,9 +2,9 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Dict, Optional
 
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel
 
-from uaproject_backend_schemas.schemas import UserDefaultSort
+from uaproject_backend_schemas.schemas import SerializableHttpUrl, UserDefaultSort
 
 __all__ = [
     "WebhookSort",
@@ -34,7 +34,7 @@ class WebhookStatus(StrEnum):
 
 
 class WebhookBase(BaseModel):
-    endpoint: HttpUrl
+    endpoint: SerializableHttpUrl
     scopes: Dict[str, bool]
     authorization: Optional[str] = None
 
