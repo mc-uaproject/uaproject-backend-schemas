@@ -37,7 +37,7 @@ class TransactionType(StrEnum):
 
 class TransactionBase(BaseModel):
     amount: Optional[SerializableDecimal]
-    recipient_id: int
+    recipient_id: Optional[int]
     type: TransactionType
     description: Optional[str] = None
     transaction_metadata: Optional[Dict[str, Any]] = None
