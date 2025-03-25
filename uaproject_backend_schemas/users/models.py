@@ -7,13 +7,14 @@ from sqlalchemy import BigInteger, Column
 from sqlmodel import Field, Relationship
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
-from uaproject_backend_schemas.users.roles.models import Role, UserRoles
+from uaproject_backend_schemas.users.roles import Role, UserRoles
 from uaproject_backend_schemas.webhooks.mixins import WebhookPayloadMixin
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.applications import Application
     from uaproject_backend_schemas.payments import Balance, Transaction
+    from uaproject_backend_schemas.punishments import Punishment
 
 __all__ = ["User", "Token"]
 
@@ -30,7 +31,9 @@ class User(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
     )
     is_superuser: Optional[bool] = Field(default=False, nullable=True)
 
-    roles: List["Role"] = Relationship(sa_relationship_kwargs={"secondary": UserRoles.__table__})
+    roles: List["Role"] = Relationship(
+        sa_relationship_kwargs={"secondary": UserRoles.__table__}, overlaps="roles"
+    )
 
     token: Optional["Token"] = Relationship(
         back_populates="user",
@@ -39,6 +42,8 @@ class User(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
             "lazy": "joined",
         },
     )
+
+    punishments: List["Punishment"] = Relationship(back_populates="user")
 
     balance: Optional["Balance"] = Relationship(
         back_populates="user", sa_relationship_kwargs={"uselist": False, "lazy": "joined"}
