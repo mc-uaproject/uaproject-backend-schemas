@@ -43,7 +43,9 @@ class User(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
         },
     )
 
-    punishments: List["Punishment"] = Relationship(back_populates="user")
+    punishments: List["Punishment"] = Relationship(
+        back_populates="user", sa_relationship_kwargs={"foreign_keys": "[Punishment.user_id]"}
+    )
 
     balance: Optional["Balance"] = Relationship(
         back_populates="user", sa_relationship_kwargs={"uselist": False, "lazy": "joined"}
