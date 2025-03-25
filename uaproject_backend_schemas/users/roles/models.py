@@ -1,8 +1,11 @@
-from typing import List
+from typing import TYPE_CHECKING, List
 
 from sqlmodel import JSON, Column, Field, Relationship
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
+
+if TYPE_CHECKING:
+    from uaproject_backend_schemas.users.models import User
 
 __all__ = ["Role", "UserRoles"]
 
@@ -21,6 +24,6 @@ class Role(Base, IDMixin, TimestampsMixin, table=True):
     permissions: List[str] = Field(sa_column=Column(JSON))
     weight: int = Field(default=0, index=True)
 
-    roles: List["Role"] = Relationship(
+    roles: List["User"] = Relationship(
         sa_relationship_kwargs={"secondary": UserRoles.__table__}, back_populates="roles"
     )
