@@ -12,7 +12,7 @@ from .payload import (
     UserUpdatedPayload,
     UserUpdatedPayloadFull,
 )
-from .roles import Role, RoleCreate, RoleResponse, RoleSort, RoleUpdate, UserRoles
+from .roles import Role, RoleCreate, RoleFilterParams, RoleResponse, RoleSort, RoleUpdate, UserRoles
 from .schemas import (
     TokenResponse,
     UserCreate,
@@ -41,6 +41,7 @@ __all__ = [
     "RoleCreate",
     "RoleUpdate",
     "RoleResponse",
+    "RoleFilterParams",
     "BaseUserPayload",
     "UserCreatedPayload",
     "UserUpdatedPayload",

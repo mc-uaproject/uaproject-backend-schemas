@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
-__all__ = ["RoleSort", "RoleCreate", "RoleUpdate", "RoleResponse"]
+__all__ = ["RoleSort", "RoleCreate", "RoleUpdate", "RoleFilterParams", "RoleResponse"]
 
 
 class RoleSort(StrEnum):
@@ -25,6 +25,13 @@ class RoleUpdate(BaseModel):
     display_name: Optional[str] = None
     permissions: Optional[List[str]] = None
     weight: Optional[int] = None
+
+
+class RoleFilterParams(BaseModel):
+    id: Optional[int] = None
+    name: Optional[str] = None
+    weight: Optional[int] = None
+    display_name: Optional[str] = None
 
 
 class RoleResponse(BaseModel):
