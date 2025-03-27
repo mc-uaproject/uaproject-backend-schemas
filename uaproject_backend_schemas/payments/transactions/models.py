@@ -30,7 +30,7 @@ class Transaction(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=Tru
     transaction_metadata: Optional[Dict[str, Any]] = Field(sa_column=Column(JSON, nullable=True))
 
     service: Optional["Service"] = Relationship(
-        sa_relationship_kwargs={"foreign_key": "[Transaction.service_id]"}
+        sa_relationship_kwargs={"foreign_keys": "[Transaction.service_id]"}
     )
     user: Optional["User"] = Relationship(
         back_populates="transactions",
