@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Any, Dict, Optional
 from sqlmodel import DECIMAL, JSON, Column, Enum, Field, Relationship
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
+from uaproject_backend_schemas.payments.services.models import Service
 from uaproject_backend_schemas.payments.transactions.schemas import TransactionType
 from uaproject_backend_schemas.schemas import SerializableDecimal
 from uaproject_backend_schemas.users.models import User
@@ -28,6 +29,9 @@ class Transaction(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=Tru
     service_id: Optional[int] = Field(foreign_key="services.id", nullable=True)
     transaction_metadata: Optional[Dict[str, Any]] = Field(sa_column=Column(JSON, nullable=True))
 
+    service: Optional["Service"] = Relationship(
+        sa_relationship_kwargs={"foreign_key": "[Transaction.service_id]"}
+    )
     user: Optional["User"] = Relationship(
         back_populates="transactions",
         sa_relationship_kwargs={"foreign_keys": "[Transaction.user_id]"},
