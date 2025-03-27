@@ -29,6 +29,7 @@ class BalanceResponse(BaseModel):
 
 class BalanceFilterParams(BaseModel):
     user_id: Optional[int] = None
+    identifier: Optional[UUID] = None
     min_amount: Optional[SerializableDecimal] = None
     max_amount: Optional[SerializableDecimal] = None
 
