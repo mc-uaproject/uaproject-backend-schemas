@@ -25,7 +25,9 @@ class User(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
 
     model_config = {"arbitrary_types_allowed": True}
 
-    discord_id: Optional[int] = Field(default=None, sa_column=Column(BigInteger(), index=True))
+    discord_id: Optional[int] = Field(
+        default=None, sa_column=Column(BigInteger(), index=True, unique=True)
+    )
     minecraft_nickname: Optional[str] = Field(
         default=None, index=True, nullable=True, max_length=16
     )
