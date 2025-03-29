@@ -36,7 +36,7 @@ class Webhook(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
     authorization: str | None = Field(sa_column=Column(JSON, default=None, nullable=True))
 
     user: Optional["User"] = Relationship(
-        back_populates="punishments",
+        back_populates="webhooks",
         sa_relationship_kwargs={"foreign_keys": "[Webhook.user_id]"},
     )
 
