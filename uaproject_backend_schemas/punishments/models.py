@@ -120,9 +120,7 @@ class Punishment(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True
 
     def is_expired(self) -> bool:
         """Check if the punishment has expired"""
-        if not self.expires_at:
-            return False
-        return datetime.now(UTC) > self.expires_at
+        return datetime.now(UTC) > self.expires_at if self.expires_at else False
 
     def revoke(self, admin_id: Optional[int] = None, reason: Optional[str] = None) -> None:
         """Revoke a punishment"""

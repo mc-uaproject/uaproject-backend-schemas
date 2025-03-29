@@ -20,6 +20,7 @@ __all__ = [
 
 class WebhookSort(StrEnum):
     ID = UserDefaultSort.ID
+    USER_ID = UserDefaultSort.USER_ID
     CREATED_AT = UserDefaultSort.CREATED_AT
     UPDATED_AT = UserDefaultSort.UPDATED_AT
     STATUS = "status"
@@ -36,6 +37,7 @@ class WebhookStatus(StrEnum):
 class WebhookBase(BaseModel):
     endpoint: SerializableHttpUrl
     scopes: Dict[str, bool]
+    user_id: Optional[int] = None
     authorization: Optional[str] = None
 
 
@@ -55,6 +57,7 @@ class WebhookStage(StrEnum):
 
 class WebhookResponse(WebhookBase):
     id: int
+    user_id: Optional[int]
     status: WebhookStatus
     created_at: datetime
     updated_at: datetime
