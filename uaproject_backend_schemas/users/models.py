@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from uaproject_backend_schemas.applications import Application
     from uaproject_backend_schemas.payments import Balance, Transaction
     from uaproject_backend_schemas.punishments import Punishment
+    from uaproject_backend_schemas.webhooks.models import Webhook
 
 __all__ = ["User", "Token"]
 
@@ -63,6 +64,9 @@ class User(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
     received_transactions: List["Transaction"] = Relationship(
         back_populates="recipient",
         sa_relationship_kwargs={"foreign_keys": "[Transaction.recipient_id]"},
+    )
+    webhooks: List["Webhook"] = Relationship(
+        back_populates="user", sa_relationship_kwargs={"foreign_keys": "[Webhook.user_id]"}
     )
 
     @model_validator(mode="before")
