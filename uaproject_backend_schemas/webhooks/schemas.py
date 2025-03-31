@@ -46,6 +46,8 @@ class WebhookCreate(WebhookBase):
 
 
 class WebhookUpdate(WebhookBase):
+    endpoint: Optional[SerializableHttpUrl] = None
+    scopes: Optional[Dict[str, bool]] = None
     status: Optional[WebhookStatus] = None
 
 

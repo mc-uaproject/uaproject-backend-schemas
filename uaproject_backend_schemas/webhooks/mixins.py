@@ -59,13 +59,11 @@ class WebhookPayloadMixin:
         fields_set = set(fields) if fields is not None else None
 
         model_fields = set(cls.__table__.columns.keys())
-        invalid_triggers = trigger_fields_set - model_fields
-        if invalid_triggers:
+        if invalid_triggers := trigger_fields_set - model_fields:
             raise ValueError(f"Invalid trigger fields for {cls.__name__}: {invalid_triggers}")
 
         if fields_set is not None:
-            invalid_fields = fields_set - model_fields
-            if invalid_fields:
+            if invalid_fields := fields_set - model_fields:
                 raise ValueError(f"Invalid payload fields for {cls.__name__}: {invalid_fields}")
 
         scopes[scope_name] = WebhookScopeFields(
