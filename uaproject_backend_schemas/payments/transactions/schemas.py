@@ -42,6 +42,7 @@ class TransactionBase(BaseModel):
     description: Optional[str] = None
     transaction_metadata: Optional[Dict[str, Any]] = None
     user_id: Optional[int] = None
+    service_id: Optional[int] = None
 
 
 class TransactionFilterParams(BaseModel):
