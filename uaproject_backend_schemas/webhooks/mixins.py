@@ -212,7 +212,7 @@ class WebhookPayloadMixin:
                 continue
 
             if hasattr(self, rel_name):
-                session.refresh(self, options=[joinedload(rel_name)])
+                session.refresh(self, options=[joinedload([rel_name])])
 
                 rel_object = getattr(self, rel_name)
                 if rel_object is not None:
