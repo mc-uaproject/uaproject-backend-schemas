@@ -53,7 +53,15 @@ class Transaction(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=Tru
                 "recipient_id",
                 "service_id",
             },
-            fields={"id", "user_id", "amount", "type", "description"},
+            fields={"id", "user_id", "amount", "type", "description", "service"},
+            relationships={
+                "service": {
+                    "fields": ["id", "name", "pricw"],
+                    "condition": "service_id",
+                    "condition_value": None,
+                    "condition_operator": "is not",
+                },
+            },
             stage=WebhookStage.AFTER,
         )
         cls.register_scope(

@@ -5,13 +5,21 @@ from sqlalchemy import inspect
 
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
 
-__all__ = ["WebhookScopeFields", "PayloadType", "WebhookPayloadMixin"]
+__all__ = ["WebhookScopeFields", "PayloadType", "WebhookPayloadMixin", "RelationshipConfig"]
+
+
+class RelationshipConfig(BaseModel):
+    fields: Optional[List[str]] = None
+    condition: Optional[str] = None
+    condition_value: Optional[Any] = None
+    condition_operator: str = "=="
 
 
 class WebhookScopeFields(BaseModel):
     trigger_fields: List[str]
     fields: Optional[List[str]] = None
     stage: WebhookStage = WebhookStage.AFTER
+    relationships: Optional[Dict[str, RelationshipConfig]] = None
 
 
 PayloadType = Union[Dict[str, Any], Dict[Literal["before", "after"], Dict[str, Any]]]
@@ -35,17 +43,20 @@ class WebhookPayloadMixin:
         scope_name: str,
         trigger_fields: List[str] | Set[str],
         fields: List[str] | Set[str] | None = None,
+        relationships: Dict[str, Dict[str, Any]] | None = None,
         stage: WebhookStage = WebhookStage.AFTER,
     ) -> None:
         """
         Register a new scope for the model with specified
-        trigger fields and optional payload fields.
+        trigger fields, optional payload fields and relationships.
 
         Args:
             scope_name: Unique identifier for the scope
             trigger_fields: Fields that will trigger the webhook when modified
             fields: Optional specific fields to include in the payload.
                    If None, all fields will be included.
+            relationships: Optional dictionary mapping relationship names to their configurations
+                   Example: {"service": {"fields": ["id", "name"], "condition": "service_id", "condition_value": 0, "condition_operator": ">"}}
             stage: WebhookStage indicating when the webhook should be triggered
                   and what data should be included in the payload
         """
@@ -63,12 +74,26 @@ class WebhookPayloadMixin:
             raise ValueError(f"Invalid trigger fields for {cls.__name__}: {invalid_triggers}")
 
         if fields_set is not None:
-            if invalid_fields := fields_set - model_fields:
+            fields_to_check = fields_set.copy()
+            relationship_names = set()
+
+            if relationships:
+                relationship_names = set(relationships.keys())
+                fields_to_check = fields_set - relationship_names
+
+            if invalid_fields := fields_to_check - model_fields:
                 raise ValueError(f"Invalid payload fields for {cls.__name__}: {invalid_fields}")
 
+        relationship_configs = None
+        if relationships:
+            relationship_configs = {
+                rel_name: RelationshipConfig(**rel_config)
+                for rel_name, rel_config in relationships.items()
+            }
         scopes[scope_name] = WebhookScopeFields(
             trigger_fields=list(trigger_fields_set),
             fields=list(fields_set) if fields_set else None,
+            relationships=relationship_configs,
             stage=stage,
         )
 
@@ -113,31 +138,107 @@ class WebhookPayloadMixin:
             set(scope_config.fields) if scope_config.fields else set(self.__table__.columns.keys())
         )
 
+        relationships_to_load = scope_config.relationships or {}
+
         if scope_config.stage == WebhookStage.BOTH:
             return {
-                "before": self._get_payload_state(fields_to_include, state="before"),
-                "after": self._get_payload_state(fields_to_include, state="after"),
+                "before": self._get_payload_state(
+                    fields_to_include, relationships_to_load, state="before"
+                ),
+                "after": self._get_payload_state(
+                    fields_to_include, relationships_to_load, state="after"
+                ),
             }
 
         state = "before" if scope_config.stage == WebhookStage.BEFORE else "after"
-        return self._get_payload_state(fields_to_include, state)
+        return self._get_payload_state(fields_to_include, relationships_to_load, state)
 
     def _get_payload_state(
-        self, fields: Set[str], state: Literal["before", "after"]
+        self,
+        fields: Set[str],
+        relationships: Dict[str, RelationshipConfig],
+        state: Literal["before", "after"],
     ) -> Dict[str, Any]:
-        """Get payload for specified fields in the requested state"""
+        """Get payload for specified fields in the requested state including relationships"""
         inspector = inspect(self)
-        payload = {}
+        payload = self._process_fields(inspector, fields, relationships, state)
+        self._process_relationships(payload, relationships)
+        return payload
 
+    def _process_fields(
+        self,
+        inspector,
+        fields: Set[str],
+        relationships: Dict[str, RelationshipConfig],
+        state: Literal["before", "after"],
+    ) -> Dict[str, Any]:
+        """Process fields and add them to the payload"""
+        payload = {}
         for field in fields:
+            if field in relationships:
+                continue
+
             if hasattr(inspector.attrs, field):
                 history = getattr(inspector.attrs, field).history
-
-                if state == "before":
-                    value = history.deleted[0] if history.deleted else getattr(self, field)
-                else:
-                    value = history.added[0] if history.added else getattr(self, field)
-
+                value = (
+                    history.deleted[0]
+                    if history.deleted
+                    else getattr(self, field)
+                    if state == "before"
+                    else history.added[0]
+                    if history.added
+                    else getattr(self, field)
+                )
                 payload[field] = value
-
         return payload
+
+    def _process_relationships(
+        self,
+        payload: Dict[str, Any],
+        relationships: Dict[str, RelationshipConfig],
+    ) -> None:
+        """Process relationships and add them to the payload"""
+        for rel_name, rel_config in relationships.items():
+            if not self._is_condition_met(rel_config):
+                continue
+
+            if hasattr(self, rel_name):
+                rel_object = getattr(self, rel_name)
+                if rel_object is not None:
+                    payload[rel_name] = self._get_relationship_data(rel_object, rel_config)
+
+    def _is_condition_met(self, rel_config: RelationshipConfig) -> bool:
+        """Check if the condition for a relationship is met"""
+        if not rel_config.condition:
+            return True
+
+        condition_field = rel_config.condition
+        condition_value = rel_config.condition_value
+        condition_operator = rel_config.condition_operator
+        field_value = getattr(self, condition_field)
+
+        operators = {
+            "==": field_value == condition_value,
+            "!=": field_value != condition_value,
+            ">": field_value > condition_value,
+            "<": field_value < condition_value,
+            ">=": field_value >= condition_value,
+            "<=": field_value <= condition_value,
+            "is": field_value is condition_value,
+            "is not": field_value is not condition_value,
+        }
+        return operators.get(condition_operator, False)
+
+    def _get_relationship_data(
+        self, rel_object: Any, rel_config: RelationshipConfig
+    ) -> Dict[str, Any]:
+        """Get data for a relationship based on its configuration"""
+        if rel_config.fields:
+            return {
+                rel_field: getattr(rel_object, rel_field)
+                for rel_field in rel_config.fields
+                if hasattr(rel_object, rel_field)
+            }
+        if hasattr(rel_object, "to_dict"):
+            return rel_object.to_dict()
+        return {key: value for key, value in rel_object.__dict__.items() if not key.startswith("_")}
