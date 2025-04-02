@@ -136,7 +136,7 @@ class WebhookPayloadMixin:
 
         return triggered_scopes
 
-    def get_payload_for_scope(
+    async def get_payload_for_scope(
         self,
         session: AsyncSession,
         scope_name: str,
@@ -162,24 +162,24 @@ class WebhookPayloadMixin:
 
         if scope_config.stage == WebhookStage.BOTH:
             return {
-                "before": self._get_payload_state(
+                "before": await self._get_payload_state(
                     session,
                     fields_to_include,
                     relationships_to_load,
                     scope_changes,
                     state="before",
                 ),
-                "after": self._get_payload_state(
+                "after": await self._get_payload_state(
                     session, fields_to_include, relationships_to_load, scope_changes, state="after"
                 ),
             }
 
         state = "before" if scope_config.stage == WebhookStage.BEFORE else "after"
-        return self._get_payload_state(
+        return await self._get_payload_state(
             session, fields_to_include, relationships_to_load, scope_changes, state
         )
 
-    def _get_payload_state(
+    async def _get_payload_state(
         self,
         session: AsyncSession,
         fields: Set[str],
@@ -189,7 +189,7 @@ class WebhookPayloadMixin:
     ) -> Dict[str, Any]:
         """Get payload for specified fields in the requested state including relationships"""
         payload = self._process_fields(scope_changes, fields, relationships, state)
-        self._process_relationships(session, payload, relationships)
+        await self._process_relationships(session, payload, relationships)
         return payload
 
     def _process_fields(
