@@ -3,6 +3,8 @@ from typing import Any, Dict, List, Literal, Optional, Set, Union
 
 from pydantic import BaseModel
 from sqlalchemy import inspect
+from sqlalchemy.orm import joinedload
+from sqlmodel import Session
 
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
 
@@ -125,7 +127,7 @@ class WebhookPayloadMixin:
         scopes = self.__class__.get_webhook_scopes()
         return [scope_name for scope_name in scopes if self.is_webhook_triggered(scope_name)]
 
-    def get_payload_for_scope(self, scope_name: str) -> PayloadType:
+    def get_payload_for_scope(self, session: Session, scope_name: str) -> PayloadType:
         """
         Get the payload for the specified scope based on its stage configuration.
 
@@ -155,10 +157,11 @@ class WebhookPayloadMixin:
             }
 
         state = "before" if scope_config.stage == WebhookStage.BEFORE else "after"
-        return self._get_payload_state(fields_to_include, relationships_to_load, state)
+        return self._get_payload_state(session, fields_to_include, relationships_to_load, state)
 
     def _get_payload_state(
         self,
+        session: Session,
         fields: Set[str],
         relationships: Dict[str, RelationshipConfig],
         state: Literal["before", "after"],
@@ -166,7 +169,7 @@ class WebhookPayloadMixin:
         """Get payload for specified fields in the requested state including relationships"""
         inspector = inspect(self)
         payload = self._process_fields(inspector, fields, relationships, state)
-        self._process_relationships(payload, relationships)
+        self._process_relationships(session, payload, relationships)
         return payload
 
     def _process_fields(
@@ -198,15 +201,19 @@ class WebhookPayloadMixin:
 
     def _process_relationships(
         self,
+        session: Session,
         payload: Dict[str, Any],
         relationships: Dict[str, RelationshipConfig],
     ) -> None:
         """Process relationships and add them to the payload"""
+
         for rel_name, rel_config in relationships.items():
             if not self._is_condition_met(rel_config):
                 continue
 
             if hasattr(self, rel_name):
+                session.refresh(self, options=[joinedload(rel_name)])
+
                 rel_object = getattr(self, rel_name)
                 if rel_object is not None:
                     payload[rel_name] = self._get_relationship_data(rel_object, rel_config)
@@ -223,7 +230,9 @@ class WebhookPayloadMixin:
 
         return self._evaluate_condition(field_value, condition_value, condition_operator)
 
-    def _evaluate_condition(self, field_value: Any, condition_value: Any, condition_operator: str) -> bool:
+    def _evaluate_condition(
+        self, field_value: Any, condition_value: Any, condition_operator: str
+    ) -> bool:
         """Evaluate the condition based on the operator"""
         try:
             if condition_operator == "==":
