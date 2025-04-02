@@ -103,33 +103,45 @@ class WebhookPayloadMixin:
             stage=stage,
         )
 
-    def is_webhook_triggered(self, scope_name: str) -> bool:
-        """Check if the webhook should be triggered for the specified scope"""
+    def get_changes(self, scope_name: str) -> Dict[str, Dict[Literal["before", "after"], Any]]:
+        """Check if the webhook should be triggered for the specified scope and return changed fields with their states"""
         scopes = self.__class__.get_webhook_scopes()
         scope_config = scopes.get(scope_name)
 
         if not scope_config:
-            return False
+            return {}
 
         inspector = inspect(self)
-        changed_fields = set()
+        changed_fields = {}
 
         for field in scope_config.trigger_fields:
             if hasattr(inspector.attrs, field):
                 history = getattr(inspector.attrs, field).history
-                print(f"Field: {field}, History: {history}")
                 if history.has_changes():
-                    changed_fields.add(field)
+                    changed_fields[field] = {
+                        "before": history.deleted[0] if history.deleted else None,
+                        "after": history.added[0] if history.added else getattr(self, field),
+                    }
 
-        print(f"Changed fields for scope '{scope_name}': {changed_fields}")
-        return bool(changed_fields)
+        return changed_fields
 
-    def get_triggered_scopes(self) -> List[str]:
-        """Get all scopes that should be triggered based on field changes"""
+    def get_triggered_scopes(self) -> Dict[str, Dict[str, Dict[Literal["before", "after"], Any]]]:
+        """Get all scopes that should be triggered based on field changes and their states"""
         scopes = self.__class__.get_webhook_scopes()
-        return [scope_name for scope_name in scopes if self.is_webhook_triggered(scope_name)]
+        triggered_scopes = {}
 
-    def get_payload_for_scope(self, session: AsyncSession, scope_name: str) -> PayloadType:
+        for scope_name in scopes:
+            if changes := self.get_changes(scope_name):
+                triggered_scopes[scope_name] = changes
+
+        return triggered_scopes
+
+    def get_payload_for_scope(
+        self,
+        session: AsyncSession,
+        scope_name: str,
+        scope_changes: Dict[str, Dict[Literal["before", "after"], Any]],
+    ) -> PayloadType:
         """
         Get the payload for the specified scope based on its stage configuration.
 
@@ -151,53 +163,50 @@ class WebhookPayloadMixin:
         if scope_config.stage == WebhookStage.BOTH:
             return {
                 "before": self._get_payload_state(
-                    fields_to_include, relationships_to_load, state="before"
+                    session,
+                    fields_to_include,
+                    relationships_to_load,
+                    scope_changes,
+                    state="before",
                 ),
                 "after": self._get_payload_state(
-                    fields_to_include, relationships_to_load, state="after"
+                    session, fields_to_include, relationships_to_load, scope_changes, state="after"
                 ),
             }
 
         state = "before" if scope_config.stage == WebhookStage.BEFORE else "after"
-        return self._get_payload_state(session, fields_to_include, relationships_to_load, state)
+        return self._get_payload_state(
+            session, fields_to_include, relationships_to_load, scope_changes, state
+        )
 
     def _get_payload_state(
         self,
         session: AsyncSession,
         fields: Set[str],
         relationships: Dict[str, RelationshipConfig],
+        scope_changes: Dict[str, Dict[Literal["before", "after"], Any]],
         state: Literal["before", "after"],
     ) -> Dict[str, Any]:
         """Get payload for specified fields in the requested state including relationships"""
-        inspector = inspect(self)
-        payload = self._process_fields(inspector, fields, relationships, state)
+        payload = self._process_fields(scope_changes, fields, relationships, state)
         self._process_relationships(session, payload, relationships)
         return payload
 
     def _process_fields(
         self,
-        inspector,
+        scopes_changes: Dict[str, Dict[Literal["before", "after"], Any]],
         fields: Set[str],
         relationships: Dict[str, RelationshipConfig],
         state: Literal["before", "after"],
     ) -> Dict[str, Any]:
-        """Process fields and add them to the payload"""
+        """Process fields and add them to the payload using scope changes"""
         payload = {}
         for field in fields:
             if field in relationships:
                 continue
 
-            if hasattr(inspector.attrs, field):
-                history = getattr(inspector.attrs, field).history
-                value = (
-                    history.deleted[0]
-                    if history.deleted
-                    else getattr(self, field)
-                    if state == "before"
-                    else history.added[0]
-                    if history.added
-                    else getattr(self, field)
-                )
+            if field in scopes_changes:
+                value = scopes_changes[field].get(state, getattr(self, field))
                 payload[field] = value
         return payload
 
