@@ -3,8 +3,8 @@ from typing import Any, Dict, List, Literal, Optional, Set, Union
 
 from pydantic import BaseModel
 from sqlalchemy import inspect
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
-from sqlmodel import Session
 
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
 
@@ -127,7 +127,7 @@ class WebhookPayloadMixin:
         scopes = self.__class__.get_webhook_scopes()
         return [scope_name for scope_name in scopes if self.is_webhook_triggered(scope_name)]
 
-    def get_payload_for_scope(self, session: Session, scope_name: str) -> PayloadType:
+    def get_payload_for_scope(self, session: AsyncSession, scope_name: str) -> PayloadType:
         """
         Get the payload for the specified scope based on its stage configuration.
 
@@ -161,7 +161,7 @@ class WebhookPayloadMixin:
 
     def _get_payload_state(
         self,
-        session: Session,
+        session: AsyncSession,
         fields: Set[str],
         relationships: Dict[str, RelationshipConfig],
         state: Literal["before", "after"],
@@ -199,9 +199,9 @@ class WebhookPayloadMixin:
                 payload[field] = value
         return payload
 
-    def _process_relationships(
+    async def _process_relationships(
         self,
-        session: Session,
+        session: AsyncSession,
         payload: Dict[str, Any],
         relationships: Dict[str, RelationshipConfig],
     ) -> None:
@@ -212,7 +212,7 @@ class WebhookPayloadMixin:
                 continue
 
             if hasattr(self, rel_name):
-                session.refresh(self, options=[joinedload([rel_name])])
+                await session.refresh(self, options=[joinedload([rel_name])])
 
                 rel_object = getattr(self, rel_name)
                 if rel_object is not None:
