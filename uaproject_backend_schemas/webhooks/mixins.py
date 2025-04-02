@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Dict, List, Literal, Optional, Set, Union
 
 from pydantic import BaseModel
@@ -6,6 +7,9 @@ from sqlalchemy import inspect
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
 
 __all__ = ["WebhookScopeFields", "PayloadType", "WebhookPayloadMixin", "RelationshipConfig"]
+
+
+logger = logging.getLogger(__name__)
 
 
 class RelationshipConfig(BaseModel):
@@ -207,7 +211,7 @@ class WebhookPayloadMixin:
                 if rel_object is not None:
                     payload[rel_name] = self._get_relationship_data(rel_object, rel_config)
 
-    def _is_condition_met(self, rel_config: RelationshipConfig) -> bool:
+    def is_condition_met(self, rel_config: RelationshipConfig) -> bool:
         """Check if the condition for a relationship is met"""
         if not rel_config.condition:
             return True
@@ -217,17 +221,35 @@ class WebhookPayloadMixin:
         condition_operator = rel_config.condition_operator
         field_value = getattr(self, condition_field)
 
-        operators = {
-            "==": field_value == condition_value,
-            "!=": field_value != condition_value,
-            ">": field_value > condition_value,
-            "<": field_value < condition_value,
-            ">=": field_value >= condition_value,
-            "<=": field_value <= condition_value,
-            "is": field_value is condition_value,
-            "is not": field_value is not condition_value,
-        }
-        return operators.get(condition_operator, False)
+        return self._evaluate_condition(field_value, condition_value, condition_operator)
+
+    def _evaluate_condition(self, field_value: Any, condition_value: Any, condition_operator: str) -> bool:
+        """Evaluate the condition based on the operator"""
+        try:
+            if condition_operator == "==":
+                return field_value == condition_value
+            elif condition_operator == "!=":
+                return field_value != condition_value
+            elif condition_operator == ">":
+                return field_value > condition_value
+            elif condition_operator == "<":
+                return field_value < condition_value
+            elif condition_operator == ">=":
+                return field_value >= condition_value
+            elif condition_operator == "<=":
+                return field_value <= condition_value
+            elif condition_operator == "is not":
+                return field_value is not condition_value
+            elif condition_operator == "is":
+                return field_value is condition_value
+            else:
+                return False
+        except TypeError:
+            logger.error(
+                f"Condition check failed for field with value '{field_value}' "
+                f"and condition value '{condition_value}'"
+            )
+            return False
 
     def _get_relationship_data(
         self, rel_object: Any, rel_config: RelationshipConfig

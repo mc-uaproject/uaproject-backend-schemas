@@ -4,6 +4,7 @@ from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, field_validator
 
+from uaproject_backend_schemas.payments.services.schemas import ServiceResponse
 from uaproject_backend_schemas.schemas import SerializableDecimal, UserDefaultSort
 
 __all__ = [
@@ -147,6 +148,7 @@ class TransactionResponse(TransactionBase):
     id: int
     recipient_id: int
     service_id: Optional[int] = None
+    service: Optional[ServiceResponse] = None
     created_at: datetime = datetime.now()
     updated_at: datetime = datetime.now()
 

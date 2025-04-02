@@ -56,7 +56,7 @@ class Transaction(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=Tru
             fields={"id", "user_id", "amount", "type", "description", "service"},
             relationships={
                 "service": {
-                    "fields": ["id", "name", "pricw"],
+                    "fields": ["id", "name", "price"],
                     "condition": "service_id",
                     "condition_value": None,
                     "condition_operator": "is not",
