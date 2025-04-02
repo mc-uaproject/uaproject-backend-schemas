@@ -117,9 +117,11 @@ class WebhookPayloadMixin:
         for field in scope_config.trigger_fields:
             if hasattr(inspector.attrs, field):
                 history = getattr(inspector.attrs, field).history
+                print(f"Field: {field}, History: {history}")
                 if history.has_changes():
                     changed_fields.add(field)
 
+        print(f"Changed fields for scope '{scope_name}': {changed_fields}")
         return bool(changed_fields)
 
     def get_triggered_scopes(self) -> List[str]:
