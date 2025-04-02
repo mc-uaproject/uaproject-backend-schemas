@@ -211,7 +211,7 @@ class WebhookPayloadMixin:
                 if rel_object is not None:
                     payload[rel_name] = self._get_relationship_data(rel_object, rel_config)
 
-    def is_condition_met(self, rel_config: RelationshipConfig) -> bool:
+    def _is_condition_met(self, rel_config: RelationshipConfig) -> bool:
         """Check if the condition for a relationship is met"""
         if not rel_config.condition:
             return True
