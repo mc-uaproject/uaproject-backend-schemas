@@ -243,12 +243,13 @@ class WebhookPayloadMixin:
                 continue
 
             if field in scope_changes:
-                value = (
-                    scope_changes[field].get(state, None)
-                    or scope_changes["_untracked"].get(field, {}).get(state, None)
-                ) or getattr(self, field)
+                value = scope_changes[field].get(state, None)
+            elif field in scope_changes.get("_untracked", {}):
+                value = scope_changes["_untracked"][field].get(state, None)
+            else:
+                value = getattr(self, field, None)
 
-                payload[field] = value
+            payload[field] = value
 
         print(payload)
         return payload
