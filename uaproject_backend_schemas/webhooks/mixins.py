@@ -96,7 +96,7 @@ class WebhookPayloadMixin:
         relationship_configs = None
         if relationships:
             relationship_configs = {
-                rel_name: RelationshipConfig(**rel_config)
+                rel_name: RelationshipConfig(**rel_config.copy())
                 for rel_name, rel_config in relationships.items()
             }
         scopes[scope_name] = WebhookScopeFields(
