@@ -141,7 +141,7 @@ class WebhookPayloadMixin:
             changes, unchanged = self.get_changes(scope_name)
             if changes:
                 triggered_scopes[scope_name] = changes
-                triggered_scopes[scope_name]["unchanged"](unchanged)
+                triggered_scopes[scope_name]["unchanged"] = unchanged
 
         return triggered_scopes
 
