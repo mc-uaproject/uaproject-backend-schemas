@@ -260,16 +260,19 @@ class WebhookPayloadMixin:
     ) -> None:
         """Process relationships and add them to the payload"""
 
-        for rel_name, rel_config in relationships.items():
-            if not self._is_condition_met(rel_config):
-                continue
+        try:
+            for rel_name, rel_config in relationships.items():
+                if not self._is_condition_met(rel_config):
+                    continue
 
-            if hasattr(self, rel_name):
-                await session.refresh(self, options=[joinedload([rel_name])])
+                if hasattr(self, rel_name, None):
+                    await session.refresh(self, options=[joinedload([rel_name])])
 
-                rel_object = getattr(self, rel_name)
-                if rel_object is not None:
-                    payload[rel_name] = self._get_relationship_data(rel_object, rel_config)
+                    rel_object = getattr(self, rel_name)
+                    if rel_object is not None:
+                        payload[rel_name] = self._get_relationship_data(rel_object, rel_config)
+        except Exception as e:
+            logger.exception(f"Error processing relationships for {self.__class__.__name__}: {e}")
 
     def _is_condition_met(self, rel_config: RelationshipConfig) -> bool:
         """Check if the condition for a relationship is met"""
