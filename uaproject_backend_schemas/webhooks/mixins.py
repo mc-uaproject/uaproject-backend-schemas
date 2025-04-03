@@ -262,9 +262,7 @@ class WebhookPayloadMixin:
 
         try:
             for rel_name in relationships:
-                await session.execute(
-                    joinedload(getattr(self.__class__, rel_name)).load(self)
-                )
+                await session.refresh(self, attribute_names=[rel_name])
 
             for rel_name, rel_config in relationships.items():
                 if not self._is_condition_met(rel_config):
