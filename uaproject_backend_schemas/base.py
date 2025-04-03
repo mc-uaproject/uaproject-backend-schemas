@@ -35,8 +35,8 @@ class TimestampsMixin(BaseModel):
 
 
 class DatetimeBaseMixin(BaseModel):
-    created_at: datetime = Field(default=utcnow, nullable=True)
-    updated_at: datetime = Field(default=utcnow, onupdate=utcnow, nullable=True)
+    created_at: datetime = Field(default=utcnow)
+    updated_at: datetime = Field(default=utcnow)
 
 
 class PayloadBaseModel(BaseModel):
