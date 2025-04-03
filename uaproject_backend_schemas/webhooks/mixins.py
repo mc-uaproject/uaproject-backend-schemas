@@ -131,6 +131,11 @@ class WebhookPayloadMixin:
             field for field in self.__table__.columns.keys() if field not in model_relationships
         ]:
             if hasattr(inspector.attrs, field):
+
+                if field == "id":
+                    unchanged_fields[field] = getattr(self, field)
+                    continue
+
                 history = getattr(inspector.attrs, field).history
                 if history.has_changes() and field in scope_config.trigger_fields:
                     changed_fields[field] = {
