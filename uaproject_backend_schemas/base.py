@@ -29,7 +29,7 @@ class UsersIDMixin(IDMixin):
     user_id: int
 
 
-class TimestampsMixin(BaseModel):
+class TimestampsMixin:
     created_at: datetime = Column(DateTime, default=utcnow, nullable=True)
     updated_at: datetime = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=True)
 
