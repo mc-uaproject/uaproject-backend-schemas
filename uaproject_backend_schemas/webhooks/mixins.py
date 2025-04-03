@@ -217,6 +217,7 @@ class WebhookPayloadMixin:
     ) -> Dict[str, Any]:
         """Process fields and add them to the payload using scope changes"""
         payload = {}
+        print(f"Scope changes: {scope_changes}")
         for field in fields:
             if field in relationships:
                 continue
