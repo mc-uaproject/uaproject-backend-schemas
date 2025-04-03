@@ -30,8 +30,8 @@ class UsersIDMixin(IDMixin):
 
 
 class TimestampsMixin(BaseModel):
-    created_at = Column(DateTime, default=utcnow, nullable=True)
-    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=True)
+    created_at: datetime = Column(DateTime, default=utcnow, nullable=True)
+    updated_at: datetime = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=True)
 
 
 class PayloadBaseModel(BaseModel):
