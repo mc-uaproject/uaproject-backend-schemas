@@ -261,16 +261,16 @@ class WebhookPayloadMixin:
         """Process relationships and add them to the payload"""
 
         try:
+            options = [joinedload(rel_name) for rel_name in relationships]
+            await session.refresh(self, options=options)
+
             for rel_name, rel_config in relationships.items():
                 if not self._is_condition_met(rel_config):
                     continue
 
-                if hasattr(self, rel_name, None):
-                    await session.refresh(self, options=[joinedload([rel_name])])
-
-                    rel_object = getattr(self, rel_name)
-                    if rel_object is not None:
-                        payload[rel_name] = self._get_relationship_data(rel_object, rel_config)
+                rel_object = getattr(self, rel_name, None)
+                if rel_object is not None:
+                    payload[rel_name] = self._get_relationship_data(rel_object, rel_config)
         except Exception as e:
             logger.exception(f"Error processing relationships for {self.__class__.__name__}: {e}")
 
