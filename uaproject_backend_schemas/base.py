@@ -28,7 +28,7 @@ class UsersIDMixin(IDMixin):
     user_id: int
 
 
-class TimestampsMixin(SQLModel):
+class TimestampsMixin(BaseModel):
     created_at: datetime = Field(default_factory=utcnow, nullable=False)
     updated_at: datetime = Field(
         default_factory=utcnow, sa_column_kwargs={"onupdate": utcnow}, nullable=False
