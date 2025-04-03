@@ -34,6 +34,11 @@ class TimestampsMixin(BaseModel):
     updated_at: datetime = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=True)
 
 
+class DatetimeBaseMixin(BaseModel):
+    created_at: datetime = Field(default=utcnow, nullable=True)
+    updated_at: datetime = Field(default=utcnow, onupdate=utcnow, nullable=True)
+
+
 class PayloadBaseModel(BaseModel):
     action: str
     scope: str
