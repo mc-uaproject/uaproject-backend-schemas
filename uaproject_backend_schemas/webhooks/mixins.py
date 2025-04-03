@@ -160,6 +160,10 @@ class WebhookPayloadMixin:
             for field in (scope_config.fields or self.__table__.columns.keys())
             if field not in model_relationships
         }
+        print(f"Model relationships: {model_relationships}")
+        print(f"Scope relationships: {scope_config.relationships}")
+        print(f"Scope fields: {scope_config.fields}")
+        print(f"Fields to include: {fields_to_include}")
 
         relationships_to_load = scope_config.relationships or {}
 
