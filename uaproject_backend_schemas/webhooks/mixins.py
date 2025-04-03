@@ -105,7 +105,11 @@ class WebhookPayloadMixin:
 
     def get_changes(
         self, scope_name: str
-    ) -> Tuple[Dict[str, Dict[Literal["before", "after"], Any]], Dict[str, Any]]:
+    ) -> Tuple[
+        Dict[str, Dict[Literal["before", "after"], Any]],
+        Dict[str, Dict[Literal["before", "after"], Any]],
+        Dict[str, Any],
+    ]:
         """Check if the webhook should be triggered for the specified scope and return changed fields with their states"""
         scopes = self.__class__.get_webhook_scopes()
         scope_config = scopes.get(scope_name)
@@ -116,32 +120,48 @@ class WebhookPayloadMixin:
         inspector = inspect(self)
         changed_fields = {}
         unchanged_fields = {}
+        untracked_fields = {}
 
-        for field in scope_config.trigger_fields:
+        model_relationships = set(self.__mapper__.relationships.keys())
+
+        for field in scope_config.fields or [
+            field for field in self.__table__.columns.keys() if field not in model_relationships
+        ]:
             if hasattr(inspector.attrs, field):
                 history = getattr(inspector.attrs, field).history
-                if history.has_changes():
+                if history.has_changes() and field in scope_config.trigger_fields:
                     changed_fields[field] = {
+                        "before": history.deleted[0] if history.deleted else None,
+                        "after": history.added[0] if history.added else getattr(self, field),
+                    }
+                elif history.has_changes() and field not in scope_config.trigger_fields:
+                    untracked_fields[field] = {
                         "before": history.deleted[0] if history.deleted else None,
                         "after": history.added[0] if history.added else getattr(self, field),
                     }
                 else:
                     unchanged_fields[field] = getattr(self, field)
 
-        return changed_fields, unchanged_fields
+        return changed_fields, untracked_fields, unchanged_fields
 
     def get_triggered_scopes(
         self,
-    ) -> Dict[str, Dict[str, Dict[Literal["before", "after"], Any]]]:
+    ) -> Dict[
+        str,
+        Dict[
+            Literal["_untracked", "_unchanged"] | str, Dict[Literal["before", "after"] | str, Any]
+        ],
+    ]:
         """Get all scopes that should be triggered based on field changes and their states"""
         scopes = self.__class__.get_webhook_scopes()
         triggered_scopes: dict[str, dict] = {}
 
         for scope_name in scopes:
-            changes, unchanged = self.get_changes(scope_name)
+            changes, untracked, unchanged = self.get_changes(scope_name)
             if changes:
                 triggered_scopes[scope_name] = changes
-                triggered_scopes[scope_name]["unchanged"] = unchanged
+                triggered_scopes[scope_name]["_untracked"] = untracked
+                triggered_scopes[scope_name]["_unchanged"] = unchanged
 
         return triggered_scopes
 
@@ -149,7 +169,7 @@ class WebhookPayloadMixin:
         self,
         session: AsyncSession,
         scope_name: str,
-        scope_changes: Dict[str, Dict[Literal["before", "after", "unchanged"], Any]],
+        scope_changes: Dict[str, Dict[Literal["before", "after"], Any]],
     ) -> PayloadType:
         """
         Get the payload for the specified scope based on its stage configuration.
@@ -200,7 +220,7 @@ class WebhookPayloadMixin:
         session: AsyncSession,
         fields: Set[str],
         relationships: Dict[str, RelationshipConfig],
-        scope_changes: Dict[str, Dict[Literal["before", "after", "unchanged"], Any]],
+        scope_changes: Dict[str, Dict[Literal["before", "after"], Any]],
         state: Literal["before", "after"],
     ) -> Dict[str, Any]:
         """Get payload for specified fields in the requested state including relationships"""
@@ -210,7 +230,7 @@ class WebhookPayloadMixin:
 
     def _process_fields(
         self,
-        scope_changes: Dict[str, Dict[Literal["before", "after", "unchanged"], Any]],
+        scope_changes: Dict[str, Dict[Literal["before", "after"], Any]],
         fields: Set[str],
         relationships: Dict[str, RelationshipConfig],
         state: Literal["before", "after"],
@@ -223,9 +243,11 @@ class WebhookPayloadMixin:
                 continue
 
             if field in scope_changes:
-                value = scope_changes[field].get(state, getattr(self, field)) or scope_changes[
-                    field
-                ].get("unchanged", getattr(self, field))
+                value = (
+                    scope_changes[field].get(state, getattr(self, field))
+                    or scope_changes["_untracked"].get(field, {}).get(state, getattr(self, field))
+                    or scope_changes["_unchanged"].get(field)
+                )
 
                 payload[field] = value
         return payload
