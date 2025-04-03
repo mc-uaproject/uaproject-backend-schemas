@@ -7,6 +7,7 @@ from sqlalchemy import BigInteger, Column
 from sqlmodel import Field, Relationship
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
+from uaproject_backend_schemas.users.payload import DiscordIdPayload, MinecraftNicknamePayload
 from uaproject_backend_schemas.users.roles import Role, UserRoles
 from uaproject_backend_schemas.webhooks.mixins import WebhookPayloadMixin
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
@@ -87,14 +88,14 @@ class User(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
         cls.register_scope(
             "minecraft_nickname",
             trigger_fields={"minecraft_nickname"},
-            fields={"id", "discord_id", "minecraft_nickname", "updated_at"},
+            fields=MinecraftNicknamePayload.model_construct(),
             stage=WebhookStage.BOTH,
         )
 
         cls.register_scope(
             "discord_id",
             trigger_fields={"discord_id"},
-            fields={"id", "discord_id", "minecraft_nickname", "updated_at"},
+            fields=DiscordIdPayload.model_construct(),
             stage=WebhookStage.BOTH,
         )
 

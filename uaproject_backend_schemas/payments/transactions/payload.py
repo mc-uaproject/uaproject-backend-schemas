@@ -7,6 +7,7 @@ from uaproject_backend_schemas.base import (
     TimestampsMixin,
     UsersIDMixin,
 )
+from uaproject_backend_schemas.payments.services.schemas import ServiceResponse
 from uaproject_backend_schemas.schemas import SerializableDecimal
 
 from .schemas import TransactionType
@@ -38,6 +39,7 @@ class TransactionCreatedPayload(TransactionBasePayload):
     user_id: int
     recipient_id: Optional[int] = None
     service_id: Optional[int] = None
+    service: Optional[ServiceResponse] = None
     transaction_metadata: Optional[Dict[str, Any]] = None
 
 
