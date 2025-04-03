@@ -161,8 +161,6 @@ class WebhookPayloadMixin:
             if field not in model_relationships
         }
 
-        print(model_relationships)
-        print(fields_to_include)
         relationships_to_load = scope_config.relationships or {}
 
         if scope_config.stage == WebhookStage.BOTH:
