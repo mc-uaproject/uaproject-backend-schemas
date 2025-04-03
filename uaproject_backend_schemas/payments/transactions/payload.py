@@ -24,7 +24,7 @@ __all__ = [
 ]
 
 
-class TransactionBasePayload(UsersIDMixin):
+class TransactionBasePayload(UsersIDMixin, TimestampsMixin):
     """Base payload for transactions"""
 
     amount: SerializableDecimal
