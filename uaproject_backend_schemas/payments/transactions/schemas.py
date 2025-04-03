@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, field_validator
 
-from uaproject_backend_schemas.base import DatetimeBaseMixin
+from uaproject_backend_schemas.base import TimestampsMixin
 from uaproject_backend_schemas.payments.services.schemas import ServiceResponse
 from uaproject_backend_schemas.schemas import SerializableDecimal, UserDefaultSort
 
@@ -145,7 +145,7 @@ class TransactionUpdate(BaseModel):
     transaction_metadata: Optional[Dict[str, Any]] = None
 
 
-class TransactionResponse(TransactionBase, DatetimeBaseMixin):
+class TransactionResponse(TransactionBase, TimestampsMixin):
     id: int
     recipient_id: int
     service_id: Optional[int] = None

@@ -2,7 +2,6 @@ from datetime import UTC, datetime
 from typing import Any, Literal
 
 from pydantic import BaseModel
-from sqlalchemy import Column, DateTime
 from sqlmodel import Field, SQLModel
 
 PayloadBoth = Literal["before", "after"]
@@ -29,14 +28,11 @@ class UsersIDMixin(IDMixin):
     user_id: int
 
 
-class TimestampsMixin:
-    created_at: datetime = Column(DateTime, default=utcnow, nullable=True)
-    updated_at: datetime = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=True)
-
-
-class DatetimeBaseMixin(BaseModel):
-    created_at: datetime = Field(default=utcnow)
-    updated_at: datetime = Field(default=utcnow)
+class TimestampsMixin(SQLModel):
+    created_at: datetime = Field(default_factory=utcnow, nullable=True)
+    updated_at: datetime = Field(
+        default_factory=utcnow, sa_column_kwargs={"onupdate": utcnow}, nullable=True
+    )
 
 
 class PayloadBaseModel(BaseModel):

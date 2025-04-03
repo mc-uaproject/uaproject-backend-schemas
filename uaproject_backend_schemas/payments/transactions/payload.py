@@ -2,7 +2,6 @@ from typing import Any, Dict, Optional
 
 from uaproject_backend_schemas.base import (
     BothPayloadBaseModel,
-    DatetimeBaseMixin,
     PayloadBaseModel,
     PayloadBoth,
     TimestampsMixin,
@@ -25,7 +24,7 @@ __all__ = [
 ]
 
 
-class TransactionBasePayload(UsersIDMixin, DatetimeBaseMixin):
+class TransactionBasePayload(UsersIDMixin, TimestampsMixin):
     """Base payload for transactions"""
 
     amount: SerializableDecimal
