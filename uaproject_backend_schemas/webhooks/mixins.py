@@ -261,7 +261,7 @@ class WebhookPayloadMixin:
         """Process relationships and add them to the payload"""
 
         try:
-            options = [joinedload(rel_name) for rel_name in relationships]
+            options = [joinedload(getattr(self.__class__, rel_name)) for rel_name in relationships]
             await session.refresh(self, options=options)
 
             for rel_name, rel_config in relationships.items():
