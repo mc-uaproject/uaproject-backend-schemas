@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Literal, Optional, Set, Union
+from typing import Any, Dict, List, Literal, Optional, Set, Tuple, Union
 
 from pydantic import BaseModel
 from sqlalchemy import inspect
@@ -103,7 +103,9 @@ class WebhookPayloadMixin:
             stage=stage,
         )
 
-    def get_changes(self, scope_name: str) -> Dict[str, Dict[Literal["before", "after"], Any]]:
+    def get_changes(
+        self, scope_name: str
+    ) -> Tuple[Dict[str, Dict[Literal["before", "after"], Any]], Dict[str, Any]]:
         """Check if the webhook should be triggered for the specified scope and return changed fields with their states"""
         scopes = self.__class__.get_webhook_scopes()
         scope_config = scopes.get(scope_name)
@@ -113,6 +115,7 @@ class WebhookPayloadMixin:
 
         inspector = inspect(self)
         changed_fields = {}
+        unchanged_fields = {}
 
         for field in scope_config.trigger_fields:
             if hasattr(inspector.attrs, field):
@@ -122,17 +125,23 @@ class WebhookPayloadMixin:
                         "before": history.deleted[0] if history.deleted else None,
                         "after": history.added[0] if history.added else getattr(self, field),
                     }
+                else:
+                    unchanged_fields[field] = getattr(self, field)
 
-        return changed_fields
+        return changed_fields, unchanged_fields
 
-    def get_triggered_scopes(self) -> Dict[str, Dict[str, Dict[Literal["before", "after"], Any]]]:
+    def get_triggered_scopes(
+        self,
+    ) -> Dict[str, Dict[str, Dict[Literal["before", "after"], Any]]]:
         """Get all scopes that should be triggered based on field changes and their states"""
         scopes = self.__class__.get_webhook_scopes()
-        triggered_scopes = {}
+        triggered_scopes: dict[str, dict] = {}
 
         for scope_name in scopes:
-            if changes := self.get_changes(scope_name):
+            changes, unchanged = self.get_changes(scope_name)
+            if changes:
                 triggered_scopes[scope_name] = changes
+                triggered_scopes[scope_name]["unchanged"](unchanged)
 
         return triggered_scopes
 
@@ -140,7 +149,7 @@ class WebhookPayloadMixin:
         self,
         session: AsyncSession,
         scope_name: str,
-        scope_changes: Dict[str, Dict[Literal["before", "after"], Any]],
+        scope_changes: Dict[str, Dict[Literal["before", "after", "unchanged"], Any]],
     ) -> PayloadType:
         """
         Get the payload for the specified scope based on its stage configuration.
@@ -191,7 +200,7 @@ class WebhookPayloadMixin:
         session: AsyncSession,
         fields: Set[str],
         relationships: Dict[str, RelationshipConfig],
-        scope_changes: Dict[str, Dict[Literal["before", "after"], Any]],
+        scope_changes: Dict[str, Dict[Literal["before", "after", "unchanged"], Any]],
         state: Literal["before", "after"],
     ) -> Dict[str, Any]:
         """Get payload for specified fields in the requested state including relationships"""
@@ -201,7 +210,7 @@ class WebhookPayloadMixin:
 
     def _process_fields(
         self,
-        scopes_changes: Dict[str, Dict[Literal["before", "after"], Any]],
+        scope_changes: Dict[str, Dict[Literal["before", "after", "unchanged"], Any]],
         fields: Set[str],
         relationships: Dict[str, RelationshipConfig],
         state: Literal["before", "after"],
@@ -212,8 +221,11 @@ class WebhookPayloadMixin:
             if field in relationships:
                 continue
 
-            if field in scopes_changes:
-                value = scopes_changes[field].get(state, getattr(self, field))
+            if field in scope_changes:
+                value = scope_changes[field].get(state, getattr(self, field)) or scope_changes[
+                    field
+                ].get("unchanged", getattr(self, field))
+
                 payload[field] = value
         return payload
 
