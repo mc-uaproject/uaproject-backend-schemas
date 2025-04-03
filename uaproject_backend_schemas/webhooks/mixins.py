@@ -244,12 +244,13 @@ class WebhookPayloadMixin:
 
             if field in scope_changes:
                 value = (
-                    scope_changes[field].get(state, getattr(self, field))
-                    or scope_changes["_untracked"].get(field, {}).get(state, getattr(self, field))
-                    or scope_changes["_unchanged"].get(field)
-                )
+                    scope_changes[field].get(state, None)
+                    or scope_changes["_untracked"].get(field, {}).get(state, None)
+                ) or getattr(self, field)
 
                 payload[field] = value
+
+        print(payload)
         return payload
 
     async def _process_relationships(
