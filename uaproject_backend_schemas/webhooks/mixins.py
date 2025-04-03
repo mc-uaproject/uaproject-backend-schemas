@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Literal, Optional, Set, Tuple, Union
 from pydantic import BaseModel
 from sqlalchemy import inspect
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
 
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
 
@@ -15,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class RelationshipConfig(BaseModel):
-    fields: Optional[List[str]] = None
+    fields: Optional[List[str] | BaseModel] = None
     condition: Optional[str] = None
     condition_value: Optional[Any] = None
     condition_operator: str = "=="
@@ -321,9 +320,16 @@ class WebhookPayloadMixin:
     ) -> Dict[str, Any]:
         """Get data for a relationship based on its configuration"""
         if rel_config.fields:
+            if not isinstance(rel_config.fields, BaseModel):
+                return {
+                    rel_field: getattr(rel_object, rel_field)
+                    for rel_field in rel_config.fields
+                    if hasattr(rel_object, rel_field)
+                }
+            fields = set(rel_config.fields.model_fields.keys())
             return {
                 rel_field: getattr(rel_object, rel_field)
-                for rel_field in rel_config.fields
+                for rel_field in fields
                 if hasattr(rel_object, rel_field)
             }
         if hasattr(rel_object, "to_dict"):
