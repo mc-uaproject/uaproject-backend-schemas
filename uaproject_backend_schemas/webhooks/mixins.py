@@ -48,7 +48,7 @@ class WebhookPayloadMixin:
         cls,
         scope_name: str,
         trigger_fields: List[str] | Set[str],
-        fields: List[str] | Set[str] | None = None,
+        fields: List[str] | Set[str] | BaseModel | None = None,
         relationships: Dict[str, Dict[str, Any]] | None = None,
         stage: WebhookStage = WebhookStage.AFTER,
     ) -> None:
@@ -60,7 +60,7 @@ class WebhookPayloadMixin:
             scope_name: Unique identifier for the scope
             trigger_fields: Fields that will trigger the webhook when modified
             fields: Optional specific fields to include in the payload.
-                   If None, all fields will be included.
+                   If None, all fields will be included. Can also be a Pydantic BaseModel.
             relationships: Optional dictionary mapping relationship names to their configurations
                    Example: {"service": {"fields": ["id", "name"], "condition": "service_id", "condition_value": 0, "condition_operator": ">"}}
             stage: WebhookStage indicating when the webhook should be triggered
@@ -73,7 +73,11 @@ class WebhookPayloadMixin:
             raise ValueError(f"Scope '{scope_name}' is already registered for {cls.__name__}")
 
         trigger_fields_set = set(trigger_fields)
-        fields_set = set(fields) if fields is not None else None
+
+        if isinstance(fields, BaseModel):
+            fields_set = set(fields.model_fields.keys())
+        else:
+            fields_set = set(fields) if fields is not None else None
 
         model_fields = set(cls.__table__.columns.keys())
         if invalid_triggers := trigger_fields_set - model_fields:

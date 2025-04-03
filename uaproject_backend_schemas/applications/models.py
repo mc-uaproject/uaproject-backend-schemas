@@ -5,6 +5,10 @@ from pydantic import model_validator
 from sqlalchemy import ARRAY, Column, Enum, String
 from sqlmodel import Field, Relationship
 
+from uaproject_backend_schemas.applications.payload import (
+    ApplicationFormPayload,
+    ApplicationStatusPayload,
+)
 from uaproject_backend_schemas.applications.schemas import ApplicationStatus
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.webhooks.mixins import WebhookPayloadMixin
@@ -84,7 +88,7 @@ class Application(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=Tru
         cls.register_scope(
             "status",
             trigger_fields={"status"},
-            fields={"id", "user_id", "status"},
+            fields=ApplicationStatusPayload,
             stage=WebhookStage.BOTH,
         )
         cls.register_scope(
@@ -94,7 +98,7 @@ class Application(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=Tru
             stage=WebhookStage.AFTER,
         )
         form_fields = set(cls.__table__.columns.keys()) - {"status"}
-        cls.register_scope("form", trigger_fields=form_fields, stage=WebhookStage.AFTER)
+        cls.register_scope("form", trigger_fields=form_fields, fields=ApplicationFormPayload, stage=WebhookStage.AFTER)
         cls.register_scope(
             "full", trigger_fields=set(cls.__table__.columns.keys()), stage=WebhookStage.AFTER
         )

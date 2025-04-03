@@ -4,6 +4,7 @@ from sqlmodel import DECIMAL, JSON, Column, Enum, Field, Relationship
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.payments.services.models import Service
+from uaproject_backend_schemas.payments.transactions.payload import TransactionCreatedPayload
 from uaproject_backend_schemas.payments.transactions.schemas import TransactionType
 from uaproject_backend_schemas.schemas import SerializableDecimal
 from uaproject_backend_schemas.users.models import User
@@ -53,7 +54,7 @@ class Transaction(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=Tru
                 "recipient_id",
                 "service_id",
             },
-            fields={"id", "user_id", "amount", "type", "description", "service"},
+            fields=TransactionCreatedPayload,
             relationships={
                 "service": {
                     "fields": ["id", "name", "price"],
