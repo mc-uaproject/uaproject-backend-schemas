@@ -154,9 +154,12 @@ class WebhookPayloadMixin:
             raise ValueError(f"Unknown scope: {scope_name}")
 
         scope_config = scopes[scope_name]
-        fields_to_include = (
-            set(scope_config.fields) if scope_config.fields else set(self.__table__.columns.keys())
-        )
+        model_relationships = set(self.__mapper__.relationships.keys())
+        fields_to_include = {
+            field
+            for field in (scope_config.fields or self.__table__.columns.keys())
+            if field not in model_relationships
+        }
 
         relationships_to_load = scope_config.relationships or {}
 
