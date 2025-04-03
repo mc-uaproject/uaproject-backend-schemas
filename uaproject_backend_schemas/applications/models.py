@@ -88,7 +88,7 @@ class Application(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=Tru
         cls.register_scope(
             "status",
             trigger_fields={"status"},
-            fields=ApplicationStatusPayload,
+            fields=ApplicationStatusPayload.model_construct(),
             stage=WebhookStage.BOTH,
         )
         cls.register_scope(
@@ -98,7 +98,12 @@ class Application(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=Tru
             stage=WebhookStage.AFTER,
         )
         form_fields = set(cls.__table__.columns.keys()) - {"status"}
-        cls.register_scope("form", trigger_fields=form_fields, fields=ApplicationFormPayload, stage=WebhookStage.AFTER)
+        cls.register_scope(
+            "form",
+            trigger_fields=form_fields,
+            fields=ApplicationFormPayload.model_construct(),
+            stage=WebhookStage.AFTER,
+        )
         cls.register_scope(
             "full", trigger_fields=set(cls.__table__.columns.keys()), stage=WebhookStage.AFTER
         )

@@ -54,7 +54,7 @@ class Transaction(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=Tru
                 "recipient_id",
                 "service_id",
             },
-            fields=TransactionCreatedPayload,
+            fields=TransactionCreatedPayload.model_construct(),
             relationships={
                 "service": {
                     "fields": ["id", "name", "price"],
