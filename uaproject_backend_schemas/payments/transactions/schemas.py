@@ -49,6 +49,8 @@ class TransactionBase(BaseModel):
 
 class TransactionFilterParams(BaseModel):
     user_id: Optional[int] = None
+    recipient_id: Optional[int] = None
+    service_id: Optional[int] = None
     type: Optional[TransactionType] = None
     min_amount: Optional[SerializableDecimal] = None
     max_amount: Optional[SerializableDecimal] = None
