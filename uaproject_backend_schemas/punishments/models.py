@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from sqlmodel import JSON, Column, DateTime, Enum, Field, Relationship
@@ -104,12 +104,20 @@ class Punishment(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True
             },
             fields={"id", "user_id", "admin_id", "type", "status", "reason", "expires_at"},
             stage=WebhookStage.AFTER,
+            relationships={
+                "user": {"fields": ["id", "discord_id", "minecraft_nickname"]},
+                "admin": {"fields": ["id", "discord_id", "minecraft_nickname"]},
+                "config": {"fields": ["id", "name", "warn_threshold", "warn_decay_days"]},
+            },
         )
         cls.register_scope(
             "status_changed",
             trigger_fields={"status"},
             fields={"id", "user_id", "admin_id", "type", "status", "reason"},
             stage=WebhookStage.BOTH,
+            relationships={
+                "user": {"fields": ["id", "discord_id", "minecraft_nickname"]},
+            },
         )
         cls.register_scope(
             "warn_added",
@@ -118,20 +126,28 @@ class Punishment(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True
             stage=WebhookStage.AFTER,
         )
 
-    def is_expired(self) -> bool:
-        """Check if the punishment has expired"""
-        return datetime.now(UTC) > self.expires_at if self.expires_at else False
+        cls.register_scope(
+            "expired",
+            trigger_fields={"status", "expires_at"},
+            fields={"id", "user_id", "type", "status", "expires_at"},
+            stage=WebhookStage.BOTH,
+            temporal_fields=[
+                {
+                    "expires_at_field": "expires_at",
+                    "status_field": "status",
+                    "status_value": PunishmentStatus.EXPIRED.value,
+                    "scope_name": "punishment.auto_expired",
+                }
+            ],
+        )
 
-    def revoke(self, admin_id: Optional[int] = None, reason: Optional[str] = None) -> None:
-        """Revoke a punishment"""
-        self.status = PunishmentStatus.REVOKED
-
-        # Update metadata with revocation information
-        current_metadata = self.metadata or {}
-        revoke_info = {
-            "revoked_at": datetime.now(UTC).isoformat(),
-            "revoked_by": admin_id,
-            "revocation_reason": reason,
-        }
-        current_metadata["revocation"] = revoke_info
-        self.metadata = current_metadata
+        cls.register_scope(
+            "revoked",
+            trigger_fields={"status"},
+            fields={"id", "user_id", "admin_id", "type", "status", "reason", "punishment_metadata"},
+            stage=WebhookStage.BOTH,
+            relationships={
+                "user": {"fields": ["id", "discord_id", "minecraft_nickname"]},
+                "admin": {"fields": ["id", "discord_id", "minecraft_nickname"]},
+            },
+        )

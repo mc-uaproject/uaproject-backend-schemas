@@ -1,5 +1,6 @@
 import logging
-from typing import Any, Dict, List, Literal, Optional, Set, Tuple, Union
+from datetime import datetime
+from typing import Any, Callable, Dict, List, Literal, Optional, Set, Tuple, Union
 
 from pydantic import BaseModel
 from sqlalchemy import inspect
@@ -7,7 +8,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
 
-__all__ = ["WebhookScopeFields", "PayloadType", "WebhookPayloadMixin", "RelationshipConfig"]
+__all__ = [
+    "WebhookScopeFields",
+    "PayloadType",
+    "WebhookPayloadMixin",
+    "RelationshipConfig",
+    "TemporalFieldConfig",
+]
 
 
 logger = logging.getLogger(__name__)
@@ -20,11 +27,21 @@ class RelationshipConfig(BaseModel):
     condition_operator: str = "=="
 
 
+class TemporalFieldConfig(BaseModel):
+    """Configuration for fields with temporal state"""
+
+    expires_at_field: str
+    status_field: Optional[str] = None
+    status_value: Optional[Any] = None
+    scope_name: str
+
+
 class WebhookScopeFields(BaseModel):
     trigger_fields: List[str]
     fields: Optional[List[str]] = None
     stage: WebhookStage = WebhookStage.AFTER
     relationships: Optional[Dict[str, RelationshipConfig]] = None
+    temporal_fields: Optional[List[TemporalFieldConfig]] = None
 
 
 PayloadType = Union[Dict[str, Any], Dict[Literal["before", "after"], Dict[str, Any]]]
@@ -34,6 +51,7 @@ class WebhookPayloadMixin:
     """A mixin that adds webhook functionality to a model"""
 
     __scope_prefix__ = ""
+    _temporal_expiration_callbacks = {}
 
     @classmethod
     def get_webhook_scopes(cls) -> Dict[str, WebhookScopeFields]:
@@ -43,6 +61,18 @@ class WebhookPayloadMixin:
         return cls._webhook_scopes_registry
 
     @classmethod
+    def register_temporal_expiration_callback(
+        cls, callback: Callable[[int, str, Dict[str, Any]], None]
+    ) -> None:
+        """
+        Register a callback function that will be called when a temporal field expires
+
+        Args:
+            callback: A function that takes (instance_id, scope_name, changes) as parameters
+        """
+        cls._temporal_expiration_callbacks[cls.__name__] = callback
+
+    @classmethod
     def register_scope(
         cls,
         scope_name: str,
@@ -50,6 +80,7 @@ class WebhookPayloadMixin:
         fields: List[str] | Set[str] | BaseModel | None = None,
         relationships: Dict[str, Dict[str, Any]] | None = None,
         stage: WebhookStage = WebhookStage.AFTER,
+        temporal_fields: List[Dict[str, Any]] | None = None,
     ) -> None:
         """
         Register a new scope for the model with specified
@@ -64,6 +95,8 @@ class WebhookPayloadMixin:
                    Example: {"service": {"fields": ["id", "name"], "condition": "service_id", "condition_value": 0, "condition_operator": ">"}}
             stage: WebhookStage indicating when the webhook should be triggered
                   and what data should be included in the payload
+            temporal_fields: Optional list of temporal field configurations
+                  Example: [{"expires_at_field": "ban_expires_at", "scope_name": "user.ban_expired"}]
         """
         scope_name = f"{cls.__scope_prefix__}.{scope_name}"
         scopes = cls.get_webhook_scopes()
@@ -72,16 +105,38 @@ class WebhookPayloadMixin:
             raise ValueError(f"Scope '{scope_name}' is already registered for {cls.__name__}")
 
         trigger_fields_set = set(trigger_fields)
+        fields_set = cls._process_fields(fields)
+        cls._validate_trigger_fields(trigger_fields_set)
+        cls._validate_payload_fields(fields_set, relationships)
 
+        relationship_configs = cls._process_relationships(relationships)
+        temporal_field_configs = cls._process_temporal_fields(temporal_fields)
+
+        scopes[scope_name] = WebhookScopeFields(
+            trigger_fields=list(trigger_fields_set),
+            fields=list(fields_set) if fields_set else None,
+            relationships=relationship_configs,
+            stage=stage,
+            temporal_fields=temporal_field_configs,
+        )
+
+    @classmethod
+    def _process_fields(cls, fields):
+        """Process and return fields as a set."""
         if isinstance(fields, BaseModel):
-            fields_set = set(fields.model_fields.keys())
-        else:
-            fields_set = set(fields) if fields is not None else None
+            return set(fields.model_fields.keys())
+        return set(fields) if fields is not None else None
 
+    @classmethod
+    def _validate_trigger_fields(cls, trigger_fields_set):
+        """Validate trigger fields against model fields."""
         model_fields = set(cls.__table__.columns.keys())
         if invalid_triggers := trigger_fields_set - model_fields:
             raise ValueError(f"Invalid trigger fields for {cls.__name__}: {invalid_triggers}")
 
+    @classmethod
+    def _validate_payload_fields(cls, fields_set, relationships):
+        """Validate payload fields and relationships."""
         if fields_set is not None:
             fields_to_check = fields_set.copy()
             relationship_names = set()
@@ -90,21 +145,37 @@ class WebhookPayloadMixin:
                 relationship_names = set(relationships.keys())
                 fields_to_check = fields_set - relationship_names
 
+            model_fields = set(cls.__table__.columns.keys())
             if invalid_fields := fields_to_check - model_fields:
                 raise ValueError(f"Invalid payload fields for {cls.__name__}: {invalid_fields}")
 
-        relationship_configs = None
+    @classmethod
+    def _process_relationships(cls, relationships):
+        """Process and return relationship configurations."""
         if relationships:
-            relationship_configs = {
+            return {
                 rel_name: RelationshipConfig(**rel_config.copy())
                 for rel_name, rel_config in relationships.items()
             }
-        scopes[scope_name] = WebhookScopeFields(
-            trigger_fields=list(trigger_fields_set),
-            fields=list(fields_set) if fields_set else None,
-            relationships=relationship_configs,
-            stage=stage,
-        )
+        return None
+
+    @classmethod
+    def _process_temporal_fields(cls, temporal_fields):
+        """Process and validate temporal field configurations."""
+        if not temporal_fields:
+            return None
+        model_fields = set(cls.__table__.columns.keys())
+        temporal_field_configs = [TemporalFieldConfig(**config) for config in temporal_fields]
+        for config in temporal_field_configs:
+            if config.expires_at_field not in model_fields:
+                raise ValueError(
+                    f"Expires at field '{config.expires_at_field}' doesn't exist in {cls.__name__}"
+                )
+            if config.status_field and config.status_field not in model_fields:
+                raise ValueError(
+                    f"Status field '{config.status_field}' doesn't exist in {cls.__name__}"
+                )
+        return temporal_field_configs
 
     def get_changes(
         self, scope_name: str
@@ -121,27 +192,90 @@ class WebhookPayloadMixin:
             return {}
 
         inspector = inspect(self)
-        changed_fields = {}
-        unchanged_fields = {}
-        untracked_fields = {}
+        changed_fields, unchanged_fields, untracked_fields = {}, {}, {}
 
+        self._process_temporal_fields(scope_config, inspector, changed_fields)
+        self._process_regular_fields(
+            scope_config, inspector, changed_fields, unchanged_fields, untracked_fields
+        )
+
+        return changed_fields, untracked_fields, unchanged_fields
+
+    def _process_temporal_fields(self, scope_config, inspector, changed_fields):
+        """Process temporal fields and add changes to changed_fields"""
+        if not scope_config.temporal_fields:
+            return
+        for temp_config in scope_config.temporal_fields:
+            expires_field = temp_config.expires_at_field
+
+            if hasattr(inspector.attrs, expires_field):
+                history = getattr(inspector.attrs, expires_field).history
+                if history.has_changes():
+                    old_value = history.deleted[0] if history.deleted else None
+                    new_value = history.added[0] if history.added else None
+                    now = datetime.now()
+
+                    if (
+                        old_value
+                        and isinstance(old_value, datetime)
+                        and old_value > now
+                        and (
+                            new_value is None
+                            or (isinstance(new_value, datetime) and new_value <= now)
+                        )
+                    ):
+                        changed_fields[expires_field] = {
+                            "before": old_value,
+                            "after": new_value,
+                        }
+                        self._handle_status_field(temp_config, changed_fields)
+                        self._trigger_expiration_callback(temp_config, expires_field, old_value)
+
+    def _handle_status_field(self, temp_config, changed_fields):
+        """Handle status field changes for temporal fields"""
+        if temp_config.status_field:
+            status_field = temp_config.status_field
+            if hasattr(self, status_field):
+                status_value = getattr(self, status_field)
+                if status_value != temp_config.status_value:
+                    changed_fields[status_field] = {
+                        "before": status_value,
+                        "after": temp_config.status_value,
+                    }
+
+    def _trigger_expiration_callback(self, temp_config, expires_field, old_value):
+        """Trigger expiration callback if applicable"""
+        if self.__class__.__name__ in self._temporal_expiration_callbacks and hasattr(self, "id"):
+            callback = self._temporal_expiration_callbacks[self.__class__.__name__]
+            try:
+                callback(
+                    self.id,
+                    temp_config.scope_name,
+                    {expires_field: {"before": old_value, "after": None}},
+                )
+            except Exception as e:
+                logger.error(f"Error in temporal expiration callback: {e}")
+
+    def _process_regular_fields(
+        self, scope_config, inspector, changed_fields, unchanged_fields, untracked_fields
+    ):
+        """Process regular fields and categorize them into changed, unchanged, and untracked"""
         model_relationships = set(self.__mapper__.relationships.keys())
-
         for field in scope_config.fields or [
             field for field in self.__table__.columns.keys() if field not in model_relationships
         ]:
             if hasattr(inspector.attrs, field):
-
                 if field == "id":
                     unchanged_fields[field] = getattr(self, field)
                     continue
 
                 history = getattr(inspector.attrs, field).history
                 if history.has_changes() and field in scope_config.trigger_fields:
-                    changed_fields[field] = {
-                        "before": history.deleted[0] if history.deleted else None,
-                        "after": history.added[0] if history.added else getattr(self, field),
-                    }
+                    if field not in changed_fields:
+                        changed_fields[field] = {
+                            "before": history.deleted[0] if history.deleted else None,
+                            "after": history.added[0] if history.added else getattr(self, field),
+                        }
                 elif history.has_changes() and field not in scope_config.trigger_fields:
                     untracked_fields[field] = {
                         "before": history.deleted[0] if history.deleted else None,
@@ -149,8 +283,6 @@ class WebhookPayloadMixin:
                     }
                 else:
                     unchanged_fields[field] = getattr(self, field)
-
-        return changed_fields, untracked_fields, unchanged_fields
 
     def get_triggered_scopes(
         self,
@@ -171,7 +303,32 @@ class WebhookPayloadMixin:
                 triggered_scopes[scope_name]["_untracked"] = untracked
                 triggered_scopes[scope_name]["_unchanged"] = unchanged
 
-        return triggered_scopes
+        for scope_name, scope_config in scopes.items():
+            if scope_config.temporal_fields and scope_name not in triggered_scopes:
+                for temp_config in scope_config.temporal_fields:
+                    if hasattr(self, temp_config.expires_at_field):
+                        expires_at = getattr(self, temp_config.expires_at_field)
+
+                        if (
+                            expires_at is None
+                            or (isinstance(expires_at, datetime) and expires_at <= datetime.now())
+                        ) and temp_config.scope_name not in triggered_scopes:
+                            triggered_scopes[temp_config.scope_name] = {
+                                "_untracked": {},
+                                "_unchanged": {},
+                            }
+                            triggered_scopes[temp_config.scope_name][
+                                temp_config.expires_at_field
+                            ] = {"before": expires_at, "after": None}
+
+                            if temp_config.status_field:
+                                status_field = temp_config.status_field
+                                if hasattr(self, status_field):
+                                    current_value = getattr(self, status_field)
+                                    triggered_scopes[temp_config.scope_name][status_field] = {
+                                        "before": current_value,
+                                        "after": temp_config.status_value,
+                                    }
 
     async def get_payload_for_scope(
         self,
