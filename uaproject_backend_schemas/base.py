@@ -1,10 +1,15 @@
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any, Literal
 
-from pydantic import BaseModel
-from sqlmodel import Field, SQLModel
+from pydantic import BaseModel, computed_field
+from sqlmodel import BigInteger, Column, Field, SQLModel
+
+from uaproject_backend_schemas.id_generator import UAIdGenerator
 
 PayloadBoth = Literal["before", "after"]
+
+id_generator = UAIdGenerator()
+EPOCH = id_generator.epoch
 
 
 class Base(SQLModel): ...
@@ -15,7 +20,10 @@ def utcnow():
 
 
 class IDMixin(BaseModel):
-    id: int | None = Field(default=None, primary_key=True)
+    id: int = Field(
+        default_factory=id_generator.generate,
+        sa_column=Column(BigInteger, primary_key=True),
+    )
 
     def __str__(self):
         return str(self.id)
@@ -29,10 +37,15 @@ class UsersIDMixin(IDMixin):
 
 
 class TimestampsMixin(BaseModel):
-    created_at: datetime = Field(default_factory=utcnow, nullable=False)
     updated_at: datetime = Field(
         default_factory=utcnow, sa_column_kwargs={"onupdate": utcnow}, nullable=False
     )
+
+    @computed_field(return_type=datetime)
+    @property
+    def created_at(self) -> datetime:
+        millis = self.id // 1000
+        return EPOCH + timedelta(milliseconds=millis)
 
 
 class PayloadBaseModel(BaseModel):
