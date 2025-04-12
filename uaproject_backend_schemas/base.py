@@ -20,10 +20,7 @@ def utcnow():
 
 
 class IDMixin(BaseModel):
-    id: int = Field(
-        default_factory=id_generator.generate,
-        sa_column=Column(BigInteger, primary_key=True),
-    )
+    id: int = Field(default_factory=id_generator.generate, sa_type=BigInteger, primary_key=True)
 
     def __str__(self):
         return str(self.id)
