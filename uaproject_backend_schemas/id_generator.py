@@ -42,14 +42,18 @@ class UAIdGenerator:
         self.last_timestamp = 0
         self.sequence = 0
 
-    def generate(self) -> int:
+    def generate(self, custom_date: Optional[datetime] = None) -> int:
         with self.lock:
-            now = int((datetime.now(timezone.utc) - self.epoch).total_seconds() * 1000)
+            now = int(
+                (custom_date.astimezone(timezone.utc) - self.epoch).total_seconds() * 1000
+            ) if custom_date else int(
+                (datetime.now(timezone.utc) - self.epoch).total_seconds() * 1000
+            )
             if now == self.last_timestamp:
                 self.sequence += 1
                 if self.sequence >= 10:
                     time.sleep(0.001)
-                    return self.generate()
+                    return self.generate(custom_date)
             else:
                 self.sequence = 0
                 self.last_timestamp = now
