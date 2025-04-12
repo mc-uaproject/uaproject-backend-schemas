@@ -2,7 +2,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any, Literal
 
 from pydantic import BaseModel, computed_field
-from sqlmodel import BigInteger, Column, Field, SQLModel
+from sqlmodel import BigInteger, Field, SQLModel
 
 from uaproject_backend_schemas.id_generator import UAIdGenerator
 
