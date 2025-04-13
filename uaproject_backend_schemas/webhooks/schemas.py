@@ -35,7 +35,7 @@ class WebhookStatus(StrEnum):
     ERROR = "error"
 
 
-class WebhookBase(BaseModel):
+class WebhookBase(BaseResponseModel):
     endpoint: SerializableHttpUrl
     scopes: Dict[str, bool]
     user_id: Optional[int] = None
@@ -58,7 +58,7 @@ class WebhookStage(StrEnum):
     BOTH = "both"
 
 
-class WebhookResponse(WebhookBase, BaseResponseModel):
+class WebhookResponse(WebhookBase):
     id: int
     user_id: Optional[int]
     status: WebhookStatus

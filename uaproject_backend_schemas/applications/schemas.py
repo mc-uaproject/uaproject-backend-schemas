@@ -35,7 +35,7 @@ class ApplicationStatus(StrEnum):
     NOT_SENT = "not_sent"
 
 
-class ApplicationBase(BaseModel):
+class ApplicationBase(BaseResponseModel):
     birth_date: Optional[datetime] = None
     launcher: Optional[str] = Field(None, max_length=32)
     server_source: Optional[str] = Field(None, max_length=512)
@@ -69,7 +69,7 @@ class ApplicationUpdate(ApplicationBase):
     editable_fields: Optional[List[str]] = None
 
 
-class ApplicationResponse(ApplicationBase, BaseResponseModel):
+class ApplicationResponse(ApplicationBase):
     id: int
     user_id: int
     status: ApplicationStatus

@@ -23,7 +23,7 @@ class ServiceSort(StrEnum):
     PRICE = "price"
 
 
-class ServiceBase(BaseModel):
+class ServiceBase(BaseResponseModel):
     name: str
     description: Optional[str] = None
     price: SerializableDecimal
@@ -45,7 +45,7 @@ class ServiceUpdate(ServiceBase):
     category: Optional[str] = None
 
 
-class ServiceResponse(ServiceBase, BaseResponseModel):
+class ServiceResponse(ServiceBase):
     id: int
     created_at: datetime | None
     updated_at: datetime | None

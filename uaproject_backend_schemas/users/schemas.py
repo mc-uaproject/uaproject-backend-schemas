@@ -29,7 +29,7 @@ class UserTokenResponse(BaseResponseModel):
     created_at: datetime
 
 
-class UserCreate(BaseModel, BaseResponseModel):
+class UserCreate(BaseResponseModel):
     minecraft_nickname: Optional[str] = None
     discord_id: Optional[int] = None
     is_superuser: Optional[bool] = False
