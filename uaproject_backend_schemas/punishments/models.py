@@ -80,7 +80,7 @@ class Punishment(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True
     reason: Optional[str] = Field(default=None)
     expires_at: Optional[datetime] = Field(sa_column=Column(DateTime, nullable=True))
     config_id: Optional[int] = Field(
-        sa_column=Column(ForeignKey("punishment_configs.id"), BigInteger()), nullable=True
+        sa_column=Column(BigInteger(), ForeignKey("punishment_configs.id"), nullable=True)
     )
     punishment_metadata: Optional[Dict[str, Any]] = Field(sa_column=Column(JSON, nullable=True))
 
