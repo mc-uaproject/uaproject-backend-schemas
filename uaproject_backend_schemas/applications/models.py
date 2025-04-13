@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, ClassVar, List, Optional
 
 from pydantic import model_validator
 from sqlalchemy import ARRAY, Column, Enum, String
-from sqlmodel import Field, Relationship
+from sqlmodel import BigInteger, Field, Relationship
 
 from uaproject_backend_schemas.applications.payload import (
     ApplicationFormPayload,
@@ -35,7 +35,7 @@ class Application(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=Tru
         "quiz_answer",
     ]
 
-    user_id: int = Field(foreign_key="users.id", nullable=False, unique=True)
+    user_id: int = Field(foreign_key="users.id", sa_column=Column(BigInteger()), nullable=False, unique=True)
     user: Optional["User"] = Relationship(
         back_populates="application", sa_relationship_kwargs={"uselist": False}
     )

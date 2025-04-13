@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from sqlmodel import JSON, Column, DateTime, Enum, Field, Relationship
+from sqlmodel import JSON, BigInteger, Column, DateTime, Enum, Field, Relationship
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.punishments.schemas import PunishmentStatus, PunishmentType
@@ -65,8 +65,8 @@ class Punishment(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True
     __tablename__ = "punishments"
     __scope_prefix__ = "punishment"
 
-    user_id: int = Field(foreign_key="users.id", nullable=False)
-    admin_id: Optional[int] = Field(foreign_key="users.id", nullable=True)
+    user_id: int = Field(foreign_key="users.id", sa_column=Column(BigInteger()), nullable=False)
+    admin_id: Optional[int] = Field(foreign_key="users.id", sa_column=Column(BigInteger()), nullable=True)
     type: PunishmentType = Field(sa_column=Column(Enum(PunishmentType, native_enum=False)))
     status: PunishmentStatus = Field(
         sa_column=Column(
@@ -77,7 +77,7 @@ class Punishment(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True
     )
     reason: Optional[str] = Field(default=None)
     expires_at: Optional[datetime] = Field(sa_column=Column(DateTime, nullable=True))
-    config_id: Optional[int] = Field(foreign_key="punishment_configs.id", nullable=True)
+    config_id: Optional[int] = Field(foreign_key="punishment_configs.id", sa_column=Column(BigInteger()), nullable=True)
     punishment_metadata: Optional[Dict[str, Any]] = Field(sa_column=Column(JSON, nullable=True))
 
     user: Optional["User"] = Relationship(
