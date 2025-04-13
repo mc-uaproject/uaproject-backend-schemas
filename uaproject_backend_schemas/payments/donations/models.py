@@ -14,8 +14,8 @@ class Donation(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True):
     __tablename__ = "donations"
     __scope_prefix__ = "donation"
 
-    user_id: int = Field(foreign_key="users.id", sa_column=Column(BigInteger()), nullable=False)
-    balance_id: int = Field(foreign_key="balances.id", nullable=False)
+    user_id: int = Field(foreign_key="users.id", sa_column=Column(BigInteger(), nullable=False))
+    balance_id: int = Field(foreign_key="balances.id", sa_column=Column(BigInteger(), nullable=False))
     amount: SerializableDecimal = Field(sa_column=Column(DECIMAL(10, 2), nullable=False))
     currency: str = Field(max_length=3)
     donor_name: str = Field(max_length=255)

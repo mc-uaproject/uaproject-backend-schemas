@@ -12,8 +12,8 @@ __all__ = ["Role", "UserRoles"]
 
 class UserRoles(Base, table=True):
     __tablename__ = "user_roles"
-    user_id: int = Field(foreign_key="users.id", sa_column=Column(BigInteger()), primary_key=True)
-    role_id: int = Field(foreign_key="roles.id", sa_column=Column(BigInteger()), primary_key=True)
+    user_id: int = Field(foreign_key="users.id", sa_column=Column(BigInteger(), primary_key=True))
+    role_id: int = Field(foreign_key="roles.id", sa_column=Column(BigInteger(), primary_key=True))
 
 
 class Role(Base, IDMixin, TimestampsMixin, table=True):

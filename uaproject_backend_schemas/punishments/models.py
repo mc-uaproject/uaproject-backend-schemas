@@ -65,8 +65,8 @@ class Punishment(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True
     __tablename__ = "punishments"
     __scope_prefix__ = "punishment"
 
-    user_id: int = Field(foreign_key="users.id", sa_column=Column(BigInteger()), nullable=False)
-    admin_id: Optional[int] = Field(foreign_key="users.id", sa_column=Column(BigInteger()), nullable=True)
+    user_id: int = Field(foreign_key="users.id", sa_column=Column(BigInteger(), nullable=False))
+    admin_id: Optional[int] = Field(foreign_key="users.id", sa_column=Column(BigInteger(), nullable=True))
     type: PunishmentType = Field(sa_column=Column(Enum(PunishmentType, native_enum=False)))
     status: PunishmentStatus = Field(
         sa_column=Column(

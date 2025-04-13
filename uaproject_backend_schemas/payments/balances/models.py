@@ -19,7 +19,7 @@ class Balance(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True):
     __tablename__ = "balances"
     __scope_prefix__ = "balance"
 
-    user_id: int = Field(foreign_key="users.id", sa_column=Column(BigInteger()), nullable=False, unique=True)
+    user_id: int = Field(foreign_key="users.id", sa_column=Column(BigInteger(), nullable=False, unique=True))
     identifier: UUID = Field(default_factory=uuid4, nullable=False, unique=True)
     amount: SerializableDecimal = Field(default=SerializableDecimal("0.00"), sa_column=Column(DECIMAL(10, 2)))
     user: Optional["User"] = Relationship(
