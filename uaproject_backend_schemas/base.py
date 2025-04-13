@@ -1,5 +1,5 @@
 from datetime import UTC, datetime, timedelta
-from typing import Any, Literal
+from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, computed_field
 from sqlmodel import BigInteger, Field, SQLModel
@@ -38,11 +38,15 @@ class TimestampsMixin(BaseModel):
         default_factory=utcnow, sa_column_kwargs={"onupdate": utcnow}, nullable=False
     )
 
-    @computed_field(return_type=datetime)
+    computed_field(return_type=Optional[datetime])
     @property
-    def created_at(self) -> datetime:
-        seconds = self.id // 1000_000
-        return EPOCH + timedelta(seconds=seconds)
+    def created_at(self) -> Optional[datetime]:
+        try:
+            seconds = self.id // 1_000_000
+            result = EPOCH + timedelta(milliseconds=seconds)
+            return result if 1970 <= result.year <= 9999 else None
+        except (OverflowError, ValueError):
+            return None
 
 
 class PayloadBaseModel(BaseModel):
