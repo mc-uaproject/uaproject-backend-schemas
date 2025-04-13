@@ -4,6 +4,8 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
+from uaproject_backend_schemas.base import BaseResponseModel
+
 __all__ = ["RoleSort", "RoleCreate", "RoleUpdate", "RoleFilterParams", "RoleResponse"]
 
 
@@ -34,7 +36,7 @@ class RoleFilterParams(BaseModel):
     display_name: Optional[str] = None
 
 
-class RoleResponse(BaseModel):
+class RoleResponse(BaseResponseModel):
     id: int
     name: str
     display_name: Optional[str] = None

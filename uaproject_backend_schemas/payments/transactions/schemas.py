@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, field_validator
 
-from uaproject_backend_schemas.base import TimestampsMixin
+from uaproject_backend_schemas.base import BaseResponseModel, TimestampsMixin
 from uaproject_backend_schemas.payments.services.schemas import ServiceResponse
 from uaproject_backend_schemas.schemas import SerializableDecimal, UserDefaultSort
 
@@ -37,7 +37,7 @@ class TransactionType(StrEnum):
     ADJUSTMENT = "adjustment"
 
 
-class TransactionBase(BaseModel):
+class TransactionBase(BaseResponseModel):
     amount: Optional[SerializableDecimal] = None
     recipient_id: Optional[int] = None
     type: TransactionType

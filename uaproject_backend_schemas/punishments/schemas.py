@@ -1,13 +1,11 @@
 from datetime import datetime
 from enum import StrEnum
-from typing import TYPE_CHECKING, Any, Dict, Optional
+from typing import Any, Dict, Optional
 
 from pydantic import BaseModel
 
+from uaproject_backend_schemas.base import BaseResponseModel
 from uaproject_backend_schemas.schemas import UserDefaultSort
-
-if TYPE_CHECKING:
-    pass
 
 __all__ = [
     "PunishmentType",
@@ -45,7 +43,7 @@ class PunishmentSort(StrEnum):
     EXPIRES_AT = "expires_at"
 
 
-class PunishmentBase(BaseModel):
+class PunishmentBase(BaseResponseModel):
     user_id: int
     admin_id: Optional[int] = None
     type: PunishmentType

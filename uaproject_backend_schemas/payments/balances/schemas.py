@@ -5,6 +5,7 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
+from uaproject_backend_schemas.base import BaseResponseModel
 from uaproject_backend_schemas.schemas import SerializableDecimal, UserDefaultSort
 
 __all__ = ["BalanceUpdate", "BalanceResponse", "BalanceFilterParams", "BalanceSort"]
@@ -14,7 +15,7 @@ class BalanceUpdate(BaseModel):
     amount: Optional[SerializableDecimal] = None
 
 
-class BalanceResponse(BaseModel):
+class BalanceResponse(BaseResponseModel):
     id: int
     user_id: int
     identifier: UUID

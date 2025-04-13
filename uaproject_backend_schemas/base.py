@@ -1,7 +1,7 @@
 from datetime import UTC, datetime, timedelta
 from typing import Any, Literal, Optional
 
-from pydantic import BaseModel, computed_field
+from pydantic import BaseModel, ConfigDict, computed_field
 from sqlmodel import BigInteger, Field, SQLModel
 
 from uaproject_backend_schemas.id_generator import UAIdGenerator
@@ -18,6 +18,14 @@ class Base(SQLModel): ...
 def utcnow():
     return datetime.now(UTC)
 
+
+class BaseResponseModel(BaseModel):
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={
+            int: lambda v: str(v) if abs(v) > 2**53 else v
+        }
+    )
 
 class IDMixin(BaseModel):
     id: int = Field(default_factory=id_generator.generate, sa_type=BigInteger, primary_key=True)

@@ -5,6 +5,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, model_validator
 
+from uaproject_backend_schemas.base import BaseResponseModel
 from uaproject_backend_schemas.schemas import UserDefaultSort
 
 __all__ = [
@@ -22,13 +23,13 @@ class TokenResponse(BaseModel):
     token: UUID
 
 
-class UserTokenResponse(BaseModel):
+class UserTokenResponse(BaseResponseModel):
     token: UUID
     user_id: int
     created_at: datetime
 
 
-class UserCreate(BaseModel):
+class UserCreate(BaseModel, BaseResponseModel):
     minecraft_nickname: Optional[str] = None
     discord_id: Optional[int] = None
     is_superuser: Optional[bool] = False
@@ -52,7 +53,7 @@ class UserUpdate(BaseModel):
         return values
 
 
-class UserResponse(BaseModel):
+class UserResponse(BaseResponseModel):
     id: int
     discord_id: Optional[int] = None
     minecraft_nickname: Optional[str] = None

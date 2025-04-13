@@ -5,6 +5,7 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr, field_validator
 from pydantic import Field as PydanticField
 
+from uaproject_backend_schemas.base import BaseResponseModel
 from uaproject_backend_schemas.schemas import SerializableDecimal, UserDefaultSort
 
 __all__ = ["DonationSort", "DonationFilterParams", "DonationBase", "DonationCreate", "DonationUpdate", "DonationResponse"]
@@ -17,7 +18,7 @@ class DonationSort(StrEnum):
     UPDATED_AT = UserDefaultSort.UPDATED_AT
 
 
-class DonationFilterParams(BaseModel):
+class DonationFilterParams(BaseResponseModel):
     user_id: Optional[int] = None
     min_amount: Optional[SerializableDecimal] = None
     max_amount: Optional[SerializableDecimal] = None
@@ -32,9 +33,8 @@ class DonationFilterParams(BaseModel):
 
     @field_validator("max_amount")
     def validate_max_amount(cls, v, values):
-        if v is not None and "min_amount" in values and values["min_amount"] is not None:
-            if v < values["min_amount"]:
-                raise ValueError("max_amount cannot be less than min_amount")
+        if v is not None and "min_amount" in values and values["min_amount"] is not None and v < values["min_amount"]:
+            raise ValueError("max_amount cannot be less than min_amount")
         return v
 
 

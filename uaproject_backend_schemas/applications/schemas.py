@@ -4,6 +4,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
 
+from uaproject_backend_schemas.base import BaseResponseModel
 from uaproject_backend_schemas.schemas import UserDefaultSort
 
 __all__ = [
@@ -68,7 +69,7 @@ class ApplicationUpdate(ApplicationBase):
     editable_fields: Optional[List[str]] = None
 
 
-class ApplicationResponse(ApplicationBase):
+class ApplicationResponse(ApplicationBase, BaseResponseModel):
     id: int
     user_id: int
     status: ApplicationStatus

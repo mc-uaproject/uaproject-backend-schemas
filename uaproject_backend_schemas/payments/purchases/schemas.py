@@ -4,6 +4,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
+from uaproject_backend_schemas.base import BaseResponseModel
 from uaproject_backend_schemas.schemas import UserDefaultSort
 
 __all__ = ["PurchasedItemStatus", "PurchasedItemSort", "PurchasedItemBase", "PurchasedItemCreate", "PurchasedItemUpdate", "PurchasedItemResponse", "PurchasedItemFilterParams"]
@@ -23,7 +24,7 @@ class PurchasedItemSort(StrEnum):
     SERVICE_ID = "service_id"
 
 
-class PurchasedItemBase(BaseModel):
+class PurchasedItemBase(BaseResponseModel):
     service_id: int
     status: PurchasedItemStatus = PurchasedItemStatus.ACTIVE
     quantity: int = Field(default=1, ge=1)

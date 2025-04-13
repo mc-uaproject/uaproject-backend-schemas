@@ -4,6 +4,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from uaproject_backend_schemas.base import BaseResponseModel
 from uaproject_backend_schemas.schemas import SerializableDecimal, UserDefaultSort
 
 __all__ = [
@@ -44,7 +45,7 @@ class ServiceUpdate(ServiceBase):
     category: Optional[str] = None
 
 
-class ServiceResponse(ServiceBase):
+class ServiceResponse(ServiceBase, BaseResponseModel):
     id: int
     created_at: datetime | None
     updated_at: datetime | None

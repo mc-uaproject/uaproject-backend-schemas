@@ -4,6 +4,7 @@ from typing import Dict, Optional
 
 from pydantic import BaseModel
 
+from uaproject_backend_schemas.base import BaseResponseModel
 from uaproject_backend_schemas.schemas import SerializableHttpUrl, UserDefaultSort
 
 __all__ = [
@@ -57,15 +58,12 @@ class WebhookStage(StrEnum):
     BOTH = "both"
 
 
-class WebhookResponse(WebhookBase):
+class WebhookResponse(WebhookBase, BaseResponseModel):
     id: int
     user_id: Optional[int]
     status: WebhookStatus
     created_at: datetime
     updated_at: datetime
-
-    class Config:
-        from_attributes = True
 
 
 class WebhookFilterParams(BaseModel):
