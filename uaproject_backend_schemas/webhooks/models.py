@@ -22,7 +22,7 @@ class Webhook(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
     __scope_prefix__ = "webhook"
 
     endpoint: SerializableHttpUrl = Field(sa_column=Column(JSON, nullable=False))
-    user_id: int = Field(foreign_key="users.id", nullable=True)
+    user_id: int | None = Field(foreign_key="users.id", nullable=True)
 
     status: WebhookStatus = Field(
         sa_column=Column(
