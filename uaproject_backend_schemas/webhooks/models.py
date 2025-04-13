@@ -21,7 +21,7 @@ class Webhook(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
 
     endpoint: SerializableHttpUrl = Field(sa_column=Column(JSON, nullable=False))
     user_id: int | None = Field(
-        sa_column=Column(ForeignKey("users.id"), BigInteger(), nullable=True)
+        sa_column=Column(BigInteger(), ForeignKey("users.id"), nullable=True)
     )
 
     status: WebhookStatus = Field(

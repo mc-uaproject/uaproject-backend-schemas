@@ -20,12 +20,12 @@ class PurchasedItem(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=T
     __tablename__ = "purchased_items"
     __scope_prefix__ = "purchased_item"
 
-    user_id: int = Field(sa_column=Column(ForeignKey("users.id"), BigInteger(), nullable=False))
+    user_id: int = Field(sa_column=Column(BigInteger(), ForeignKey("users.id"), nullable=False))
     service_id: int = Field(
-        sa_column=Column(ForeignKey("services.id"), BigInteger(), nullable=False)
+        sa_column=Column(BigInteger(), ForeignKey("services.id"), nullable=False)
     )
     transaction_id: int = Field(
-        sa_column=Column(ForeignKey("transactions.id"), BigInteger(), nullable=False)
+        sa_column=Column(BigInteger(), ForeignKey("transactions.id"), nullable=False)
     )
     status: PurchasedItemStatus = Field(
         sa_column=Column(

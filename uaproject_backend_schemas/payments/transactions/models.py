@@ -23,12 +23,16 @@ class Transaction(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=Tru
     __tablename__ = "transactions"
     __scope_prefix__ = "transaction"
 
-    user_id: int = Field(sa_column=Column(ForeignKey("users.id"), BigInteger(), nullable=False))
+    user_id: int = Field(sa_column=Column(BigInteger(), ForeignKey("users.id"), nullable=False))
     amount: SerializableDecimal = Field(sa_column=Column(DECIMAL(10, 2), nullable=False))
     type: TransactionType = Field(sa_column=Column(Enum(TransactionType, native_enum=False)))
     description: Optional[str] = Field(max_length=255, nullable=True)
-    recipient_id: int = Field(sa_column=Column(ForeignKey("users.id"), BigInteger(), nullable=False))
-    service_id: Optional[int] = Field(sa_column=Column(ForeignKey("services.id"), BigInteger(), nullable=True))
+    recipient_id: int = Field(
+        sa_column=Column(BigInteger(), ForeignKey("users.id"), nullable=False)
+    )
+    service_id: Optional[int] = Field(
+        sa_column=Column(BigInteger(), ForeignKey("services.id"), nullable=True)
+    )
     transaction_metadata: Optional[Dict[str, Any]] = Field(sa_column=Column(JSON, nullable=True))
 
     service: Optional["Service"] = Relationship(

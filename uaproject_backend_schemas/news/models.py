@@ -20,7 +20,7 @@ class News(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
     __tablename__ = "news"
     __scope_prefix__ = "news"
 
-    user_id: int = Field(sa_column=Column(ForeignKey("users.id"), BigInteger(), nullable=True))
+    user_id: int = Field(sa_column=Column(BigInteger(), ForeignKey("users.id"), nullable=True))
 
     type: NewsType = Field(
         sa_column=Column(

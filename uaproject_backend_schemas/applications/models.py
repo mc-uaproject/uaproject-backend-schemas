@@ -34,7 +34,7 @@ class Application(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=Tru
         "quiz_answer",
     ]
 
-    user_id: int = Field(sa_column=Column(ForeignKey("users.id"), BigInteger(), nullable=False, unique=True))
+    user_id: int = Field(sa_column=Column(BigInteger(), ForeignKey("users.id"), nullable=False, unique=True))
     user: Optional["User"] = Relationship(
         back_populates="application", sa_relationship_kwargs={"uselist": False}
     )

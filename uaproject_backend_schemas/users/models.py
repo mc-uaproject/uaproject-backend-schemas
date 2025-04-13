@@ -118,7 +118,7 @@ class Token(Base, IDMixin, TimestampsMixin, table=True):
 
     token: uuid.UUID = Field(default_factory=uuid.uuid4, nullable=False, unique=True)
 
-    user_id: int = Field(sa_column=Column(ForeignKey("users.id"), BigInteger(), nullable=False))
+    user_id: int = Field(sa_column=Column(BigInteger(), ForeignKey("users.id"), nullable=False))
     user: "User" = Relationship(back_populates="token")
 
 
