@@ -41,7 +41,7 @@ class TimestampsMixin(BaseModel):
     @computed_field(return_type=datetime)
     @property
     def created_at(self) -> datetime:
-        millis = self.id // 1000
+        millis = self.id // 1000_000
         return EPOCH + timedelta(milliseconds=millis)
 
 
