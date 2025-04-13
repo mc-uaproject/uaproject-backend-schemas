@@ -1,8 +1,7 @@
 from typing import TYPE_CHECKING, Optional
 from uuid import UUID, uuid4
 
-from sqlalchemy import DECIMAL, Column
-from sqlmodel import BigInteger, Field, Relationship
+from sqlmodel import DECIMAL, BigInteger, Column, Field, ForeignKey, Relationship
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.schemas import SerializableDecimal
@@ -19,9 +18,13 @@ class Balance(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True):
     __tablename__ = "balances"
     __scope_prefix__ = "balance"
 
-    user_id: int = Field(foreign_key="users.id", sa_column=Column(BigInteger(), nullable=False, unique=True))
+    user_id: int = Field(
+        sa_column=Column(ForeignKey("users.id"), BigInteger(), nullable=False, unique=True)
+    )
     identifier: UUID = Field(default_factory=uuid4, nullable=False, unique=True)
-    amount: SerializableDecimal = Field(default=SerializableDecimal("0.00"), sa_column=Column(DECIMAL(10, 2)))
+    amount: SerializableDecimal = Field(
+        default=SerializableDecimal("0.00"), sa_column=Column(DECIMAL(10, 2))
+    )
     user: Optional["User"] = Relationship(
         back_populates="balance", sa_relationship_kwargs={"uselist": False}
     )

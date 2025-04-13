@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlmodel import DECIMAL, BigInteger, Column, Field
+from sqlmodel import DECIMAL, BigInteger, Column, Field, ForeignKey
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.schemas import SerializableDecimal
@@ -14,8 +14,8 @@ class Donation(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True):
     __tablename__ = "donations"
     __scope_prefix__ = "donation"
 
-    user_id: int = Field(foreign_key="users.id", sa_column=Column(BigInteger(), nullable=False))
-    balance_id: int = Field(foreign_key="balances.id", sa_column=Column(BigInteger(), nullable=False))
+    user_id: int = Field(sa_column=Column(ForeignKey("users.id"), BigInteger(), nullable=False))
+    balance_id: int = Field(sa_column=Column(ForeignKey("balances.id"), BigInteger(), nullable=False))
     amount: SerializableDecimal = Field(sa_column=Column(DECIMAL(10, 2), nullable=False))
     currency: str = Field(max_length=3)
     donor_name: str = Field(max_length=255)

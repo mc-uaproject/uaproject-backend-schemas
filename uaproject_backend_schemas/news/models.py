@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import Column
 from sqlalchemy import Enum as SQLAlchemyEnum
-from sqlmodel import BigInteger, Field, Relationship
+from sqlmodel import BigInteger, Field, ForeignKey, Relationship
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.news.schemas import ImportanceType, NewsType
@@ -20,7 +20,7 @@ class News(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
     __tablename__ = "news"
     __scope_prefix__ = "news"
 
-    user_id: int = Field(foreign_key="users.id", sa_column=Column(BigInteger(), nullable=True))
+    user_id: int = Field(sa_column=Column(ForeignKey("users.id"), BigInteger(), nullable=True))
 
     type: NewsType = Field(
         sa_column=Column(

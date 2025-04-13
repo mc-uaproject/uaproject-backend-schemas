@@ -2,8 +2,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, ClassVar, List, Optional
 
 from pydantic import model_validator
-from sqlalchemy import ARRAY, Column, Enum, String
-from sqlmodel import BigInteger, Field, Relationship
+from sqlmodel import ARRAY, BigInteger, Column, Enum, Field, ForeignKey, Relationship, String
 
 from uaproject_backend_schemas.applications.payload import (
     ApplicationFormPayload,
@@ -35,7 +34,7 @@ class Application(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=Tru
         "quiz_answer",
     ]
 
-    user_id: int = Field(foreign_key="users.id", sa_column=Column(BigInteger(), nullable=False, unique=True))
+    user_id: int = Field(sa_column=Column(ForeignKey("users.id"), BigInteger(), nullable=False, unique=True))
     user: Optional["User"] = Relationship(
         back_populates="application", sa_relationship_kwargs={"uselist": False}
     )

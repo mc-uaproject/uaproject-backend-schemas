@@ -1,9 +1,7 @@
 import logging
 from typing import TYPE_CHECKING, Dict, Optional
 
-from sqlalchemy import JSON, Column
-from sqlalchemy import Enum as SQLAlchemyEnum
-from sqlmodel import BigInteger, Field, Relationship
+from sqlmodel import JSON, BigInteger, Column, Enum, Field, ForeignKey, Relationship
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.schemas import SerializableHttpUrl
@@ -22,11 +20,13 @@ class Webhook(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
     __scope_prefix__ = "webhook"
 
     endpoint: SerializableHttpUrl = Field(sa_column=Column(JSON, nullable=False))
-    user_id: int | None = Field(foreign_key="users.id", sa_column=Column(BigInteger(), nullable=True))
+    user_id: int | None = Field(
+        sa_column=Column(ForeignKey("users.id"), BigInteger(), nullable=True)
+    )
 
     status: WebhookStatus = Field(
         sa_column=Column(
-            SQLAlchemyEnum(WebhookStatus, native_enum=False),
+            Enum(WebhookStatus, native_enum=False),
             default=WebhookStatus.ACTIVE.value,
             server_default=WebhookStatus.ACTIVE.value,
         )

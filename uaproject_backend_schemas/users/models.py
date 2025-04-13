@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, List, Optional
 
 from pydantic import model_validator
 from sqlalchemy import BigInteger, Column
-from sqlmodel import Field, Relationship
+from sqlmodel import Field, ForeignKey, Relationship
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.users.payload import DiscordIdPayload, MinecraftNicknamePayload
@@ -118,7 +118,7 @@ class Token(Base, IDMixin, TimestampsMixin, table=True):
 
     token: uuid.UUID = Field(default_factory=uuid.uuid4, nullable=False, unique=True)
 
-    user_id: int = Field(foreign_key="users.id", sa_column=Column(BigInteger(), nullable=False))
+    user_id: int = Field(sa_column=Column(ForeignKey("users.id"), BigInteger(), nullable=False))
     user: "User" = Relationship(back_populates="token")
 
 

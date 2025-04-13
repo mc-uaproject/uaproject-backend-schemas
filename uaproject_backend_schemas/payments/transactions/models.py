@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
-from sqlmodel import DECIMAL, JSON, BigInteger, Column, Enum, Field, Relationship
+from sqlmodel import DECIMAL, JSON, BigInteger, Column, Enum, Field, ForeignKey, Relationship
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.payments.services.models import Service
@@ -23,12 +23,12 @@ class Transaction(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=Tru
     __tablename__ = "transactions"
     __scope_prefix__ = "transaction"
 
-    user_id: int = Field(foreign_key="users.id", sa_column=Column(BigInteger(), nullable=False))
+    user_id: int = Field(sa_column=Column(ForeignKey("users.id"), BigInteger(), nullable=False))
     amount: SerializableDecimal = Field(sa_column=Column(DECIMAL(10, 2), nullable=False))
     type: TransactionType = Field(sa_column=Column(Enum(TransactionType, native_enum=False)))
     description: Optional[str] = Field(max_length=255, nullable=True)
-    recipient_id: int = Field(foreign_key="users.id", sa_column=Column(BigInteger(), nullable=False))
-    service_id: Optional[int] = Field(foreign_key="services.id", sa_column=Column(BigInteger(), nullable=True))
+    recipient_id: int = Field(sa_column=Column(ForeignKey("users.id"), BigInteger(), nullable=False))
+    service_id: Optional[int] = Field(sa_column=Column(ForeignKey("services.id"), BigInteger(), nullable=True))
     transaction_metadata: Optional[Dict[str, Any]] = Field(sa_column=Column(JSON, nullable=True))
 
     service: Optional["Service"] = Relationship(

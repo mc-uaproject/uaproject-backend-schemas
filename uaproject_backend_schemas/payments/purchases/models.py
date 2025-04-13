@@ -1,7 +1,6 @@
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import Enum
-from sqlmodel import BigInteger, Column, Field, Relationship
+from sqlmodel import BigInteger, Column, Enum, Field, ForeignKey, Relationship
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.payments.purchases.schemas import PurchasedItemStatus
@@ -16,13 +15,18 @@ if TYPE_CHECKING:
 
 __all__ = ["PurchasedItem"]
 
+
 class PurchasedItem(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True):
     __tablename__ = "purchased_items"
     __scope_prefix__ = "purchased_item"
 
-    user_id: int = Field(foreign_key="users.id", sa_column=Column(BigInteger(), nullable=False))
-    service_id: int = Field(foreign_key="services.id", sa_column=Column(BigInteger(), nullable=False))
-    transaction_id: int = Field(foreign_key="transactions.id", nullable=False)
+    user_id: int = Field(sa_column=Column(ForeignKey("users.id"), BigInteger(), nullable=False))
+    service_id: int = Field(
+        sa_column=Column(ForeignKey("services.id"), BigInteger(), nullable=False)
+    )
+    transaction_id: int = Field(
+        sa_column=Column(ForeignKey("transactions.id"), BigInteger(), nullable=False)
+    )
     status: PurchasedItemStatus = Field(
         sa_column=Column(
             Enum(PurchasedItemStatus, native_enum=False),
