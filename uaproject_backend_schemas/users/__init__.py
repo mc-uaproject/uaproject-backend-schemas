@@ -14,6 +14,7 @@ from .payload import (
 )
 from .roles import Role, RoleCreate, RoleFilterParams, RoleResponse, RoleSort, RoleUpdate, UserRoles
 from .schemas import (
+    SearchMode,
     TokenResponse,
     UserCreate,
     UserFilterParams,
@@ -53,4 +54,5 @@ __all__ = [
     "DiscordIdPayload",
     "MinecraftNicknamePayloadFull",
     "DiscordIdPayloadFull",
+    "SearchMode",
 ]

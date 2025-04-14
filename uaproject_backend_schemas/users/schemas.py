@@ -16,6 +16,7 @@ __all__ = [
     "UserResponse",
     "UserFilterParams",
     "UserSort",
+    "SearchMode",
 ]
 
 class SearchMode(StrEnum):
