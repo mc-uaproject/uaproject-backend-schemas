@@ -18,6 +18,9 @@ __all__ = [
     "UserSort",
 ]
 
+class SearchMode(StrEnum):
+    SIMILAR = "similar"
+    ANY = "any"
 
 class TokenResponse(BaseModel):
     token: UUID
