@@ -49,10 +49,6 @@ class ServiceDiscount(BaseModel):
     reason: Optional[str] = None
 
 
-class ServiceMetadata(BaseModel):
-    data: Dict[str, Any] = Field(default_factory=dict)
-
-
 class ServiceBase(BaseResponseModel):
     name: str
     display_name: Optional[str] = None
@@ -67,7 +63,7 @@ class ServiceBase(BaseResponseModel):
     is_upgradable: Optional[bool] = False
     upgrade_from: Optional[str] = None
     upgrade_to: Optional[str] = None
-    service_metadata: Optional[ServiceMetadata] = None
+    service_metadata: Dict[str, Any] = Field(default_factory=dict)
     discounts: Optional[List[ServiceDiscount]] = None
 
 
@@ -89,7 +85,7 @@ class ServiceUpdate(ServiceBase):
     is_upgradable: Optional[bool] = None
     upgrade_from: Optional[str] = None
     upgrade_to: Optional[str] = None
-    service_metadata: Optional[ServiceMetadata] = None
+    service_metadata: Dict[str, Any] = Field(default_factory=dict)
     discounts: Optional[List[ServiceDiscount]] = None
 
 

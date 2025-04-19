@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from sqlmodel import DECIMAL, JSON, Column, Enum, Field
 
@@ -33,7 +33,7 @@ class Service(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True):
     is_upgradable: bool = Field(default=False)
     upgrade_from: Optional[str] = Field(max_length=100, nullable=True)
     upgrade_to: Optional[str] = Field(max_length=100, nullable=True)
-    service_metadata: Optional[ServiceMetadata] = Field(sa_column=Column(JSON), default=None)
+    service_metadata: Optional[Dict[str, Any]] = Field(sa_column=Column(JSON), default=None)
     discounts: Optional[List[ServiceDiscount]] = Field(sa_column=Column(JSON), default=None)
 
     @classmethod
