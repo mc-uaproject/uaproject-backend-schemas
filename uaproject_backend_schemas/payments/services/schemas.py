@@ -85,7 +85,7 @@ class ServiceUpdate(ServiceBase):
     is_upgradable: Optional[bool] = None
     upgrade_from: Optional[str] = None
     upgrade_to: Optional[str] = None
-    service_metadata: Dict[str, Any] = Field(default_factory=dict)
+    service_metadata: Optional[Dict[str, Any]] = None
     discounts: Optional[List[ServiceDiscount]] = None
 
 

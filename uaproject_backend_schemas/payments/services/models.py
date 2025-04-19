@@ -5,7 +5,6 @@ from sqlmodel import DECIMAL, JSON, Column, Enum, Field
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.payments.services.schemas import (
     ServiceDiscount,
-    ServiceMetadata,
     ServicePoint,
     ServiceType,
 )
