@@ -29,7 +29,7 @@ class Service(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True):
     currency: str = Field(max_length=3, default="UAH")
     is_active: bool = Field(default=True)
     category: Optional[str] = Field(max_length=100, nullable=True)
-    type: ServiceType = Field(a_column=Column(Enum(ServiceType, native_enum=False)))
+    type: ServiceType = Field(sa_column=Column(Enum(ServiceType, native_enum=False)))
     duration_months: Optional[int] = Field(nullable=True)
     is_upgradable: bool = Field(default=False)
     upgrade_from: Optional[str] = Field(max_length=100, nullable=True)
