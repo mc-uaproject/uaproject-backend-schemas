@@ -15,7 +15,6 @@ __all__ = [
     "ServiceResponse",
     "ServiceFilterParams",
     "ServicePoint",
-    "ServicePoints",
     "ServiceDiscount",
     "ServiceMetadata",
 ]
@@ -42,17 +41,6 @@ class ServicePoint(BaseModel):
     tooltip: Optional[str] = None
 
 
-class ServicePoints(BaseModel):
-    title: str
-    identifier: str
-    discount: Optional[float] = 0
-    sub_title: Optional[str] = None
-    img: Optional[str] = None
-    price: float
-    price_sub_title: Optional[str] = None
-    points: List[ServicePoint]
-
-
 class ServiceDiscount(BaseModel):
     user_id: Optional[int] = None
     discount_percent: float
@@ -69,7 +57,7 @@ class ServiceBase(BaseResponseModel):
     name: str
     display_name: Optional[str] = None
     description: Optional[str] = None
-    points: Optional[List[ServicePoints]] = None
+    points: Optional[List[ServicePoint]] = None
     image: Optional[str] = None
     price: SerializableDecimal
     is_active: bool = True
@@ -91,7 +79,7 @@ class ServiceUpdate(ServiceBase):
     name: Optional[str] = None
     display_name: Optional[str] = None
     description: Optional[str] = None
-    points: Optional[List[ServicePoints]] = None
+    points: Optional[List[ServicePoint]] = None
     image: Optional[str] = None
     price: Optional[SerializableDecimal] = None
     is_active: Optional[bool] = None

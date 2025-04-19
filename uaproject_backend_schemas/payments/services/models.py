@@ -6,7 +6,7 @@ from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.payments.services.schemas import (
     ServiceDiscount,
     ServiceMetadata,
-    ServicePoints,
+    ServicePoint,
     ServiceType,
 )
 from uaproject_backend_schemas.schemas import SerializableDecimal
@@ -23,7 +23,7 @@ class Service(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True):
     name: str = Field(max_length=255, unique=True, nullable=False)
     display_name: Optional[str] = Field(max_length=255, nullable=True)
     description: Optional[str] = Field(max_length=1000, nullable=True)
-    points: Optional[List[ServicePoints]] = Field(sa_column=Column(JSON), default=None)
+    points: Optional[List[ServicePoint]] = Field(sa_column=Column(JSON), default=None)
     image: Optional[str] = Field(max_length=500, nullable=True)
     price: SerializableDecimal = Field(sa_column=Column(DECIMAL(10, 2), nullable=False))
     is_active: bool = Field(default=True)
