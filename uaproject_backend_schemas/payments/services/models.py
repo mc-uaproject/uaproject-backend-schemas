@@ -42,7 +42,7 @@ class Service(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True):
             "full",
             trigger_fields={
                 "name", "display_name", "description", "points", "image",
-                "price", "currency", "is_active", "category", "type",
+                "price", "is_active", "category", "type",
                 "duration_months", "is_upgradable", "upgrade_from", "upgrade_to",
                 "service_metadata", "discounts"
             },
@@ -59,7 +59,7 @@ class Service(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True):
         cls.register_scope(
             "price",
             trigger_fields={"price"},
-            fields={"id", "name", "display_name", "price", "currency"},
+            fields={"id", "name", "display_name", "price"},
             stage=WebhookStage.BOTH,
         )
 
