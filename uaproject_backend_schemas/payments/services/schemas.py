@@ -72,7 +72,6 @@ class ServiceBase(BaseResponseModel):
     points: Optional[List[ServicePoints]] = None
     image: Optional[str] = None
     price: SerializableDecimal
-    currency: str = "UAH"
     is_active: bool = True
     category: Optional[str] = None
     type: ServiceType
@@ -95,7 +94,6 @@ class ServiceUpdate(ServiceBase):
     points: Optional[List[ServicePoints]] = None
     image: Optional[str] = None
     price: Optional[SerializableDecimal] = None
-    currency: Optional[str] = None
     is_active: Optional[bool] = None
     category: Optional[str] = None
     type: Optional[ServiceType] = None

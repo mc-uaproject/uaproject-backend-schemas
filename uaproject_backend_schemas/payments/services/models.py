@@ -26,7 +26,6 @@ class Service(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True):
     points: Optional[List[ServicePoints]] = Field(sa_column=Column(JSON), default=None)
     image: Optional[str] = Field(max_length=500, nullable=True)
     price: SerializableDecimal = Field(sa_column=Column(DECIMAL(10, 2), nullable=False))
-    currency: str = Field(max_length=3, default="UAH")
     is_active: bool = Field(default=True)
     category: Optional[str] = Field(max_length=100, nullable=True)
     type: ServiceType = Field(sa_column=Column(Enum(ServiceType, native_enum=False)))
