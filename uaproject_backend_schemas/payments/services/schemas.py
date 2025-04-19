@@ -16,7 +16,6 @@ __all__ = [
     "ServiceFilterParams",
     "ServicePoint",
     "ServiceDiscount",
-    "ServiceMetadata",
 ]
 
 
@@ -63,7 +62,7 @@ class ServiceBase(BaseResponseModel):
     is_upgradable: Optional[bool] = False
     upgrade_from: Optional[str] = None
     upgrade_to: Optional[str] = None
-    service_metadata: Dict[str, Any] = Field(default_factory=dict)
+    service_metadata: Optional[Dict[str, Any]] = Field(default_factory=dict)
     discounts: Optional[List[ServiceDiscount]] = None
 
 
