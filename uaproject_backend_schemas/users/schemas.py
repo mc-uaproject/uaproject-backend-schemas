@@ -39,12 +39,16 @@ class UserCreate(BaseResponseModel):
     minecraft_nickname: Optional[str] = None
     discord_id: Optional[int] = None
     is_superuser: Optional[bool] = False
+    biography: Optional[str] = None
+    access: Optional[bool] = False
 
 
 class UserUpdate(BaseModel):
     minecraft_nickname: Optional[str] = None
     discord_id: Optional[int] = None
     is_superuser: Optional[bool] = None
+    biography: Optional[str] = None
+    access: Optional[bool] = None
 
     @model_validator(mode="before")
     def validate_minecraft_nickname(cls, values):
@@ -58,12 +62,21 @@ class UserUpdate(BaseModel):
                 )
         return values
 
+    @model_validator(mode="before")
+    def validate_biography(cls, values):
+        biography = values.get("biography")
+        if biography is not None and len(biography) > 2048:
+            raise ValueError("Biography must not exceed 2048 characters.")
+        return values
+
 
 class UserResponse(BaseResponseModel):
     id: int
     discord_id: Optional[int] = None
     minecraft_nickname: Optional[str] = None
     is_superuser: bool = False
+    biography: Optional[str] = None
+    access: bool = False
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
 
@@ -76,6 +89,8 @@ class UserFilterParams(BaseModel):
     minecraft_nickname: Optional[str] = None
     is_superuser: Optional[bool] = None
     role_name: Optional[str] = None
+    biography: Optional[str] = None
+    access: Optional[bool] = None
 
 
 class UserSort(StrEnum):

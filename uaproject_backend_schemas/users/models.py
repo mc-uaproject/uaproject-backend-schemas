@@ -34,6 +34,8 @@ class User(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
         default=None, index=True, nullable=True, max_length=16
     )
     is_superuser: Optional[bool] = Field(default=False, nullable=True)
+    biography: Optional[str] = Field(default=None, nullable=True)
+    access: Optional[bool] = Field(default=False, nullable=True)
 
     roles: List["Role"] = Relationship(
         back_populates="users", sa_relationship_kwargs={"secondary": UserRoles.__table__}
@@ -107,8 +109,14 @@ class User(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
         )
 
         cls.register_scope(
+            "access",
+            trigger_fields={"access"},
+            stage=WebhookStage.BOTH,
+        )
+
+        cls.register_scope(
             "full",
-            trigger_fields={"discord_id", "minecraft_nickname", "is_superuser"},
+            trigger_fields={"discord_id", "minecraft_nickname", "is_superuser", "access"},
             stage=WebhookStage.AFTER,
         )
 
