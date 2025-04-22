@@ -51,6 +51,7 @@ class TimestampsMixin(BaseModel):
     )
 
     computed_field(return_type=Optional[datetime])
+
     @property
     def created_at(self) -> Optional[datetime]:
         try:

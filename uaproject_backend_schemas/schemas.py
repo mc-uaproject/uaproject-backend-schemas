@@ -1,10 +1,11 @@
 from decimal import Decimal
 from enum import StrEnum
-from typing import Any
+from typing import Any, TypeVar
 from urllib.parse import urlparse
 
 from pydantic import BaseModel, GetCoreSchemaHandler
 from pydantic_core import CoreSchema, core_schema
+from sqlalchemy.orm import DeclarativeBase
 
 __all__ = [
     "SortOrder",
@@ -13,7 +14,17 @@ __all__ = [
     "RedirectUrlResponse",
     "SerializableHttpUrl",
     "SerializableDecimal",
+    "ModelType",
+    "CreateSchemaType",
+    "UpdateSchemaType",
+    "FilterSchemaType",
 ]
+
+
+ModelType = TypeVar("ModelType", bound=DeclarativeBase)
+CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
+UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
+FilterSchemaType = TypeVar("FilterSchemaType", bound=BaseModel)
 
 
 class SortOrder(StrEnum):
