@@ -3,7 +3,7 @@ from enum import StrEnum
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from uaproject_backend_schemas.base import BaseResponseModel
 from uaproject_backend_schemas.schemas import SerializableDecimal, UserDefaultSort
@@ -23,9 +23,7 @@ class BalanceResponse(BaseResponseModel):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
-        json_encoders = {UUID: str}  # noqa: RUF012
+    model_config = ConfigDict(from_attributes=True, json_encoders={UUID: str})
 
 
 class BalanceFilterParams(BaseModel):

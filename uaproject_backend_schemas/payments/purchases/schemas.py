@@ -2,12 +2,21 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from uaproject_backend_schemas.base import BaseResponseModel
 from uaproject_backend_schemas.schemas import UserDefaultSort
 
-__all__ = ["PurchasedItemStatus", "PurchasedItemSort", "PurchasedItemBase", "PurchasedItemCreate", "PurchasedItemUpdate", "PurchasedItemResponse", "PurchasedItemFilterParams"]
+__all__ = [
+    "PurchasedItemStatus",
+    "PurchasedItemSort",
+    "PurchasedItemBase",
+    "PurchasedItemCreate",
+    "PurchasedItemUpdate",
+    "PurchasedItemResponse",
+    "PurchasedItemFilterParams",
+]
+
 
 class PurchasedItemStatus(StrEnum):
     ACTIVE = "active"
@@ -48,8 +57,7 @@ class PurchasedItemResponse(PurchasedItemBase):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PurchasedItemFilterParams(BaseModel):

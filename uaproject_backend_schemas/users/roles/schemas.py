@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from uaproject_backend_schemas.base import BaseResponseModel
 
@@ -45,5 +45,4 @@ class RoleResponse(BaseResponseModel):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

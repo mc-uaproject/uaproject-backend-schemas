@@ -2,13 +2,20 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, field_validator
 from pydantic import Field as PydanticField
 
 from uaproject_backend_schemas.base import BaseResponseModel
 from uaproject_backend_schemas.schemas import SerializableDecimal, UserDefaultSort
 
-__all__ = ["DonationSort", "DonationFilterParams", "DonationBase", "DonationCreate", "DonationUpdate", "DonationResponse"]
+__all__ = [
+    "DonationSort",
+    "DonationFilterParams",
+    "DonationBase",
+    "DonationCreate",
+    "DonationUpdate",
+    "DonationResponse",
+]
 
 
 class DonationSort(StrEnum):
@@ -33,7 +40,12 @@ class DonationFilterParams(BaseResponseModel):
 
     @field_validator("max_amount")
     def validate_max_amount(cls, v, values):
-        if v is not None and "min_amount" in values and values["min_amount"] is not None and v < values["min_amount"]:
+        if (
+            v is not None
+            and "min_amount" in values
+            and values["min_amount"] is not None
+            and v < values["min_amount"]
+        ):
             raise ValueError("max_amount cannot be less than min_amount")
         return v
 
@@ -70,5 +82,4 @@ class DonationResponse(DonationBase):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

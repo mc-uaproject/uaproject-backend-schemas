@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Any, Dict, Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from uaproject_backend_schemas.base import BaseResponseModel, TimestampsMixin
 from uaproject_backend_schemas.payments.services.schemas import ServiceResponse
@@ -151,5 +151,4 @@ class TransactionResponse(TransactionBase, TimestampsMixin):
     service_id: Optional[int] = None
     service: Optional[ServiceResponse] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

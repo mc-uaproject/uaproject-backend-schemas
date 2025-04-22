@@ -3,7 +3,7 @@ from enum import StrEnum
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, ConfigDict, model_validator
 
 from uaproject_backend_schemas.base import BaseResponseModel
 from uaproject_backend_schemas.schemas import UserDefaultSort
@@ -19,9 +19,11 @@ __all__ = [
     "SearchMode",
 ]
 
+
 class SearchMode(StrEnum):
     SIMILAR = "similar"
     ANY = "any"
+
 
 class TokenResponse(BaseModel):
     token: UUID
@@ -65,8 +67,7 @@ class UserResponse(BaseResponseModel):
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserFilterParams(BaseModel):
