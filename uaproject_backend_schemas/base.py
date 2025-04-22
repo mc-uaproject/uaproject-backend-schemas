@@ -24,10 +24,12 @@ class BaseResponseModel(BaseModel):
 
     @model_serializer
     def serialize(self) -> dict[str, Any]:
-        result = self.model_dump()
-        for key, value in result.items():
+        result = {}
+        for key, value in self.__dict__.items():
             if isinstance(value, int) and abs(value) > 2**53:
                 result[key] = str(value)
+            else:
+                result[key] = value
         return result
 
 
