@@ -76,7 +76,7 @@ class UserResponse(BaseResponseModel):
     minecraft_nickname: Optional[str] = None
     is_superuser: bool = False
     biography: Optional[str] = None
-    access: bool = False
+    access: Optional[bool] = False
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
 
