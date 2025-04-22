@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Any, Dict, Optional
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 from uaproject_backend_schemas.base import BaseResponseModel, TimestampsMixin
 from uaproject_backend_schemas.payments.services.schemas import ServiceResponse
@@ -41,7 +41,7 @@ class TransactionBase(BaseResponseModel):
     amount: Optional[SerializableDecimal] = None
     recipient_id: Optional[int] = None
     type: TransactionType
-    description: Optional[str] = None
+    description: Optional[str] = Field(default=None, alias="reason")
     transaction_metadata: Optional[Dict[str, Any]] = None
     user_id: Optional[int] = None
     service_id: Optional[int] = None
@@ -121,12 +121,10 @@ class SystemDepositTransaction(TransactionBase):
 class RefundTransaction(TransactionBase):
     type: TransactionType = TransactionType.REFUND
     original_transaction_id: int
-    reason: str
 
 
 class AdjustmentTransaction(TransactionBase):
     type: TransactionType = TransactionType.ADJUSTMENT
-    reason: str
 
 
 class DonationTransaction(TransactionBase):
