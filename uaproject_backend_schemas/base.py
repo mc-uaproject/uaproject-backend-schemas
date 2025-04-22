@@ -1,7 +1,7 @@
 from datetime import UTC, datetime, timedelta
 from typing import Any, Literal, Optional
 
-from pydantic import BaseModel, ConfigDict, computed_field
+from pydantic import BaseModel, ConfigDict, computed_field, model_serializer
 from sqlmodel import BigInteger, Field, SQLModel
 
 from uaproject_backend_schemas.id_generator import UAIdGenerator
@@ -22,12 +22,10 @@ def utcnow():
 class BaseResponseModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    def model_dump(self, *args, **kwargs) -> dict[str, Any]:
-        result = super().model_dump(*args, **kwargs)
-        for key, value in result.items():
-            if isinstance(value, int) and abs(value) > 2**53:
-                result[key] = str(value)
-        return result
+    @model_serializer(mode="plain")
+    def serialize_model(self):
+        data = self.__dict__
+        return {k: str(v) if isinstance(v, int) and abs(v) > 2**53 else v for k, v in data.items()}
 
 
 class IDMixin(BaseModel):
