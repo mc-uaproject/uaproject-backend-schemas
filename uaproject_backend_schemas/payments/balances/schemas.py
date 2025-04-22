@@ -3,7 +3,7 @@ from enum import StrEnum
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_serializer
 
 from uaproject_backend_schemas.base import BaseResponseModel
 from uaproject_backend_schemas.schemas import SerializableDecimal, UserDefaultSort
@@ -23,7 +23,11 @@ class BalanceResponse(BaseResponseModel):
     created_at: datetime
     updated_at: datetime
 
-    model_config = ConfigDict(from_attributes=True, json_encoders={UUID: str})
+    model_config = ConfigDict(from_attributes=True)
+
+    @field_serializer('identifier')
+    def serialize_identifier(self, identifier: UUID, _info):
+        return str(identifier)
 
 
 class BalanceFilterParams(BaseModel):
