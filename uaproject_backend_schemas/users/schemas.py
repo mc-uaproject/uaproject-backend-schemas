@@ -111,7 +111,7 @@ class UserResponse(BaseResponseModel):
     @classmethod
     def model_rebuild(cls, **kwargs):
         from uaproject_backend_schemas.payments import TransactionResponse  # noqa: F401
-        cls.__pydantic_model_rebuild__()
+        return super().model_rebuild(**kwargs)
 
     def __init__(self, **data):
         super().__init__(**data)
