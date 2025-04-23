@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import datetime
 from enum import StrEnum
 from typing import TYPE_CHECKING, List, Optional
@@ -90,16 +88,36 @@ class UserResponse(BaseResponseModel):
     updated_at: Optional[datetime]
 
     # Relationships
-    roles: Optional[List[RoleResponse]] = None
+    roles: Optional[List["RoleResponse"]] = None
     token: Optional[UUID] = None
-    punishments: Optional[List[PunishmentResponse]] = None
-    balance: Optional[BalanceResponse] = None
-    application: Optional[ApplicationResponse] = None
-    transactions: Optional[List[TransactionResponse]] = None
-    received_transactions: Optional[List[TransactionResponse]] = None
-    webhooks: Optional[List[WebhookResponse]] = None
+    punishments: Optional[List["PunishmentResponse"]] = None
+    balance: Optional["BalanceResponse"] = None
+    application: Optional["ApplicationResponse"] = None
+    transactions: Optional[List["TransactionResponse"]] = None
+    received_transactions: Optional[List["TransactionResponse"]] = None
+    webhooks: Optional[List["WebhookResponse"]] = None
 
     model_config = ConfigDict(from_attributes=True)
+
+    # def model_post_init(self, __context) -> None:
+    #     super().model_post_init(__context)
+    #     # Update forward refs
+    #     from uaproject_backend_schemas.applications.schemas import ApplicationResponse
+    #     from uaproject_backend_schemas.payments import BalanceResponse, TransactionResponse
+    #     from uaproject_backend_schemas.punishments.schemas import PunishmentResponse
+    #     from uaproject_backend_schemas.users.roles.schemas import RoleResponse
+    #     from uaproject_backend_schemas.webhooks.schemas import WebhookResponse
+
+    #     self.model_rebuild(
+    #         _types_namespace={
+    #             "RoleResponse": RoleResponse,
+    #             "PunishmentResponse": PunishmentResponse,
+    #             "BalanceResponse": BalanceResponse,
+    #             "ApplicationResponse": ApplicationResponse,
+    #             "TransactionResponse": TransactionResponse,
+    #             "WebhookResponse": WebhookResponse,
+    #         }
+    #     )
 
 
 class UserFilterParams(BaseModel):
