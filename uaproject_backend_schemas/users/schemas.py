@@ -104,14 +104,13 @@ class UserResponse(BaseResponseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+    @classmethod
+    def model_rebuild(cls):
+        from uaproject_backend_schemas.payments import TransactionResponse
+        super().model_rebuild()
+
     def __init__(self, **data):
         super().__init__(**data)
-
-    def model_rebuild(self):
-        from uaproject_backend_schemas.payments import TransactionResponse
-
-        self.__pydantic_model_rebuild__()
-        return TransactionResponse
 
 
 class UserFilterParams(BaseModel):
