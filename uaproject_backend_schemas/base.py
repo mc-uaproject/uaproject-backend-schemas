@@ -48,8 +48,7 @@ class TimestampsMixin(BaseModel):
         default_factory=utcnow, sa_column_kwargs={"onupdate": utcnow}, nullable=False
     )
 
-    computed_field(return_type=Optional[datetime])
-
+    @computed_field
     @property
     def created_at(self) -> Optional[datetime]:
         try:

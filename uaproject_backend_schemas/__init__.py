@@ -1,3 +1,5 @@
+from uaproject_backend_schemas.users.schemas import UserResponse
+
 from .schemas import (
     CreateSchemaType,
     DefaultSort,
@@ -10,8 +12,6 @@ from .schemas import (
     UpdateSchemaType,
     UserDefaultSort,
 )
-
-from uaproject_backend_schemas.users.schemas import UserResponse
 
 __all__ = [
     "DefaultSort",
