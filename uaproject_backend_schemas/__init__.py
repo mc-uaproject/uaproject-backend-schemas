@@ -11,6 +11,8 @@ from .schemas import (
     UserDefaultSort,
 )
 
+from uaproject_backend_schemas.users.schemas import UserResponse
+
 __all__ = [
     "DefaultSort",
     "SortOrder",
@@ -23,3 +25,6 @@ __all__ = [
     "UpdateSchemaType",
     "FilterSchemaType",
 ]
+
+def initialize_models():
+    UserResponse.initialize()
