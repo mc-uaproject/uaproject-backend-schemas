@@ -2,18 +2,21 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
 from uaproject_backend_schemas.applications.schemas import ApplicationResponse
 from uaproject_backend_schemas.base import BaseResponseModel
-from uaproject_backend_schemas.payments import BalanceResponse, TransactionResponse
+from uaproject_backend_schemas.payments import BalanceResponse
 from uaproject_backend_schemas.punishments.schemas import PunishmentResponse
 from uaproject_backend_schemas.schemas import UserDefaultSort
 from uaproject_backend_schemas.users.roles.schemas import RoleResponse
 from uaproject_backend_schemas.webhooks.schemas import WebhookResponse
+
+if TYPE_CHECKING:
+    from uaproject_backend_schemas.payments import TransactionResponse
 
 __all__ = [
     "TokenResponse",
@@ -98,6 +101,9 @@ class UserResponse(BaseResponseModel):
     webhooks: Optional[List["WebhookResponse"]] = None
 
     model_config = ConfigDict(from_attributes=True)
+
+    def __init__(self, **data):
+        super().__init__(**data)
 
 
 class UserFilterParams(BaseModel):
