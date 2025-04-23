@@ -102,12 +102,15 @@ class UserResponse(BaseResponseModel):
     received_transactions: Optional[List[TransactionResponse]] = None
     webhooks: Optional[List["WebhookResponse"]] = None
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True,
+        defer_build=True,
+        arbitrary_types_allowed=True
+    )
 
-    @classmethod
-    def model_rebuild(cls):
+    def model_rebuild(self):
         from uaproject_backend_schemas.payments import TransactionResponse
-        super().model_rebuild()
+        self.__pydantic_model_rebuild__()
 
     def __init__(self, **data):
         super().__init__(**data)
