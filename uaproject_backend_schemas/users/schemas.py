@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
-from typing import TYPE_CHECKING, Annotated, List, Optional
+from typing import TYPE_CHECKING, List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, model_validator
 
 from uaproject_backend_schemas.base import BaseResponseModel
 from uaproject_backend_schemas.schemas import UserDefaultSort
@@ -100,24 +100,6 @@ class UserResponse(BaseResponseModel):
     webhooks: Optional[List["WebhookResponse"]] = None
 
     model_config = ConfigDict(from_attributes=True)
-
-    @classmethod
-    def model_rebuild(cls) -> None:
-        from uaproject_backend_schemas.applications.schemas import ApplicationResponse
-        from uaproject_backend_schemas.payments import BalanceResponse, TransactionResponse
-        from uaproject_backend_schemas.punishments.schemas import PunishmentResponse
-        from uaproject_backend_schemas.users.roles.schemas import RoleResponse
-        from uaproject_backend_schemas.webhooks.schemas import WebhookResponse
-
-        ApplicationResponse.model_rebuild()
-        BalanceResponse.model_rebuild()
-        TransactionResponse.model_rebuild()
-        PunishmentResponse.model_rebuild()
-        RoleResponse.model_rebuild()
-        WebhookResponse.model_rebuild()
-
-        super().model_rebuild()
-
 
 class UserFilterParams(BaseModel):
     user_id: Optional[int] = None
