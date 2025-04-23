@@ -1,12 +1,17 @@
 from datetime import datetime
 from enum import StrEnum
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
+from uaproject_backend_schemas.applications.schemas import ApplicationResponse
 from uaproject_backend_schemas.base import BaseResponseModel
+from uaproject_backend_schemas.payments import BalanceResponse, TransactionResponse
+from uaproject_backend_schemas.punishments.schemas import PunishmentResponse
 from uaproject_backend_schemas.schemas import UserDefaultSort
+from uaproject_backend_schemas.users.roles.schemas import RoleResponse
+from uaproject_backend_schemas.webhooks.schemas import WebhookResponse
 
 __all__ = [
     "TokenResponse",
@@ -79,6 +84,16 @@ class UserResponse(BaseResponseModel):
     access: Optional[bool] = False
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
+
+    # Relationships
+    roles: Optional[List[RoleResponse]] = None
+    token: Optional[UUID] = None
+    punishments: Optional[List[PunishmentResponse]] = None
+    balance: Optional[BalanceResponse] = None
+    application: Optional[ApplicationResponse] = None
+    transactions: Optional[List[TransactionResponse]] = None
+    received_transactions: Optional[List[TransactionResponse]] = None
+    webhooks: Optional[List[WebhookResponse]] = None
 
     model_config = ConfigDict(from_attributes=True)
 
