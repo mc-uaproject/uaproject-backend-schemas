@@ -101,6 +101,7 @@ class UserResponse(BaseResponseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class UserFilterParams(BaseModel):
     user_id: Optional[int] = None
     discord_id: Optional[int] = None
@@ -118,3 +119,6 @@ class UserSort(StrEnum):
     MINECRAFT_NICKNAME = "minecraft_nickname"
     DISCORD_ID = "discord_id"
     ROLE_WEIGHT = "role_weight"
+
+
+UserResponse.model_rebuild()
