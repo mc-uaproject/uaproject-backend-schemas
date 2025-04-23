@@ -91,7 +91,7 @@ class UserResponse(BaseResponseModel):
 
     # Relationships
     roles: Optional[List["RoleResponse"]] = None
-    token: Optional[UUID] = None
+    token: Optional["TokenResponse"] = None
     punishments: Optional[List["PunishmentResponse"]] = None
     balance: Optional["BalanceResponse"] = None
     application: Optional["ApplicationResponse"] = None
@@ -119,6 +119,3 @@ class UserSort(StrEnum):
     MINECRAFT_NICKNAME = "minecraft_nickname"
     DISCORD_ID = "discord_id"
     ROLE_WEIGHT = "role_weight"
-
-
-UserResponse.model_rebuild()
