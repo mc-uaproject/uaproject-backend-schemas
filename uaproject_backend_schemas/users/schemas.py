@@ -108,18 +108,17 @@ class UserResponse(BaseResponseModel):
         arbitrary_types_allowed=True
     )
 
-    def model_rebuild(self):
+    @classmethod
+    def model_rebuild(cls, **kwargs):
         from uaproject_backend_schemas.payments import TransactionResponse  # noqa: F401
-        self.__pydantic_model_rebuild__()
+        cls.__pydantic_model_rebuild__()
 
     def __init__(self, **data):
         super().__init__(**data)
 
     @classmethod
     def initialize(cls):
-        from uaproject_backend_schemas.payments import TransactionResponse  # noqa: F401
-        instance = cls()
-        instance.model_rebuild()
+        cls.model_rebuild()
 
 
 class UserFilterParams(BaseModel):
