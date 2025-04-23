@@ -90,26 +90,33 @@ class UserResponse(BaseResponseModel):
     updated_at: Optional[datetime]
 
     # Relationships
-    roles: Optional[List[Annotated["RoleResponse", Field(description="User roles")]]] = None
+    roles: Optional[List["RoleResponse"]] = None
     token: Optional[UUID] = None
-    punishments: Optional[
-        List[Annotated["PunishmentResponse", Field(description="User punishments")]]
-    ] = None
-    balance: Optional[Annotated["BalanceResponse", Field(description="User balance")]] = None
-    application: Optional[
-        Annotated["ApplicationResponse", Field(description="User application")]
-    ] = None
-    transactions: Optional[
-        List[Annotated["TransactionResponse", Field(description="User transactions")]]
-    ] = None
-    received_transactions: Optional[
-        List[Annotated["TransactionResponse", Field(description="User received transactions")]]
-    ] = None
-    webhooks: Optional[List[Annotated["WebhookResponse", Field(description="User webhooks")]]] = (
-        None
-    )
+    punishments: Optional[List["PunishmentResponse"]] = None
+    balance: Optional["BalanceResponse"] = None
+    application: Optional["ApplicationResponse"] = None
+    transactions: Optional[List["TransactionResponse"]] = None
+    received_transactions: Optional[List["TransactionResponse"]] = None
+    webhooks: Optional[List["WebhookResponse"]] = None
 
     model_config = ConfigDict(from_attributes=True)
+
+    @classmethod
+    def model_rebuild(cls) -> None:
+        from uaproject_backend_schemas.applications.schemas import ApplicationResponse
+        from uaproject_backend_schemas.payments import BalanceResponse, TransactionResponse
+        from uaproject_backend_schemas.punishments.schemas import PunishmentResponse
+        from uaproject_backend_schemas.users.roles.schemas import RoleResponse
+        from uaproject_backend_schemas.webhooks.schemas import WebhookResponse
+
+        ApplicationResponse.model_rebuild()
+        BalanceResponse.model_rebuild()
+        TransactionResponse.model_rebuild()
+        PunishmentResponse.model_rebuild()
+        RoleResponse.model_rebuild()
+        WebhookResponse.model_rebuild()
+
+        super().model_rebuild()
 
 
 class UserFilterParams(BaseModel):
