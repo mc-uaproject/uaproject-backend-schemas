@@ -118,7 +118,8 @@ class UserResponse(BaseResponseModel):
     @classmethod
     def initialize(cls):
         from uaproject_backend_schemas.payments import TransactionResponse  # noqa: F401
-        cls.model_rebuild()
+        instance = cls()
+        instance.model_rebuild()
 
 
 class UserFilterParams(BaseModel):
