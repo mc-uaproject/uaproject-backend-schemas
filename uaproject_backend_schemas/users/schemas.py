@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, ForwardRef, List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, model_validator
@@ -17,6 +17,8 @@ from uaproject_backend_schemas.webhooks.schemas import WebhookResponse
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.payments import TransactionResponse
+else:
+    TransactionResponse = ForwardRef("TransactionResponse")
 
 __all__ = [
     "TokenResponse",
@@ -96,14 +98,20 @@ class UserResponse(BaseResponseModel):
     punishments: Optional[List["PunishmentResponse"]] = None
     balance: Optional["BalanceResponse"] = None
     application: Optional["ApplicationResponse"] = None
-    transactions: Optional[List["TransactionResponse"]] = None
-    received_transactions: Optional[List["TransactionResponse"]] = None
+    transactions: Optional[List[TransactionResponse]] = None
+    received_transactions: Optional[List[TransactionResponse]] = None
     webhooks: Optional[List["WebhookResponse"]] = None
 
     model_config = ConfigDict(from_attributes=True)
 
     def __init__(self, **data):
         super().__init__(**data)
+
+    def model_rebuild(self):
+        from uaproject_backend_schemas.payments import TransactionResponse
+
+        self.__pydantic_model_rebuild__()
+        return TransactionResponse
 
 
 class UserFilterParams(BaseModel):
