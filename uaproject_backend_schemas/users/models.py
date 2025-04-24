@@ -26,12 +26,12 @@ __all__ = ["User", "Token"]
 
 
 class User(
-    Base,
-    IDMixin,
-    TimestampsMixin,
     WebhookBaseMixin,
     WebhookChangesMixin,
     WebhookRelationshipsMixin,
+    TimestampsMixin,
+    IDMixin,
+    Base,
     table=True,
 ):
     __tablename__ = "users"

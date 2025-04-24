@@ -19,12 +19,12 @@ if TYPE_CHECKING:
 
 
 class Balance(
-    TimestampsMixin,
-    IDMixin,
-    Base,
     WebhookBaseMixin,
     WebhookChangesMixin,
     WebhookRelationshipsMixin,
+    TimestampsMixin,
+    IDMixin,
+    Base,
     table=True,
 ):
     __tablename__ = "balances"

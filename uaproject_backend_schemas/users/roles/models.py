@@ -17,12 +17,12 @@ __all__ = ["Role", "UserRoles"]
 
 
 class UserRoles(
-    Base,
-    IDMixin,
-    TimestampsMixin,
     WebhookBaseMixin,
     WebhookChangesMixin,
     WebhookRelationshipsMixin,
+    TimestampsMixin,
+    IDMixin,
+    Base,
     table=True,
 ):
     __tablename__ = "user_roles"
@@ -66,12 +66,12 @@ class UserRoles(
 
 
 class Role(
-    Base,
-    IDMixin,
-    TimestampsMixin,
     WebhookBaseMixin,
     WebhookChangesMixin,
     WebhookRelationshipsMixin,
+    TimestampsMixin,
+    IDMixin,
+    Base,
     table=True,
 ):
     __tablename__ = "roles"

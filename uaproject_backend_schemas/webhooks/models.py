@@ -20,12 +20,12 @@ logger = logging.getLogger(__name__)
 
 
 class Webhook(
-    Base,
-    IDMixin,
-    TimestampsMixin,
     WebhookBaseMixin,
     WebhookChangesMixin,
     WebhookRelationshipsMixin,
+    TimestampsMixin,
+    IDMixin,
+    Base,
     table=True,
 ):
     __tablename__ = "webhooks"

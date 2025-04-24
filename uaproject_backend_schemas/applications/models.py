@@ -25,12 +25,12 @@ __all__ = ["Application"]
 
 
 class Application(
-    TimestampsMixin,
-    IDMixin,
-    Base,
     WebhookBaseMixin,
     WebhookChangesMixin,
     WebhookRelationshipsMixin,
+    TimestampsMixin,
+    IDMixin,
+    Base,
     table=True,
 ):
     __tablename__ = "applications"

@@ -20,12 +20,12 @@ __all__ = ["Service"]
 
 
 class Service(
-    TimestampsMixin,
-    IDMixin,
-    Base,
     WebhookBaseMixin,
     WebhookChangesMixin,
     WebhookRelationshipsMixin,
+    TimestampsMixin,
+    IDMixin,
+    Base,
     table=True,
 ):
     __tablename__ = "services"
@@ -52,21 +52,10 @@ class Service(
         cls.register_scope(
             "full",
             trigger_fields={
-                "name",
-                "display_name",
-                "description",
-                "points",
-                "image",
-                "price",
-                "is_active",
-                "category",
-                "type",
-                "duration_months",
-                "is_upgradable",
-                "upgrade_from",
-                "upgrade_to",
-                "service_metadata",
-                "discounts",
+                "name", "display_name", "description", "points", "image",
+                "price", "is_active", "category", "type",
+                "duration_months", "is_upgradable", "upgrade_from", "upgrade_to",
+                "service_metadata", "discounts"
             },
             stage=WebhookStage.AFTER,
         )

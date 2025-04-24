@@ -15,21 +15,19 @@ __all__ = ["Donation"]
 
 
 class Donation(
-    TimestampsMixin,
-    IDMixin,
-    Base,
     WebhookBaseMixin,
     WebhookChangesMixin,
     WebhookRelationshipsMixin,
+    TimestampsMixin,
+    IDMixin,
+    Base,
     table=True,
 ):
     __tablename__ = "donations"
     __scope_prefix__ = "donation"
 
     user_id: int = Field(sa_column=Column(BigInteger(), ForeignKey("users.id"), nullable=False))
-    balance_id: int = Field(
-        sa_column=Column(BigInteger(), ForeignKey("balances.id"), nullable=False)
-    )
+    balance_id: int = Field(sa_column=Column(BigInteger(), ForeignKey("balances.id"), nullable=False))
     amount: SerializableDecimal = Field(sa_column=Column(DECIMAL(10, 2), nullable=False))
     currency: str = Field(max_length=3)
     donor_name: str = Field(max_length=255)
