@@ -8,7 +8,6 @@ from uaproject_backend_schemas.payments.services.schemas import ServiceResponse
 from uaproject_backend_schemas.payments.transactions.payload import TransactionCreatedPayload
 from uaproject_backend_schemas.payments.transactions.schemas import TransactionType
 from uaproject_backend_schemas.schemas import SerializableDecimal
-from uaproject_backend_schemas.users.models import User
 from uaproject_backend_schemas.webhooks.mixins import (
     WebhookActionsMixin,
     WebhookChangesMixin,
