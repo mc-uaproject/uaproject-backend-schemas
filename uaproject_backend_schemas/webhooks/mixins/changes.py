@@ -7,9 +7,7 @@ from sqlalchemy import inspect
 from sqlalchemy.orm import Mapper
 
 from uaproject_backend_schemas.webhooks.mixins.base import WebhookBaseMixin, WebhookScopeFields
-from uaproject_backend_schemas.webhooks.mixins.temporal import (
-    WebhookTemporalMixin,
-)
+from uaproject_backend_schemas.webhooks.mixins.temporal import WebhookTemporalMixin
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +38,7 @@ class TriggeredScopeData(TypedDict):
     _unchanged: Dict[str, Any]
 
 
-class WebhookChangesMixin(WebhookBaseMixin, WebhookTemporalMixin):
+class WebhookChangesMixin(WebhookTemporalMixin, WebhookBaseMixin):
     """Mixin for handling field changes"""
 
     @classmethod

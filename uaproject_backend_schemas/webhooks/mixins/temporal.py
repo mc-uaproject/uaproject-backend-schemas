@@ -2,7 +2,6 @@ import logging
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from uaproject_backend_schemas.webhooks.mixins.base import WebhookBaseMixin
 from uaproject_backend_schemas.webhooks.mixins.config import TemporalFieldConfig
 from uaproject_backend_schemas.webhooks.types import ChangesDict, TemporalCallback, TemporalConfig
 
@@ -11,7 +10,7 @@ logger = logging.getLogger(__name__)
 __all__ = ["WebhookTemporalMixin"]
 
 
-class WebhookTemporalMixin(WebhookBaseMixin):
+class WebhookTemporalMixin:
     """Mixin for handling temporal fields"""
 
     _temporal_expiration_callbacks: Dict[str, TemporalCallback] = {}
@@ -123,3 +122,33 @@ class WebhookTemporalMixin(WebhookBaseMixin):
             )
         except Exception as e:
             logger.error(f"Error in temporal expiration callback: {e}", exc_info=True)
+
+    def _evaluate_condition(
+        self, field_value: Any, condition_value: Any, condition_operator: str
+    ) -> bool:
+        """Evaluate the condition based on the operator"""
+        operators = {
+            "==": lambda a, b: a == b,
+            "!=": lambda a, b: a != b,
+            ">": lambda a, b: a > b,
+            "<": lambda a, b: a < b,
+            ">=": lambda a, b: a >= b,
+            "<=": lambda a, b: a <= b,
+            "is": lambda a, b: a is b,
+            "is not": lambda a, b: a is not b,
+        }
+
+        try:
+            operator_func = operators.get(condition_operator)
+            if not operator_func:
+                logger.warning(f"Unknown condition operator: {condition_operator}")
+                return False
+
+            return operator_func(field_value, condition_value)
+
+        except TypeError as e:
+            logger.error(
+                f"Condition check failed for field with value '{field_value}' "
+                f"and condition value '{condition_value}': {e}"
+            )
+            return False
