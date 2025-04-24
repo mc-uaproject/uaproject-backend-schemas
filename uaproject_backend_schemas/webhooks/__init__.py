@@ -1,4 +1,3 @@
-from .handlers import register_action_handlers
 from .mixins import (
     WebhookActionsMixin,
     WebhookBaseMixin,
@@ -34,6 +33,3 @@ __all__ = [
     "WebhookResponse",
     "WebhookFilterParams",
 ]
-
-# Register action handlers
-register_action_handlers()
