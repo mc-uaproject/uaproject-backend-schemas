@@ -1,21 +1,15 @@
 import logging
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Optional
 
 from pydantic import BaseModel
 
 from uaproject_backend_schemas.webhooks.mixins.base import WebhookBaseMixin
+from uaproject_backend_schemas.webhooks.mixins.config import RelationshipConfigModel
 from uaproject_backend_schemas.webhooks.types import FieldChanges, Session
 
 logger = logging.getLogger(__name__)
 
-
-class RelationshipConfigModel(BaseModel):
-    """Configuration for relationship fields"""
-
-    fields: Optional[Union[List[str], BaseModel]] = None
-    condition: Optional[str] = None
-    condition_value: Optional[Any] = None
-    condition_operator: str = "=="
+__all__ = ["WebhookRelationshipsMixin"]
 
 
 class WebhookRelationshipsMixin(WebhookBaseMixin):

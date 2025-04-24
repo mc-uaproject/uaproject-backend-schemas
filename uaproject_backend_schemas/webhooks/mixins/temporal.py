@@ -2,23 +2,13 @@ import logging
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel
-
 from uaproject_backend_schemas.webhooks.mixins.base import WebhookBaseMixin
+from uaproject_backend_schemas.webhooks.mixins.config import TemporalFieldConfig
 from uaproject_backend_schemas.webhooks.types import ChangesDict, TemporalCallback, TemporalConfig
 
 logger = logging.getLogger(__name__)
 
-__all__ = ["TemporalFieldConfig", "WebhookTemporalMixin"]
-
-
-class TemporalFieldConfig(BaseModel):
-    """Configuration for fields with temporal state"""
-
-    expires_at_field: str
-    status_field: Optional[str] = None
-    status_value: Optional[Any] = None
-    scope_name: str
+__all__ = ["WebhookTemporalMixin"]
 
 
 class WebhookTemporalMixin(WebhookBaseMixin):
