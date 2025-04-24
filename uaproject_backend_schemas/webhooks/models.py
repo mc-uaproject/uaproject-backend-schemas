@@ -5,7 +5,11 @@ from sqlmodel import JSON, BigInteger, Column, Enum, Field, ForeignKey, Relation
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.schemas import SerializableHttpUrl
-from uaproject_backend_schemas.webhooks.mixins import WebhookPayloadMixin
+from uaproject_backend_schemas.webhooks.mixins import (
+    WebhookBaseMixin,
+    WebhookChangesMixin,
+    WebhookRelationshipsMixin,
+)
 from uaproject_backend_schemas.webhooks.schemas import WebhookStatus
 
 if TYPE_CHECKING:
@@ -15,7 +19,15 @@ __all__ = ["Webhook"]
 logger = logging.getLogger(__name__)
 
 
-class Webhook(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
+class Webhook(
+    Base,
+    IDMixin,
+    TimestampsMixin,
+    WebhookBaseMixin,
+    WebhookChangesMixin,
+    WebhookRelationshipsMixin,
+    table=True,
+):
     __tablename__ = "webhooks"
     __scope_prefix__ = "webhook"
 

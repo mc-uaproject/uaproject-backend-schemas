@@ -9,13 +9,25 @@ from uaproject_backend_schemas.payments.services.schemas import (
     ServiceType,
 )
 from uaproject_backend_schemas.schemas import SerializableDecimal
-from uaproject_backend_schemas.webhooks.mixins import WebhookPayloadMixin
+from uaproject_backend_schemas.webhooks.mixins import (
+    WebhookBaseMixin,
+    WebhookChangesMixin,
+    WebhookRelationshipsMixin,
+)
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
 
 __all__ = ["Service"]
 
 
-class Service(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True):
+class Service(
+    TimestampsMixin,
+    IDMixin,
+    Base,
+    WebhookBaseMixin,
+    WebhookChangesMixin,
+    WebhookRelationshipsMixin,
+    table=True,
+):
     __tablename__ = "services"
     __scope_prefix__ = "service"
 
@@ -40,10 +52,21 @@ class Service(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True):
         cls.register_scope(
             "full",
             trigger_fields={
-                "name", "display_name", "description", "points", "image",
-                "price", "is_active", "category", "type",
-                "duration_months", "is_upgradable", "upgrade_from", "upgrade_to",
-                "service_metadata", "discounts"
+                "name",
+                "display_name",
+                "description",
+                "points",
+                "image",
+                "price",
+                "is_active",
+                "category",
+                "type",
+                "duration_months",
+                "is_upgradable",
+                "upgrade_from",
+                "upgrade_to",
+                "service_metadata",
+                "discounts",
             },
             stage=WebhookStage.AFTER,
         )

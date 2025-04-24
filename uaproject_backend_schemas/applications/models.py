@@ -10,7 +10,11 @@ from uaproject_backend_schemas.applications.payload import (
 )
 from uaproject_backend_schemas.applications.schemas import ApplicationStatus
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
-from uaproject_backend_schemas.webhooks.mixins import WebhookPayloadMixin
+from uaproject_backend_schemas.webhooks.mixins import (
+    WebhookBaseMixin,
+    WebhookChangesMixin,
+    WebhookRelationshipsMixin,
+)
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
 
 if TYPE_CHECKING:
@@ -20,7 +24,15 @@ if TYPE_CHECKING:
 __all__ = ["Application"]
 
 
-class Application(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True):
+class Application(
+    TimestampsMixin,
+    IDMixin,
+    Base,
+    WebhookBaseMixin,
+    WebhookChangesMixin,
+    WebhookRelationshipsMixin,
+    table=True,
+):
     __tablename__ = "applications"
     __scope_prefix__ = "application"
 

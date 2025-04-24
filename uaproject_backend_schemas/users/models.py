@@ -9,7 +9,11 @@ from sqlmodel import Field, ForeignKey, Relationship
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.users.payload import DiscordIdPayload, MinecraftNicknamePayload
 from uaproject_backend_schemas.users.roles import Role, UserRoles
-from uaproject_backend_schemas.webhooks.mixins import WebhookPayloadMixin
+from uaproject_backend_schemas.webhooks.mixins import (
+    WebhookBaseMixin,
+    WebhookChangesMixin,
+    WebhookRelationshipsMixin,
+)
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
 
 if TYPE_CHECKING:
@@ -21,7 +25,15 @@ if TYPE_CHECKING:
 __all__ = ["User", "Token"]
 
 
-class User(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
+class User(
+    Base,
+    IDMixin,
+    TimestampsMixin,
+    WebhookBaseMixin,
+    WebhookChangesMixin,
+    WebhookRelationshipsMixin,
+    table=True,
+):
     __tablename__ = "users"
     __scope_prefix__ = "user"
 
@@ -102,22 +114,24 @@ class User(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
         )
 
         cls.register_scope(
-            "superuser",
-            trigger_fields={"is_superuser"},
-            fields={"id", "discord_id", "minecraft_nickname", "is_superuser", "updated_at"},
-            stage=WebhookStage.BOTH,
-        )
-
-        cls.register_scope(
             "access",
             trigger_fields={"access"},
+            fields={"id", "discord_id", "minecraft_nickname", "access"},
             stage=WebhookStage.BOTH,
         )
 
         cls.register_scope(
-            "full",
-            trigger_fields={"discord_id", "minecraft_nickname", "is_superuser", "access"},
-            stage=WebhookStage.AFTER,
+            "biography",
+            trigger_fields={"biography"},
+            fields={"id", "discord_id", "minecraft_nickname", "biography"},
+            stage=WebhookStage.BOTH,
+        )
+
+        cls.register_scope(
+            "roles",
+            trigger_fields={"roles"},
+            fields={"id", "discord_id", "minecraft_nickname", "roles"},
+            stage=WebhookStage.BOTH,
         )
 
 
