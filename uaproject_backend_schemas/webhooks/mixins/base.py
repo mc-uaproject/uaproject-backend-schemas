@@ -84,7 +84,7 @@ class WebhookBaseMixin:
                     f"Class {cls.__name__} must inherit from WebhookRelationshipsMixin to use relationships"
                 )
 
-            relationship_configs = cls._process_relationships(relationships)
+            relationships = cls._process_relationships(relationships)
 
         if temporal_fields:
             if not any(base.__name__ == "WebhookTemporalMixin" for base in cls.__bases__):
@@ -92,7 +92,7 @@ class WebhookBaseMixin:
                     f"Class {cls.__name__} must inherit from WebhookTemporalMixin to use temporal fields"
                 )
 
-            temporal_field_configs = cls._process_temporal_fields(temporal_fields)
+            temporal_fields = cls._process_temporal_fields(temporal_fields)
 
         if actions:
             if not any(base.__name__ == "WebhookActionsMixin" for base in cls.__bases__):
@@ -100,13 +100,13 @@ class WebhookBaseMixin:
                     f"Class {cls.__name__} must inherit from WebhookActionsMixin to use actions"
                 )
 
-            action_configs = cls._process_actions(actions)
+            actions = cls._process_actions(actions)
 
         scopes[scope_name] = WebhookScopeFields(
             trigger_fields=list(trigger_fields_set),
             fields=list(fields_set) if fields_set else None,
-            relationships=relationship_configs,
+            relationships=relationships,
             stage=stage,
-            temporal_fields=temporal_field_configs,
-            actions=action_configs,
+            temporal_fields=temporal_fields,
+            actions=actions,
         )
