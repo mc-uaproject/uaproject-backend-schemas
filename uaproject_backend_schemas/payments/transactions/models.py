@@ -11,7 +11,6 @@ from uaproject_backend_schemas.schemas import SerializableDecimal
 from uaproject_backend_schemas.users.models import User
 from uaproject_backend_schemas.webhooks.mixins import (
     WebhookActionsMixin,
-    WebhookBaseMixin,
     WebhookChangesMixin,
     WebhookRelationshipsMixin,
 )
@@ -28,10 +27,9 @@ class Transaction(
     TimestampsMixin,
     IDMixin,
     Base,
-    WebhookBaseMixin,
     WebhookChangesMixin,
-    WebhookRelationshipsMixin,
     WebhookActionsMixin,
+    WebhookRelationshipsMixin,
     table=True,
 ):
     __tablename__ = "transactions"

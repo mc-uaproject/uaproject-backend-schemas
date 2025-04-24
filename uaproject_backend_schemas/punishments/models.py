@@ -6,10 +6,8 @@ from sqlmodel import JSON, BigInteger, Column, DateTime, Enum, Field, ForeignKey
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.punishments.schemas import PunishmentStatus, PunishmentType
 from uaproject_backend_schemas.webhooks.mixins import (
-    WebhookBaseMixin,
     WebhookChangesMixin,
     WebhookRelationshipsMixin,
-    WebhookTemporalMixin,
 )
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
 
@@ -23,9 +21,7 @@ class PunishmentConfig(
     TimestampsMixin,
     IDMixin,
     Base,
-    WebhookBaseMixin,
     WebhookChangesMixin,
-    WebhookRelationshipsMixin,
     table=True,
 ):
     __tablename__ = "punishment_configs"
@@ -68,10 +64,8 @@ class Punishment(
     TimestampsMixin,
     IDMixin,
     Base,
-    WebhookBaseMixin,
     WebhookChangesMixin,
     WebhookRelationshipsMixin,
-    WebhookTemporalMixin,
     table=True,
 ):
     __tablename__ = "punishments"

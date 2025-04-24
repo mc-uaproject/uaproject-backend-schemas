@@ -1,6 +1,6 @@
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from sqlmodel import DECIMAL, JSON, Column, Enum, Field
+from sqlmodel import DECIMAL, JSON, Column, Enum, Field, Relationship
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.payments.services.schemas import (
@@ -9,23 +9,20 @@ from uaproject_backend_schemas.payments.services.schemas import (
     ServiceType,
 )
 from uaproject_backend_schemas.schemas import SerializableDecimal
-from uaproject_backend_schemas.webhooks.mixins import (
-    WebhookBaseMixin,
-    WebhookChangesMixin,
-    WebhookRelationshipsMixin,
-)
+from uaproject_backend_schemas.webhooks.mixins import WebhookChangesMixin
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
+
+if TYPE_CHECKING:
+    from uaproject_backend_schemas.payments.transactions.models import Transaction
 
 __all__ = ["Service"]
 
 
 class Service(
-    WebhookBaseMixin,
-    WebhookChangesMixin,
-    WebhookRelationshipsMixin,
     TimestampsMixin,
     IDMixin,
     Base,
+    WebhookChangesMixin,
     table=True,
 ):
     __tablename__ = "services"
@@ -47,15 +44,28 @@ class Service(
     service_metadata: Optional[Dict[str, Any]] = Field(sa_column=Column(JSON), default=None)
     discounts: Optional[List[ServiceDiscount]] = Field(sa_column=Column(JSON), default=None)
 
+    transactions: list["Transaction"] = Relationship(back_populates="service")
+
     @classmethod
     def register_scopes(cls) -> None:
         cls.register_scope(
             "full",
             trigger_fields={
-                "name", "display_name", "description", "points", "image",
-                "price", "is_active", "category", "type",
-                "duration_months", "is_upgradable", "upgrade_from", "upgrade_to",
-                "service_metadata", "discounts"
+                "name",
+                "display_name",
+                "description",
+                "points",
+                "image",
+                "price",
+                "is_active",
+                "category",
+                "type",
+                "duration_months",
+                "is_upgradable",
+                "upgrade_from",
+                "upgrade_to",
+                "service_metadata",
+                "discounts",
             },
             stage=WebhookStage.AFTER,
         )

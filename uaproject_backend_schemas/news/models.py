@@ -8,7 +8,7 @@ from sqlmodel import BigInteger, Field, ForeignKey, Relationship
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.news.schemas import ImportanceType, NewsType
-from uaproject_backend_schemas.webhooks.mixins import WebhookPayloadMixin
+from uaproject_backend_schemas.webhooks.mixins import WebhookChangesMixin
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.users.models import User
@@ -33,18 +33,28 @@ class NewsImage(Base, IDMixin, table=True):
     )
 
 
-class News(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
+class News(
+    Base,
+    IDMixin,
+    TimestampsMixin,
+    WebhookChangesMixin,
+    table=True,
+):
     __tablename__ = "news"
     __scope_prefix__ = "news"
 
-    user_id: Optional[int] = Field(sa_column=Column(BigInteger(), ForeignKey("users.id"), nullable=True))
-    title: str = Field(sa_column=Column(String(255), nullable=False))
-    content: str = Field(sa_column=Column(String(4096), nullable=False))
-    author: Optional[str] = Field(sa_column=Column(String(255), nullable=True))
+    title: str = Field(max_length=255, nullable=False)
+    content: str = Field(nullable=False)
+    is_published: bool = Field(default=False, nullable=False)
+    author_id: int = Field(foreign_key="users.id", nullable=False)
+
+    author: Optional["User"] = Relationship(back_populates="news")
     discord_message_id: Optional[str] = Field(sa_column=Column(String(255), nullable=True))
     telegram_message_id: Optional[str] = Field(sa_column=Column(String(255), nullable=True))
     is_weekly_update: bool = Field(sa_column=Column(Boolean, nullable=False, default=False))
-    parent_news_id: Optional[int] = Field(sa_column=Column(BigInteger(), ForeignKey("news.id"), nullable=True))
+    parent_news_id: Optional[int] = Field(
+        sa_column=Column(BigInteger(), ForeignKey("news.id"), nullable=True)
+    )
     tags: List[str] = Field(sa_column=Column(JSON, nullable=False, default=list))
     format_type: str = Field(sa_column=Column(String(20), nullable=False, default="markdown"))
     related_threads: List[str] = Field(sa_column=Column(JSON, nullable=False, default=list))
@@ -66,11 +76,6 @@ class News(Base, IDMixin, TimestampsMixin, WebhookPayloadMixin, table=True):
             default=ImportanceType.MEDIUM.value,
             server_default=ImportanceType.MEDIUM.value,
         )
-    )
-
-    user: Optional["User"] = Relationship(
-        back_populates="news",
-        sa_relationship_kwargs={"foreign_keys": "[News.user_id]"},
     )
 
     parent_news: Optional["News"] = Relationship(

@@ -4,7 +4,6 @@ from sqlmodel import JSON, BigInteger, Column, Field, ForeignKey, Relationship
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.webhooks.mixins import (
-    WebhookBaseMixin,
     WebhookChangesMixin,
     WebhookRelationshipsMixin,
 )
@@ -17,7 +16,6 @@ __all__ = ["Role", "UserRoles"]
 
 
 class UserRoles(
-    WebhookBaseMixin,
     WebhookChangesMixin,
     WebhookRelationshipsMixin,
     TimestampsMixin,
@@ -66,9 +64,7 @@ class UserRoles(
 
 
 class Role(
-    WebhookBaseMixin,
     WebhookChangesMixin,
-    WebhookRelationshipsMixin,
     TimestampsMixin,
     IDMixin,
     Base,

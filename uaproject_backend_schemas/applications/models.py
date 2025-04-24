@@ -10,11 +10,7 @@ from uaproject_backend_schemas.applications.payload import (
 )
 from uaproject_backend_schemas.applications.schemas import ApplicationStatus
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
-from uaproject_backend_schemas.webhooks.mixins import (
-    WebhookBaseMixin,
-    WebhookChangesMixin,
-    WebhookRelationshipsMixin,
-)
+from uaproject_backend_schemas.webhooks.mixins import WebhookChangesMixin
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
 
 if TYPE_CHECKING:
@@ -25,12 +21,10 @@ __all__ = ["Application"]
 
 
 class Application(
-    WebhookBaseMixin,
-    WebhookChangesMixin,
-    WebhookRelationshipsMixin,
     TimestampsMixin,
     IDMixin,
     Base,
+    WebhookChangesMixin,
     table=True,
 ):
     __tablename__ = "applications"
@@ -46,11 +40,9 @@ class Application(
         "quiz_answer",
     ]
 
-    user_id: int = Field(sa_column=Column(BigInteger(), ForeignKey("users.id"), nullable=False, unique=True))
-    user: Optional["User"] = Relationship(
-        back_populates="application", sa_relationship_kwargs={"uselist": False}
+    user_id: int = Field(
+        sa_column=Column(BigInteger(), ForeignKey("users.id"), nullable=False, unique=True)
     )
-
     status: ApplicationStatus = Field(
         sa_column=Column(
             Enum(ApplicationStatus, native_enum=False),
@@ -74,6 +66,10 @@ class Application(
             default=DEFAULT_EDITABLE_FIELDS,
             server_default="{}",
         )
+    )
+
+    user: Optional["User"] = Relationship(
+        back_populates="application", sa_relationship_kwargs={"uselist": False}
     )
 
     @model_validator(mode="before")

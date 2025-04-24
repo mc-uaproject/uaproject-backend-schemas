@@ -5,11 +5,7 @@ from sqlmodel import DECIMAL, BigInteger, Column, Field, ForeignKey, Relationshi
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.schemas import SerializableDecimal
-from uaproject_backend_schemas.webhooks.mixins import (
-    WebhookBaseMixin,
-    WebhookChangesMixin,
-    WebhookRelationshipsMixin,
-)
+from uaproject_backend_schemas.webhooks.mixins import WebhookChangesMixin
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
 
 __all__ = ["Balance"]
@@ -19,12 +15,10 @@ if TYPE_CHECKING:
 
 
 class Balance(
-    WebhookBaseMixin,
-    WebhookChangesMixin,
-    WebhookRelationshipsMixin,
     TimestampsMixin,
     IDMixin,
     Base,
+    WebhookChangesMixin,
     table=True,
 ):
     __tablename__ = "balances"

@@ -1,5 +1,3 @@
-from uaproject_backend_schemas.users.schemas import UserResponse
-
 from .schemas import (
     CreateSchemaType,
     DefaultSort,
@@ -25,6 +23,3 @@ __all__ = [
     "UpdateSchemaType",
     "FilterSchemaType",
 ]
-
-def initialize_models():
-    UserResponse.initialize()

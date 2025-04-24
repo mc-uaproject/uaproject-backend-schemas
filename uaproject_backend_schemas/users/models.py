@@ -9,11 +9,7 @@ from sqlmodel import Field, ForeignKey, Relationship
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.users.payload import DiscordIdPayload, MinecraftNicknamePayload
 from uaproject_backend_schemas.users.roles import Role, UserRoles
-from uaproject_backend_schemas.webhooks.mixins import (
-    WebhookBaseMixin,
-    WebhookChangesMixin,
-    WebhookRelationshipsMixin,
-)
+from uaproject_backend_schemas.webhooks.mixins import WebhookChangesMixin
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
 
 if TYPE_CHECKING:
@@ -26,12 +22,10 @@ __all__ = ["User", "Token"]
 
 
 class User(
-    WebhookBaseMixin,
-    WebhookChangesMixin,
-    WebhookRelationshipsMixin,
-    TimestampsMixin,
-    IDMixin,
     Base,
+    IDMixin,
+    TimestampsMixin,
+    WebhookChangesMixin,
     table=True,
 ):
     __tablename__ = "users"
@@ -114,24 +108,22 @@ class User(
         )
 
         cls.register_scope(
+            "superuser",
+            trigger_fields={"is_superuser"},
+            fields={"id", "discord_id", "minecraft_nickname", "is_superuser", "updated_at"},
+            stage=WebhookStage.BOTH,
+        )
+
+        cls.register_scope(
             "access",
             trigger_fields={"access"},
-            fields={"id", "discord_id", "minecraft_nickname", "access"},
             stage=WebhookStage.BOTH,
         )
 
         cls.register_scope(
-            "biography",
-            trigger_fields={"biography"},
-            fields={"id", "discord_id", "minecraft_nickname", "biography"},
-            stage=WebhookStage.BOTH,
-        )
-
-        cls.register_scope(
-            "roles",
-            trigger_fields={"roles"},
-            fields={"id", "discord_id", "minecraft_nickname", "roles"},
-            stage=WebhookStage.BOTH,
+            "full",
+            trigger_fields={"discord_id", "minecraft_nickname", "is_superuser", "access"},
+            stage=WebhookStage.AFTER,
         )
 
 

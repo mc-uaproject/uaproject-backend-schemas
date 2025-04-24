@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Any, Dict, List, Optional, Set
 
 from pydantic import BaseModel
 
@@ -34,3 +34,49 @@ class WebhookBaseMixin:
         if not hasattr(cls, "_webhook_scopes_registry"):
             cls._webhook_scopes_registry = {}
         return cls._webhook_scopes_registry
+
+    @classmethod
+    def register_scope(
+        cls,
+        scope_name: str,
+        trigger_fields: list[str] | Set[str],
+        fields: list[str] | Set[str] | BaseModel | None = None,
+        relationships: Dict[str, Dict[str, Any]] | None = None,
+        stage: WebhookStage = WebhookStage.AFTER,
+        temporal_fields: list[Dict[str, Any]] | None = None,
+    ) -> None:
+        """
+        Register a new scope for the model with specified
+        trigger fields, optional payload fields and relationships.
+
+        Args:
+            scope_name: Unique identifier for the scope
+            trigger_fields: Fields that will trigger the webhook when modified
+            fields: Optional specific fields to include in the payload.
+                   If None, all fields will be included. Can also be a Pydantic BaseModel.
+            relationships: Optional dictionary mapping relationship names to their configurations
+            stage: WebhookStage indicating when the webhook should be triggered
+            temporal_fields: Optional list of temporal field configurations
+        """
+        scope_name = f"{cls.__scope_prefix__}.{scope_name}"
+        scopes = cls.get_webhook_scopes()
+
+        if scope_name in scopes:
+            raise ValueError(f"Scope '{scope_name}' is already registered for {cls.__name__}")
+
+        trigger_fields_set = set(trigger_fields)
+        fields_set = cls._process_fields(fields)
+
+        cls._validate_trigger_fields(trigger_fields_set)
+        cls._validate_payload_fields(fields_set, relationships)
+
+        relationship_configs = cls._process_relationships(relationships)
+        temporal_field_configs = cls._process_temporal_fields(temporal_fields)
+
+        scopes[scope_name] = WebhookScopeFields(
+            trigger_fields=list(trigger_fields_set),
+            fields=list(fields_set) if fields_set else None,
+            relationships=relationship_configs,
+            stage=stage,
+            temporal_fields=temporal_field_configs,
+        )

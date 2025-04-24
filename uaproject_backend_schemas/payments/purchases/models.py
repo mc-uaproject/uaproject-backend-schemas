@@ -8,12 +8,7 @@ from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.payments.purchases.schemas import PurchasedItemStatus
 from uaproject_backend_schemas.payments.services.models import Service
 from uaproject_backend_schemas.payments.transactions.models import Transaction
-from uaproject_backend_schemas.webhooks.mixins import (
-    WebhookBaseMixin,
-    WebhookChangesMixin,
-    WebhookRelationshipsMixin,
-    WebhookTemporalMixin,
-)
+from uaproject_backend_schemas.webhooks.mixins import WebhookChangesMixin
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
 
 if TYPE_CHECKING:
@@ -27,10 +22,7 @@ class PurchasedItem(
     TimestampsMixin,
     IDMixin,
     Base,
-    WebhookBaseMixin,
     WebhookChangesMixin,
-    WebhookRelationshipsMixin,
-    WebhookTemporalMixin,
     table=True,
 ):
     __tablename__ = "purchased_items"
