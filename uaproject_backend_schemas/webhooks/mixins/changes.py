@@ -45,7 +45,7 @@ class WebhookChangesMixin(WebhookTemporalMixin, WebhookBaseMixin):
     def _process_fields(cls, fields: Union[List[str], BaseModel, None]) -> Optional[Set[str]]:
         """Process and return fields as a set."""
         if isinstance(fields, BaseModel):
-            return set(fields.model_fields.keys())
+            return set(fields.__class__.model_fields.keys())
         return set(fields) if fields is not None else None
 
     @classmethod
