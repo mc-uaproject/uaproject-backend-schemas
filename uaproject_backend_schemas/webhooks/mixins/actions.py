@@ -1,24 +1,13 @@
 import logging
-from typing import Any, Dict, List, Optional
-
-from pydantic import BaseModel
+from typing import Any, Dict, List
 
 from uaproject_backend_schemas.webhooks.mixins.base import WebhookBaseMixin
+from uaproject_backend_schemas.webhooks.mixins.config import ActionConfigModel
 from uaproject_backend_schemas.webhooks.types import ActionConfig, ActionHandler
 
 logger = logging.getLogger(__name__)
 
-__all__ = ["ActionConfigModel", "WebhookActionsMixin"]
-
-
-class ActionConfigModel(BaseModel):
-    """Configuration for webhook actions"""
-
-    type: str
-    condition: Optional[str] = None
-    fields: Optional[Dict[str, Any]] = None
-    user_id: Optional[str] = None
-    amount: Optional[str] = None
+__all__ = ["WebhookActionsMixin"]
 
 
 class WebhookActionsMixin(WebhookBaseMixin):

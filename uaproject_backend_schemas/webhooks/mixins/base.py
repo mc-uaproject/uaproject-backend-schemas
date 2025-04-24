@@ -2,7 +2,7 @@ from typing import Dict, Optional
 
 from pydantic import BaseModel
 
-from uaproject_backend_schemas.webhooks.mixins.actions import ActionConfigModel
+from uaproject_backend_schemas.webhooks.mixins.config import ActionConfigModel
 from uaproject_backend_schemas.webhooks.mixins.relationships import RelationshipConfigModel
 from uaproject_backend_schemas.webhooks.mixins.temporal import TemporalFieldConfig
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
