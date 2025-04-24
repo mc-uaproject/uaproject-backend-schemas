@@ -5,7 +5,12 @@ from sqlmodel import JSON, BigInteger, Column, DateTime, Enum, Field, ForeignKey
 
 from uaproject_backend_schemas.base import Base, IDMixin, TimestampsMixin
 from uaproject_backend_schemas.punishments.schemas import PunishmentStatus, PunishmentType
-from uaproject_backend_schemas.webhooks.mixins import WebhookPayloadMixin
+from uaproject_backend_schemas.webhooks.mixins import (
+    WebhookBaseMixin,
+    WebhookChangesMixin,
+    WebhookRelationshipsMixin,
+    WebhookTemporalMixin,
+)
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
 
 if TYPE_CHECKING:
@@ -14,7 +19,15 @@ if TYPE_CHECKING:
 __all__ = ["Punishment", "PunishmentConfig"]
 
 
-class PunishmentConfig(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True):
+class PunishmentConfig(
+    TimestampsMixin,
+    IDMixin,
+    Base,
+    WebhookBaseMixin,
+    WebhookChangesMixin,
+    WebhookRelationshipsMixin,
+    table=True,
+):
     __tablename__ = "punishment_configs"
     __scope_prefix__ = "punishment_config"
 
@@ -30,38 +43,37 @@ class PunishmentConfig(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, tabl
     @classmethod
     def register_scopes(cls) -> None:
         cls.register_scope(
-            "created",
+            "changed",
             trigger_fields={
                 "name",
+                "description",
                 "is_active",
                 "warn_threshold",
                 "warn_decay_days",
                 "config_data",
             },
-            fields={"id", "name", "is_active", "warn_threshold", "warn_decay_days"},
-            stage=WebhookStage.AFTER,
-        )
-        cls.register_scope(
-            "updated",
-            trigger_fields={
+            fields={
+                "id",
                 "name",
+                "description",
                 "is_active",
                 "warn_threshold",
                 "warn_decay_days",
-                "config_data",
             },
-            fields={"id", "name", "is_active", "warn_threshold", "warn_decay_days"},
-            stage=WebhookStage.BOTH,
-        )
-        cls.register_scope(
-            "status_changed",
-            trigger_fields={"is_active"},
-            fields={"id", "name", "is_active"},
             stage=WebhookStage.BOTH,
         )
 
 
-class Punishment(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True):
+class Punishment(
+    TimestampsMixin,
+    IDMixin,
+    Base,
+    WebhookBaseMixin,
+    WebhookChangesMixin,
+    WebhookRelationshipsMixin,
+    WebhookTemporalMixin,
+    table=True,
+):
     __tablename__ = "punishments"
     __scope_prefix__ = "punishment"
 
@@ -78,7 +90,7 @@ class Punishment(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True
         )
     )
     reason: Optional[str] = Field(default=None)
-    expires_at: Optional[datetime] = Field(sa_column=Column(DateTime, nullable=True))
+    expires_at: Optional[datetime] = Field(sa_column=Column(DateTime(timezone=True), nullable=True))
     config_id: Optional[int] = Field(
         sa_column=Column(BigInteger(), ForeignKey("punishment_configs.id"), nullable=True)
     )
@@ -114,39 +126,9 @@ class Punishment(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True
                 "config": {"fields": ["id", "name", "warn_threshold", "warn_decay_days"]},
             },
         )
+
         cls.register_scope(
             "status_changed",
-            trigger_fields={"status"},
-            fields={"id", "user_id", "admin_id", "type", "status", "reason"},
-            stage=WebhookStage.BOTH,
-            relationships={
-                "user": {"fields": ["id", "discord_id", "minecraft_nickname"]},
-            },
-        )
-        cls.register_scope(
-            "warn_added",
-            trigger_fields={"type", "status"},
-            fields={"id", "user_id", "admin_id", "type", "status", "reason", "config_id"},
-            stage=WebhookStage.AFTER,
-        )
-
-        cls.register_scope(
-            "expired",
-            trigger_fields={"status", "expires_at"},
-            fields={"id", "user_id", "type", "status", "expires_at"},
-            stage=WebhookStage.BOTH,
-            temporal_fields=[
-                {
-                    "expires_at_field": "expires_at",
-                    "status_field": "status",
-                    "status_value": PunishmentStatus.EXPIRED.value,
-                    "scope_name": "punishment.auto_expired",
-                }
-            ],
-        )
-
-        cls.register_scope(
-            "revoked",
             trigger_fields={"status"},
             fields={"id", "user_id", "admin_id", "type", "status", "reason", "punishment_metadata"},
             stage=WebhookStage.BOTH,
@@ -154,4 +136,12 @@ class Punishment(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True
                 "user": {"fields": ["id", "discord_id", "minecraft_nickname"]},
                 "admin": {"fields": ["id", "discord_id", "minecraft_nickname"]},
             },
+            temporal_fields=[
+                {
+                    "expires_at_field": "expires_at",
+                    "status_field": "status",
+                    "status_value": PunishmentStatus.EXPIRED.value,
+                    "scope_name": "punishment.status_changed",
+                }
+            ],
         )

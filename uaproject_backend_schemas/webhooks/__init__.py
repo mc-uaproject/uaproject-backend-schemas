@@ -1,4 +1,12 @@
-from .mixins import PayloadType, WebhookPayloadMixin, WebhookScopeFields, WebhookStage
+from .handlers import register_action_handlers
+from .mixins import (
+    WebhookActionsMixin,
+    WebhookBaseMixin,
+    WebhookChangesMixin,
+    WebhookRelationshipsMixin,
+    WebhookScopeFields,
+    WebhookTemporalMixin,
+)
 from .models import Webhook
 from .schemas import (
     WebhookBase,
@@ -13,8 +21,11 @@ from .schemas import (
 __all__ = [
     "Webhook",
     "WebhookScopeFields",
-    "PayloadType",
-    "WebhookPayloadMixin",
+    "WebhookBaseMixin",
+    "WebhookChangesMixin",
+    "WebhookRelationshipsMixin",
+    "WebhookTemporalMixin",
+    "WebhookActionsMixin",
     "WebhookSort",
     "WebhookStatus",
     "WebhookBase",
@@ -22,5 +33,7 @@ __all__ = [
     "WebhookUpdate",
     "WebhookResponse",
     "WebhookFilterParams",
-    "WebhookStage",
 ]
+
+# Register action handlers
+register_action_handlers()

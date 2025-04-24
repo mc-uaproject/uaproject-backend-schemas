@@ -9,7 +9,12 @@ from uaproject_backend_schemas.payments.transactions.payload import TransactionC
 from uaproject_backend_schemas.payments.transactions.schemas import TransactionType
 from uaproject_backend_schemas.schemas import SerializableDecimal
 from uaproject_backend_schemas.users.models import User
-from uaproject_backend_schemas.webhooks.mixins import WebhookPayloadMixin
+from uaproject_backend_schemas.webhooks.mixins import (
+    WebhookActionsMixin,
+    WebhookBaseMixin,
+    WebhookChangesMixin,
+    WebhookRelationshipsMixin,
+)
 from uaproject_backend_schemas.webhooks.schemas import WebhookStage
 
 if TYPE_CHECKING:
@@ -19,7 +24,16 @@ if TYPE_CHECKING:
 __all__ = ["Transaction"]
 
 
-class Transaction(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=True):
+class Transaction(
+    TimestampsMixin,
+    IDMixin,
+    Base,
+    WebhookBaseMixin,
+    WebhookChangesMixin,
+    WebhookRelationshipsMixin,
+    WebhookActionsMixin,
+    table=True,
+):
     __tablename__ = "transactions"
     __scope_prefix__ = "transaction"
 
@@ -81,4 +95,44 @@ class Transaction(TimestampsMixin, IDMixin, Base, WebhookPayloadMixin, table=Tru
             trigger_fields={"amount"},
             fields={"id", "user_id", "amount", "type", "description"},
             stage=WebhookStage.BOTH,
+        )
+        cls.register_scope(
+            "purchase_flow",
+            trigger_fields={"type", "service_id", "amount"},
+            fields={
+                "id",
+                "user_id",
+                "recipient_id",
+                "amount",
+                "type",
+                "service_id",
+                "transaction_metadata",
+            },
+            relationships={
+                "service": {
+                    "fields": ServiceResponse.model_construct(),
+                    "condition": "type",
+                    "condition_value": TransactionType.PURCHASE,
+                    "condition_operator": "==",
+                },
+            },
+            stage=WebhookStage.AFTER,
+            actions=[
+                {
+                    "type": "update_balance",
+                    "user_id": "recipient_id",
+                    "amount": "amount",
+                },
+                {
+                    "type": "create_or_update_purchased_item",
+                    "condition": "type == TransactionType.PURCHASE",
+                    "fields": {
+                        "user_id": "recipient_id",
+                        "service_id": "service_id",
+                        "transaction_id": "id",
+                        "status": "ACTIVE",
+                        "quantity": 1,
+                    },
+                },
+            ],
         )
