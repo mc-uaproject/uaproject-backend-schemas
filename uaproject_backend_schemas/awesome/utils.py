@@ -1,0 +1,433 @@
+from __future__ import annotations
+
+import inspect
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Optional, Type, TypeVar
+
+from pydantic import BaseModel, create_model
+from sqlmodel.main import FieldInfo as SQLModelFieldInfo
+
+if TYPE_CHECKING:
+    from uaproject_backend_schemas.awesome.model import AwesomeModel
+
+TModel = TypeVar("TModel", bound="AwesomeModel")
+
+
+class ScopeDefinition:
+    """Base class for Scope definition - a set of fields and access rights for model representation."""
+
+    fields: Optional[List[str]] = None
+    fields_exclude: Optional[List[str]] = None
+    permissions: Optional[List[str]] = None
+    relationships: Optional[Dict[str, str]] = None
+    schema: Optional[str] = None
+
+    def __init__(
+        self,
+        fields: Optional[List[str]] = None,
+        fields_exclude: Optional[List[str]] = None,
+        permissions: Optional[List[str]] = None,
+        relationships: Optional[Dict[str, str]] = None,
+        schema: Optional[str] = None,
+    ):
+        if fields is not None:
+            self.fields = fields
+        if fields_exclude is not None:
+            self.fields_exclude = fields_exclude
+        if permissions is not None:
+            self.permissions = permissions
+        if relationships is not None:
+            self.relationships = relationships
+        if schema is not None:
+            self.schema = schema
+
+
+class SchemaDefinition:
+    """Base class for Schema definition - a set of fields for model data representation."""
+
+    fields: Optional[List[str]] = None
+    fields_exclude: Optional[List[str]] = None
+
+    def __init__(
+        self, fields: Optional[List[str]] = None, fields_exclude: Optional[List[str]] = None
+    ):
+        if fields is not None:
+            self.fields = fields
+        if fields_exclude is not None:
+            self.fields_exclude = fields_exclude
+
+
+class AwesomeScopes:
+    """Model Scope manager. Provides methods for getting field configurations."""
+
+    @classmethod
+    def get(cls, name: str) -> Type[ScopeDefinition]:
+        """Get Scope definition by name (case-insensitive, e.g., 'public' -> Public class)."""
+        attr_name = name.capitalize()
+        scope_cls = getattr(cls, attr_name, None)
+        if scope_cls is None:
+            raise AttributeError(f"Scope '{name}' not found in {cls.__name__}")
+        return scope_cls
+
+    @classmethod
+    def _get_all_fields(cls, model_cls: Type[TModel]) -> List[str]:
+        """Get all model fields."""
+        if hasattr(model_cls, "model_fields"):
+            return list(model_cls.model_fields.keys())
+        return list(model_cls.__annotations__.keys())
+
+    @classmethod
+    def resolve_fields(cls, model_cls: Type[TModel], scope_name: str) -> List[str]:
+        """Determine the final list of fields for a given scope, taking into account include/exclude and relationships."""
+        scope_def_cls = cls.get(scope_name)
+        all_fields = cls._get_all_fields(model_cls)
+
+        if scope_def_cls.schema:
+            fields = model_cls.schemas._get_schema_fields(model_cls, scope_def_cls.schema)
+        elif scope_def_cls.fields is not None:
+            fields = list(scope_def_cls.fields)
+        elif scope_def_cls.fields_exclude is not None:
+            fields = [f for f in all_fields if f not in scope_def_cls.fields_exclude]
+        else:
+            fields = all_fields.copy()
+
+        if "id" in all_fields and (
+                    scope_def_cls.fields_exclude is None or "id" not in scope_def_cls.fields_exclude
+                ) and "id" not in fields:
+            fields.insert(0, "id")
+
+        rels = getattr(model_cls, "__relationships__", [])
+        return [f for f in fields if f not in rels]
+
+    @classmethod
+    def list(cls) -> List[str]:
+        """Get a list of all declared scopes (names in lowercase)."""
+        scopes: List[str] = []
+        for attr_name, attr_value in cls.__dict__.items():
+            if attr_name.startswith("_"):
+                continue
+            if inspect.isclass(attr_value) and issubclass(attr_value, ScopeDefinition):
+                if attr_value is ScopeDefinition:
+                    continue
+                scopes.append(attr_name.lower())
+        return scopes
+
+
+class AwesomeSchemas:
+    """Schema/Pydantic model manager for a specific model class.
+    When accessing an attribute, creates (or returns cached) a Pydantic model."""
+
+    def __init__(self, model_cls: Type[AwesomeModel]):
+        self.model_cls = model_cls
+        self._cache: Dict[str, Type[BaseModel]] = {}
+        self._names: Dict[str, str] = {}
+
+    @classmethod
+    def _get_all_fields(cls, model_cls: Type[TModel]) -> List[str]:
+        """Get all model fields."""
+        if hasattr(model_cls, "model_fields"):
+            return list(model_cls.model_fields.keys())
+        return list(model_cls.__annotations__.keys())
+
+    @classmethod
+    def _get_schema_fields(cls, model_cls: Type[TModel], schema_name: str) -> List[str]:
+        """Get fields from schema."""
+        schema_cls = None
+        if hasattr(model_cls, "Schemas"):
+            schema_cls = getattr(model_cls.Schemas, schema_name.capitalize(), None)
+        if schema_cls is None:
+            raise AttributeError(f"Schema '{schema_name}' not found")
+
+        all_fields = cls._get_all_fields(model_cls)
+        if inspect.isclass(schema_cls) and issubclass(schema_cls, BaseModel):
+            return (
+                list(schema_cls.model_fields.keys())
+                if hasattr(schema_cls, "model_fields")
+                else list(schema_cls.__annotations__.keys())
+            )
+        elif inspect.isclass(schema_cls) and issubclass(schema_cls, SchemaDefinition):
+            if schema_cls.fields is not None:
+                fields = list(schema_cls.fields)
+            elif schema_cls.fields_exclude is not None:
+                fields = [f for f in all_fields if f not in schema_cls.fields_exclude]
+            else:
+                fields = all_fields.copy()
+            if "id" in all_fields and (
+                            schema_cls.fields_exclude is None or "id" not in schema_cls.fields_exclude
+                        ) and "id" not in fields:
+                fields.insert(0, "id")
+            return fields
+        return all_fields.copy()
+
+    def _get_schema_definition(self, name_lower: str) -> Optional[Type[BaseModel]]:
+        """Get schema definition."""
+        if not hasattr(self.model_cls, "Schemas"):
+            return None
+        schema_attr = getattr(self.model_cls.Schemas, name_lower.capitalize(), None)
+        if schema_attr is None:
+            return None
+        if inspect.isclass(schema_attr) and issubclass(schema_attr, BaseModel):
+            return schema_attr
+        return None
+
+    def _should_include_field(self, field: Any, permissions: Optional[List[str]] = None) -> bool:
+        """Check if field should be included based on permissions."""
+        if not hasattr(field, "exclude_permissions") and not hasattr(field, "include_permissions"):
+            return True
+
+        if permissions:
+            if (
+                hasattr(field, "exclude_permissions")
+                and field.exclude_permissions
+                and any(p in permissions for p in field.exclude_permissions)
+            ):
+                return False
+            if (
+                hasattr(field, "include_permissions")
+                and field.include_permissions
+                and all(p not in permissions for p in field.include_permissions)
+            ):
+                return False
+        return True
+
+    def _get_field_type(
+        self, field_name: str, field_type: Any, relationships: Dict[str, str]
+    ) -> Any:
+        """Get field type considering relationships."""
+        if field_name in relationships:
+            related_schema_name = relationships[field_name]
+            related_schema_class = globals().get(related_schema_name)
+            return related_schema_class if related_schema_class is not None else Any
+        return field_type
+
+    def _create_schema_model(
+        self,
+        fields: List[str],
+        relationships: Dict[str, str],
+        name: str,
+        permissions: List[str] = None,
+    ) -> Type[AwesomeBaseModel]:
+        """Create Pydantic model with permission-based field visibility."""
+        field_definitions = self._get_field_definitions(fields, relationships, permissions)
+        filtered_fields = self._filter_fields_by_permissions(field_definitions, permissions)
+
+        schema_class_name = f"{self.model_cls.__name__}{name.capitalize()}Schema"
+        if permissions:
+            schema_class_name += "WithPermissions"
+
+        base_model = create_model(
+            schema_class_name,
+            __base__=AwesomeBaseModel,
+            **filtered_fields,
+        )
+
+        self._setup_schema_model(base_model, fields, relationships, name, permissions)
+        return base_model
+
+    def _get_field_definitions(
+        self, fields: List[str], relationships: Dict[str, str], permissions: List[str] = None
+    ) -> Dict[str, Any]:
+        field_definitions = {}
+        model_field_info = (
+            {fname: finfo.annotation for fname, finfo in self.model_cls.model_fields.items()}
+            if hasattr(self.model_cls, "model_fields")
+            else dict(self.model_cls.__annotations__.items())
+        )
+
+        for f in fields:
+            if f not in model_field_info:
+                continue
+
+            field = getattr(self.model_cls, f)
+            if not self._should_include_field(field, permissions):
+                continue
+
+            field_type = self._get_field_type(f, model_field_info[f], relationships)
+            field_definitions[f] = (field_type, None)
+        return field_definitions
+
+    def _filter_fields_by_permissions(
+        self, field_definitions: Dict[str, Any], permissions: List[str] = None
+    ) -> Dict[str, Any]:
+        filtered_fields = {}
+        for f, (t, _) in field_definitions.items():
+            field_info = self.model_cls.model_fields[f]
+            if not isinstance(field_info, AwesomeFieldInfo):
+                filtered_fields[f] = (
+                    t,
+                    AwesomeFieldInfo(annotation=t, required=False, default=None),
+                )
+                continue
+
+            if permissions:
+                if field_info.exclude_permissions and any(
+                    p in permissions for p in field_info.exclude_permissions
+                ):
+                    continue
+                if field_info.include_permissions and all(
+                    p not in permissions for p in field_info.include_permissions
+                ):
+                    continue
+
+            new_field_info = AwesomeFieldInfo(
+                annotation=t,
+                default=field_info.default,
+                exclude_permissions=field_info.exclude_permissions,
+                include_permissions=field_info.include_permissions,
+                **{
+                    k: v
+                    for k, v in field_info.__dict__.items()
+                    if k
+                    not in ["annotation", "default", "exclude_permissions", "include_permissions"]
+                },
+            )
+            filtered_fields[f] = (t, new_field_info)
+        return filtered_fields
+
+    def _setup_schema_model(
+        self,
+        base_model: Type[AwesomeBaseModel],
+        fields: List[str],
+        relationships: Dict[str, str],
+        name: str,
+        permissions: List[str] = None,
+    ):
+        base_model._model_father = self.model_cls
+        base_model._fields = fields
+        base_model._relationships = relationships
+        base_model._name = name
+        base_model._permissions = permissions
+
+        def with_permissions(cls, permissions: List[str]) -> Type[AwesomeBaseModel]:
+            return self._create_schema_model(
+                cls._fields, cls._relationships, cls._name, permissions
+            )
+
+        base_model.with_permissions = classmethod(with_permissions)
+
+    def __getattr__(self, name: str) -> type[AwesomeBaseModel]:
+        """Dynamically create a Pydantic model for the specified representation."""
+        if name.startswith("__"):
+            raise AttributeError(f"Attribute '{name}' not found")
+
+        name_lower = name.lower()
+        if name_lower in self._cache:
+            return self._cache[name_lower]
+
+        schema_model = self._get_schema_definition(name_lower)
+        if schema_model is not None:
+            self._cache[name_lower] = schema_model
+            self._names[name_lower] = schema_model.__name__
+            return schema_model
+
+        # Get fields from schema definition
+        schema_cls = getattr(self.model_cls.Schemas, name.capitalize(), None)
+        if schema_cls is None:
+            raise AttributeError(
+                f"Schema or scope '{name}' not defined in model {self.model_cls.__name__}"
+            )
+
+        fields = self._get_schema_fields(self.model_cls, name)
+        relationships = getattr(schema_cls, "relationships", {})
+
+        schema_model = self._create_schema_model(fields, relationships, name)
+        self._cache[name_lower] = schema_model
+        self._names[name_lower] = schema_model.__name__
+        return schema_model
+
+    def with_permissions(self, permissions: List[str]) -> Type[BaseModel]:
+        """Create a schema with specific permissions."""
+        if not hasattr(self, "_current_schema"):
+            raise AttributeError("No schema selected")
+
+        name = self._current_schema
+        fields = self._get_schema_fields(self.model_cls, name)
+        relationships = getattr(
+            getattr(self.model_cls.Schemas, name.capitalize()), "relationships", {}
+        )
+
+        return self._create_schema_model(fields, relationships, name, permissions)
+
+    def get(self, name: str) -> Type[BaseModel]:
+        """Get Pydantic model by name (alias for attribute access)."""
+        return getattr(self, name.lower())
+
+    def list(self) -> list[str]:
+        """Отримати список всіх доступних схем."""
+        names = []
+        if hasattr(self.model_cls, "Schemas"):
+            for attr_name, attr_value in self.model_cls.Schemas.__dict__.items():
+                if attr_name.startswith("_"):
+                    continue
+                if inspect.isclass(attr_value) and (
+                    issubclass(attr_value, SchemaDefinition) or issubclass(attr_value, BaseModel)
+                ):
+                    names.append(attr_name.lower())
+        return names
+
+
+class AwesomeFieldInfo(SQLModelFieldInfo):
+    """Custom field that extends SQLField with permission-based field visibility."""
+
+    def __init__(
+        self,
+        *args,
+        exclude_permissions: List[str] = None,
+        include_permissions: List[str] = None,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        self.exclude_permissions = exclude_permissions or []
+        self.include_permissions = include_permissions or []
+
+    def __repr__(self) -> str:
+        parent_repr = super().__repr__()
+        attrs = []
+        if self.exclude_permissions:
+            attrs.append(f"exclude_permissions={self.exclude_permissions}")
+        if self.include_permissions:
+            attrs.append(f"include_permissions={self.include_permissions}")
+        return f"{parent_repr[:-1]}, {', '.join(attrs)})" if attrs else parent_repr
+
+
+def AwesomeField(  # noqa: N802
+    *args,
+    exclude_permissions: List[str] = None,
+    include_permissions: List[str] = None,
+    **kwargs,
+) -> Type[AwesomeBaseModel]:
+    return AwesomeFieldInfo(
+        *args,
+        exclude_permissions=exclude_permissions,
+        include_permissions=include_permissions,
+        **kwargs,
+    )
+
+
+class AwesomeBaseModel(BaseModel):
+    _model_father: ClassVar[Type[AwesomeModel]] = None
+    _fields: ClassVar[List[str]] = []
+    _relationships: ClassVar[Dict[str, str]] = {}
+    _name: ClassVar[str] = ""
+    _permissions: ClassVar[Optional[List[str]]] = None
+    model_fields: ClassVar[dict[str, AwesomeFieldInfo]]
+
+    @classmethod
+    def _create_model(
+        cls, target_model: Type[AwesomeBaseModel], permissions: Optional[List[str]] = None, **data
+    ) -> Type[AwesomeBaseModel]:
+        """Create a new model instance with specific permissions."""
+        return cls._model_father.schemas._create_schema_model(
+            cls._fields, cls._relationships, cls._name, permissions
+        )
+
+    @classmethod
+    def with_permissions(
+        cls, target_model: Type[AwesomeBaseModel], permissions: List[str], **data
+    ) -> Type[AwesomeBaseModel]:
+        """Create a new model instance with specific permissions."""
+        return cls._create_model(target_model, permissions, **data)
+
+    @classmethod
+    def __call__(cls, *args, **kwargs) -> Type[AwesomeBaseModel]:
+        """Create a new model instance."""
+        return cls._create_model(cls, cls._permissions, **kwargs)
