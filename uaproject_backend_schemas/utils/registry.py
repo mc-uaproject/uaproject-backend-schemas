@@ -1,7 +1,7 @@
 from typing import Any, Dict, Type
 
 from uaproject_backend_schemas.awesome.utils import AwesomeActions, AwesomeModel
-from uaproject_backend_schemas.models.test import User
+from uaproject_backend_schemas.models.user import User
 
 
 class AwesomeRegistry:

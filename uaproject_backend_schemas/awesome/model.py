@@ -31,7 +31,7 @@ class AwesomeModel(SQLModel):
 
         pass
 
-    class Schemas:
+    class Schemas(AwesomeSchemas):
         """Nested Schemas class - allows defining SchemaDefinition or Pydantic models inside it."""
 
         pass

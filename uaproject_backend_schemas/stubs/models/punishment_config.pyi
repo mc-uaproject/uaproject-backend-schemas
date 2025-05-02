@@ -1,0 +1,34 @@
+# AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
+
+from datetime import datetime
+from typing import Dict, Optional
+
+from uaproject_backend_schemas.awesome.model import AwesomeModel
+from uaproject_backend_schemas.awesome.utils import AwesomeBaseModel
+from uaproject_backend_schemas.models.punishment_config import PunishmentConfig
+
+class PunishmentConfig(AwesomeModel):
+    """Base user model."""
+
+    schemas: PunishmentConfigSchemas
+    scopes: PunishmentConfigScopes
+
+class PunishmentConfigSchemas:
+    """Schemas for the user model."""
+
+class PunishmentConfigScopes:
+    """Visibility scopes for the user model."""
+
+    changed: PunishmentConfigScopeChanged
+
+class PunishmentConfigScopeChanged(AwesomeBaseModel):
+    """changed visibility scope for PunishmentConfig model"""
+
+    updated_at: datetime
+    id: int
+    name: str
+    description: Optional[str]
+    is_active: bool
+    warn_threshold: int
+    warn_decay_days: int
+    config_data: Dict
