@@ -21,7 +21,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.ruff]
 lint.select = ["E", "F", "W", "C", "I", "N", "YTT"]
 exclude = ["venv", "__pycache__", "versions"]
-lint.ignore = ["E501", "B010", "B022", "B028", "B904", "N805", "F811"]
+lint.ignore = ["E501", "B010", "B022", "B028", "B904", "N805", ]
 line-length = 100
 
 [tool.vulture]

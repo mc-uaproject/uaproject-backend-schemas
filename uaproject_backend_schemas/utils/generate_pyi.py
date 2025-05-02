@@ -394,8 +394,6 @@ def generate_pyi_for_model(model_cls: Type[AwesomeModel], module_path: str) -> s
     imports = get_required_imports(model_cls, all_fields)
     content = "# AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.\n\n"
 
-    content += f"from {module_path} import {model_cls.__name__}\n\n"
-
     content += "\n".join(sorted(imports)) + "\n\n"
 
     content += f"class {model_cls.__name__}(AwesomeModel):\n"

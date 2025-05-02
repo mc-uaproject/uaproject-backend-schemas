@@ -5,7 +5,6 @@ from typing import Dict, Optional
 
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.utils import AwesomeBaseModel
-from uaproject_backend_schemas.models.punishment_config import PunishmentConfig
 
 class PunishmentConfig(AwesomeModel):
     """Base user model."""

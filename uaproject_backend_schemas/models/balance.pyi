@@ -1,8 +1,6 @@
 # AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
 
-
 from uaproject_backend_schemas.awesome.model import AwesomeModel
-from uaproject_backend_schemas.models.balance import Balance
 
 class Balance(AwesomeModel):
     """Base user model."""

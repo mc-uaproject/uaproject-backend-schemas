@@ -5,7 +5,7 @@ from typing import List, Optional
 
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.utils import AwesomeBaseModel
-from uaproject_backend_schemas.models.application import Application, ApplicationStatus
+from uaproject_backend_schemas.models.application import ApplicationStatus
 
 class Application(AwesomeModel):
     """Base user model."""
