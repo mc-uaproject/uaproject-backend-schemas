@@ -381,7 +381,7 @@ def ensure_stub_dir(module_path: str, project_root: Path) -> Path:
     """Create and return stub directory path preserving module structure."""
     parts = module_path.split(".")
     package_root = project_root / parts[0]
-    stub_dir = package_root / "stubs" / "/".join(parts[1:-1])
+    stub_dir = package_root / "/".join(parts[1:-1])
     stub_dir.mkdir(parents=True, exist_ok=True)
     return stub_dir
 

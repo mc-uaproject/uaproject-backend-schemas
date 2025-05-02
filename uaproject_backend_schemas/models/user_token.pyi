@@ -38,20 +38,20 @@ class TokenScopeFullWithPermissions(AwesomeBaseModel):
     token: UUID
     user_id: int
 
-class TokenScopeFullWithPermissionsTokenWrite(AwesomeBaseModel):
-    """full visibility scope for Token model with permissions token.write"""
-
-    token: UUID
-
 class TokenScopeFullWithPermissionsTokenRead(AwesomeBaseModel):
     """full visibility scope for Token model with permissions token.read"""
 
     token: UUID
 
+class TokenScopeFullWithPermissionsTokenWrite(AwesomeBaseModel):
+    """full visibility scope for Token model with permissions token.write"""
+
+    token: UUID
+
     def with_permissions(
-        self, permissions: list[Literal["token.write", "token.read"]]
+        self, permissions: list[Literal["token.read", "token.write"]]
     ) -> (
-        TokenScopeFullWithPermissionsTokenWrite
-        | TokenScopeFullWithPermissionsTokenRead
+        TokenScopeFullWithPermissionsTokenRead
+        | TokenScopeFullWithPermissionsTokenWrite
         | TokenScopeFullWithPermissions
     ): ...
