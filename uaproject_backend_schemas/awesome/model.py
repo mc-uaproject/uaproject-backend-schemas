@@ -48,7 +48,9 @@ class AwesomeModel(SQLModel):
     def scopes(cls) -> None | AwesomeScopes | Type[AwesomeScopes]:
         """Get Scopes instance."""
         if cls.__scopes__ is None:
-            cls.__scopes__ = getattr(cls, "Scopes", None)
+            scope_cls = getattr(cls, "Scopes", None)
+            if scope_cls:
+                cls.__scopes__ = scope_cls(cls)
         return cls.__scopes__
 
     @classproperty

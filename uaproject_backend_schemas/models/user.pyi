@@ -15,6 +15,10 @@ class User(AwesomeModel):
 class UserSchemas:
     """Schemas for the user model."""
 
+    create: UserSchemaCreate
+    update: UserSchemaUpdate
+    response: UserSchemaResponse
+
 class UserScopes:
     """Visibility scopes for the user model."""
 
@@ -22,6 +26,39 @@ class UserScopes:
     discord_id: UserScopeDiscordId
     superuser: UserScopeSuperuser
     access: UserScopeAccess
+
+class UserSchemaCreate(AwesomeBaseModel):
+    """create schema for User model"""
+
+    id: int
+    updated_at: datetime
+    discord_id: Optional[int]
+    minecraft_nickname: Optional[str]
+    is_superuser: Optional[bool]
+    biography: Optional[str]
+    access: Optional[bool]
+
+class UserSchemaUpdate(AwesomeBaseModel):
+    """update schema for User model"""
+
+    id: int
+    updated_at: datetime
+    discord_id: Optional[int]
+    minecraft_nickname: Optional[str]
+    is_superuser: Optional[bool]
+    biography: Optional[str]
+    access: Optional[bool]
+
+class UserSchemaResponse(AwesomeBaseModel):
+    """response schema for User model"""
+
+    id: int
+    updated_at: datetime
+    discord_id: Optional[int]
+    minecraft_nickname: Optional[str]
+    is_superuser: Optional[bool]
+    biography: Optional[str]
+    access: Optional[bool]
 
 class UserScopeMinecraftNickname(AwesomeBaseModel):
     """minecraft_nickname visibility scope for User model"""

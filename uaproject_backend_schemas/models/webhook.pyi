@@ -1,6 +1,11 @@
 # AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
 
+from datetime import datetime
+from typing import Dict, Optional
+
 from uaproject_backend_schemas.awesome.model import AwesomeModel
+from uaproject_backend_schemas.awesome.utils import AwesomeBaseModel, SerializableHttpUrl
+from uaproject_backend_schemas.models.webhook import WebhookStatus
 
 class Webhook(AwesomeModel):
     """Base user model."""
@@ -11,5 +16,55 @@ class Webhook(AwesomeModel):
 class WebhookSchemas:
     """Schemas for the user model."""
 
+    create: WebhookSchemaCreate
+    update: WebhookSchemaUpdate
+    response: WebhookSchemaResponse
+
 class WebhookScopes:
     """Visibility scopes for the user model."""
+
+    full: WebhookScopeFull
+
+class WebhookSchemaCreate(AwesomeBaseModel):
+    """create schema for Webhook model"""
+
+    updated_at: datetime
+    id: int
+    endpoint: SerializableHttpUrl
+    user_id: Optional[int]
+    status: WebhookStatus
+    webhook_scopes: Dict
+    authorization: Optional[str]
+
+class WebhookSchemaUpdate(AwesomeBaseModel):
+    """update schema for Webhook model"""
+
+    updated_at: datetime
+    id: int
+    endpoint: SerializableHttpUrl
+    user_id: Optional[int]
+    status: WebhookStatus
+    webhook_scopes: Dict
+    authorization: Optional[str]
+
+class WebhookSchemaResponse(AwesomeBaseModel):
+    """response schema for Webhook model"""
+
+    updated_at: datetime
+    id: int
+    endpoint: SerializableHttpUrl
+    user_id: Optional[int]
+    status: WebhookStatus
+    webhook_scopes: Dict
+    authorization: Optional[str]
+
+class WebhookScopeFull(AwesomeBaseModel):
+    """full visibility scope for Webhook model"""
+
+    updated_at: datetime
+    id: int
+    endpoint: SerializableHttpUrl
+    user_id: Optional[int]
+    status: WebhookStatus
+    webhook_scopes: Dict
+    authorization: Optional[str]

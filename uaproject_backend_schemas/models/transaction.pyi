@@ -1,6 +1,12 @@
 # AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
 
+from datetime import datetime
+from decimal import Decimal
+from typing import Dict, Optional
+
 from uaproject_backend_schemas.awesome.model import AwesomeModel
+from uaproject_backend_schemas.awesome.utils import AwesomeBaseModel
+from uaproject_backend_schemas.models.transaction import TransactionType
 
 class Transaction(AwesomeModel):
     """Base user model."""
@@ -11,5 +17,63 @@ class Transaction(AwesomeModel):
 class TransactionSchemas:
     """Schemas for the user model."""
 
+    create: TransactionSchemaCreate
+    update: TransactionSchemaUpdate
+    response: TransactionSchemaResponse
+
 class TransactionScopes:
     """Visibility scopes for the user model."""
+
+    full: TransactionScopeFull
+
+class TransactionSchemaCreate(AwesomeBaseModel):
+    """create schema for Transaction model"""
+
+    updated_at: datetime
+    id: int
+    user_id: int
+    amount: Decimal
+    type: TransactionType
+    description: Optional[str]
+    recipient_id: int
+    service_id: Optional[int]
+    transaction_metadata: Optional[Dict]
+
+class TransactionSchemaUpdate(AwesomeBaseModel):
+    """update schema for Transaction model"""
+
+    updated_at: datetime
+    id: int
+    user_id: int
+    amount: Decimal
+    type: TransactionType
+    description: Optional[str]
+    recipient_id: int
+    service_id: Optional[int]
+    transaction_metadata: Optional[Dict]
+
+class TransactionSchemaResponse(AwesomeBaseModel):
+    """response schema for Transaction model"""
+
+    updated_at: datetime
+    id: int
+    user_id: int
+    amount: Decimal
+    type: TransactionType
+    description: Optional[str]
+    recipient_id: int
+    service_id: Optional[int]
+    transaction_metadata: Optional[Dict]
+
+class TransactionScopeFull(AwesomeBaseModel):
+    """full visibility scope for Transaction model"""
+
+    updated_at: datetime
+    id: int
+    user_id: int
+    amount: Decimal
+    type: TransactionType
+    description: Optional[str]
+    recipient_id: int
+    service_id: Optional[int]
+    transaction_metadata: Optional[Dict]

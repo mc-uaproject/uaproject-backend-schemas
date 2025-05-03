@@ -112,8 +112,15 @@ class SchemaDefinition:
 class AwesomeScopes:
     """Model Scope manager. Provides methods for getting field configurations."""
 
-    class Full(ScopeDefinition):
-        permissions = ["{model_cls.__scope_prefix__}.read"]
+    def __init__(self, model_cls: Type[TModel]):
+        self.model_cls = model_cls
+
+        if not hasattr(self.model_cls.Scopes, "Full"):
+
+            class Full(ScopeDefinition):
+                permissions = ["{model_cls.__scope_prefix__}.read"]
+
+            setattr(self.model_cls.Scopes, "Full", Full)
 
     @classmethod
     def get(cls, name: str) -> Type[ScopeDefinition]:
@@ -192,23 +199,35 @@ class AwesomeSchemas:
     """Schema/Pydantic model manager for a specific model class.
     When accessing an attribute, creates (or returns cached) a Pydantic model."""
 
-    class Create(SchemaDefinition):
-        fields_exclude = ["id"]
-        optional = True
-        permissions = ["{model_cls.__scope_prefix__}.write"]
-
-    class Update(SchemaDefinition):
-        fields_exclude = ["id"]
-        optional = True
-        permissions = ["{model_cls.__scope_prefix__}.write"]
-
-    class Response(SchemaDefinition):
-        permissions = ["{model_cls.__scope_prefix__}.read"]
-
     def __init__(self, model_cls: Type[AwesomeModel]):
         self.model_cls = model_cls
         self._cache: Dict[str, Type[BaseModel]] = {}
         self._names: Dict[str, str] = {}
+
+        if not hasattr(self.model_cls.Schemas, "Create"):
+
+            class Create(SchemaDefinition):
+                fields_exclude = ["id"]
+                optional = True
+                permissions = ["{model_cls.__scope_prefix__}.write"]
+
+            setattr(self.model_cls.Schemas, "Create", Create)
+
+        if not hasattr(self.model_cls.Schemas, "Update"):
+
+            class Update(SchemaDefinition):
+                fields_exclude = ["id"]
+                optional = True
+                permissions = ["{model_cls.__scope_prefix__}.write"]
+
+            setattr(self.model_cls.Schemas, "Update", Update)
+
+        if not hasattr(self.model_cls.Schemas, "Response"):
+
+            class Response(SchemaDefinition):
+                permissions = ["{model_cls.__scope_prefix__}.read"]
+
+            setattr(self.model_cls.Schemas, "Response", Response)
 
     @classmethod
     def _get_all_fields(cls, model_cls: Type[TModel]) -> List[str]:

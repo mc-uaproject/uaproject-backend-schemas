@@ -1,9 +1,10 @@
+import ast
 import importlib
 import inspect
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Any, List, Set, Type
+from typing import Any, List, Type
 
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.utils import AwesomeFieldInfo
@@ -52,7 +53,7 @@ def _get_schema_permissions(model_cls: Type[AwesomeModel]) -> set[str]:
         return permissions
 
     for schema_name in model_cls.schemas.list():
-        schema_def = model_cls.schemas.get_definition(schema_name)
+        schema_def = model_cls.schemas._get_schema_definition(schema_name)
         if hasattr(schema_def, "permissions"):
             for perm in schema_def.permissions:
                 formatted_perm = perm.format(model_cls=model_cls)
@@ -164,22 +165,117 @@ def _process_field_imports(
     return std_lib_imports, local_imports, model_types
 
 
-def get_required_imports(model_cls: Type[AwesomeModel], fields: list[str]) -> Set[str]:
-    """Get required imports based on field types."""
+def parse_imports_from_py(py_path: str) -> dict[str, str]:
+    """Returns a map: name -> full import (string) for all import/from-imports in the file."""
+    imports = {}
+    with open(py_path, "r") as f:
+        tree = ast.parse(f.read(), filename=py_path)
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            module = node.module
+            for alias in node.names:
+                name = alias.asname or alias.name
+                if module:
+                    imports[name] = f"from {module} import {alias.name}"
+        elif isinstance(node, ast.Import):
+            for alias in node.names:
+                name = alias.asname or alias.name
+                imports[name] = f"import {alias.name}"
+    return imports
+
+
+def extract_types_recursively(tp, used_types):
+    if hasattr(tp, "__origin__") and hasattr(tp, "__args__"):
+        used_types.add(getattr(tp, "_name", None) or getattr(tp, "__name__", str(tp)))
+        for arg in tp.__args__:
+            extract_types_recursively(arg, used_types)
+    elif hasattr(tp, "__name__"):
+        used_types.add(tp.__name__)
+    elif isinstance(tp, str):
+        used_types.add(tp)
+
+
+def extract_types_from_fields(model_cls: Type[AwesomeModel], fields: list[str]) -> set:
+    used_types = set()
+    for field in fields:
+        if field not in model_cls.model_fields:
+            continue
+        ann = model_cls.model_fields[field].annotation
+        extract_types_recursively(ann, used_types)
+    for name, value in inspect.getmembers(model_cls):
+        if isinstance(value, property) and getattr(value, "__computed_field__", False):
+            tp = value.fget.__annotations__.get("return", None)
+            if tp:
+                extract_types_recursively(tp, used_types)
+    return used_types
+
+
+def collect_imports_from_types(used_types, std_types, py_imports, model_cls) -> set:
+    imports = set()
+    already_imported = set()
+    for tp in used_types:
+        if tp in std_types:
+            imports.add(std_types[tp])
+            already_imported.add(tp)
+        elif tp in py_imports and tp not in already_imported:
+            imports.add(py_imports[tp])
+            already_imported.add(tp)
+    for name, obj in inspect.getmembers(importlib.import_module(model_cls.__module__)):
+        if inspect.isclass(obj) and name in used_types and name not in already_imported:
+            imports.add(f"from {model_cls.__module__} import {name}")
+            already_imported.add(name)
+    return imports
+
+
+def collect_imports_from_generated_content(model_cls, std_types) -> set:
+    imports = set()
+    all_content = []
+    for schema_key in (
+        getattr(model_cls, "schemas", []).list()
+        if hasattr(getattr(model_cls, "schemas", None), "list")
+        else []
+    ):
+        all_content.append(generate_schema_class(model_cls, schema_key))
+    for scope_key in (
+        getattr(model_cls, "scopes", []).list()
+        if hasattr(getattr(model_cls, "scopes", None), "list")
+        else []
+    ):
+        all_content.append(generate_scope_class(model_cls, scope_key))
+    content_str = "\n".join(all_content)
+    if "AwesomeField(" in content_str:
+        imports.add(std_types["AwesomeField"])
+    if "Literal[" in content_str:
+        imports.add(std_types["Literal"])
+    return imports
+
+
+def get_required_imports(model_cls: Type[AwesomeModel], fields: list[str]) -> set:
+    """Automatically gets required imports for .pyi based on types in fields and imports from .py."""
+    std_types = {
+        "Optional": "from typing import Optional",
+        "List": "from typing import List",
+        "Dict": "from typing import Dict",
+        "Any": "from typing import Any",
+        "Literal": "from typing import Literal",
+        "UUID": "from uuid import UUID",
+        "Decimal": "from decimal import Decimal",
+        "datetime": "from datetime import datetime",
+        "AwesomeField": "from uaproject_backend_schemas.awesome.utils import AwesomeField",
+    }
     base_imports = {
         "from uaproject_backend_schemas.awesome.model import AwesomeModel",
         "from uaproject_backend_schemas.awesome.utils import AwesomeBaseModel",
     }
-
-    std_lib_imports, extra_local_imports, model_types = _process_field_imports(model_cls, fields)
-
-    if model_types:
-        module_path = model_cls.__module__
-        extra_local_imports.update(
-            f"from {module_path} import {type_name}" for type_name in model_types
-        )
-
-    return std_lib_imports | {""} | base_imports | extra_local_imports
+    py_path = model_cls.__module__.replace(".", "/") + ".py"
+    if not os.path.exists(py_path):
+        py_path = os.path.join("uaproject_backend_schemas", "models", py_path.split("/")[-1])
+    py_imports = parse_imports_from_py(py_path)
+    used_types = extract_types_from_fields(model_cls, fields)
+    imports = set(base_imports)
+    imports |= collect_imports_from_types(used_types, std_types, py_imports, model_cls)
+    imports |= collect_imports_from_generated_content(model_cls, std_types)
+    return imports
 
 
 def _get_field_type(field: Any) -> str:
@@ -227,7 +323,10 @@ def generate_schema_class(
     class_name = f"{model_cls.__name__}Schema{schema_name.capitalize()}"
     if permissions:
         class_name += "WithPermissions"
-        class_name += "".join(p.capitalize() for p in sorted(permissions))
+        class_name += "".join(
+            _format_permission_class_name("", p)[len("WithPermissions") :]
+            for p in sorted(permissions)
+        )
 
     fields = []
     for field_name, field in model_cls.model_fields.items():
@@ -264,7 +363,9 @@ def generate_schema_class(
             content += "\n".join(fields) + "\n\n"
 
         permission_models = [
-            f"{model_cls.__name__}Schema{schema_name.capitalize()}WithPermissions{''.join(p.capitalize() for p in sorted([perm]))}"
+            _format_permission_class_name(
+                f"{model_cls.__name__}Schema{schema_name.capitalize()}", perm
+            )
             for perm in all_permissions
         ]
         permission_models.append(
@@ -274,7 +375,7 @@ def generate_schema_class(
             " | ".join(permission_models) if len(permission_models) > 1 else permission_models[0]
         )
 
-        permissions_literal = " | ".join(f'"{p}"' for p in all_permissions)
+        permissions_literal = " , ".join(f'"{p}"' for p in all_permissions)
         content += f"    def with_permissions(self, permissions: list[Literal[{permissions_literal}]]) -> {return_type}: ...\n\n"
 
     return content
@@ -392,9 +493,25 @@ def generate_pyi_for_model(model_cls: Type[AwesomeModel], module_path: str) -> s
     all_fields = list(model_cls.model_fields.keys())
 
     imports = get_required_imports(model_cls, all_fields)
+    # DEBUG: print imports to check what is being added
+    # print(f"[DEBUG] Imports for {model_cls.__name__}: {imports}")
+    # Сортуємо імпорти: std, typing, project
+    std_imports = sorted(
+        [
+            imp
+            for imp in imports
+            if imp.startswith("from datetime")
+            or imp.startswith("from uuid")
+            or imp.startswith("from decimal")
+        ]
+    )
+    typing_imports = sorted([imp for imp in imports if imp.startswith("from typing")])
+    project_imports = sorted(
+        [imp for imp in imports if imp.startswith("from uaproject_backend_schemas")]
+    )
+    other_imports = sorted(imports - set(std_imports) - set(typing_imports) - set(project_imports))
     content = "# AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.\n\n"
-
-    content += "\n".join(sorted(imports)) + "\n\n"
+    content += "\n".join(std_imports + typing_imports + project_imports + other_imports) + "\n\n"
 
     content += f"class {model_cls.__name__}(AwesomeModel):\n"
     content += '    """Base user model."""\n'

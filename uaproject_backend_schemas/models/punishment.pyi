@@ -16,11 +16,57 @@ class Punishment(AwesomeModel):
 class PunishmentSchemas:
     """Schemas for the user model."""
 
+    create: PunishmentSchemaCreate
+    update: PunishmentSchemaUpdate
+    response: PunishmentSchemaResponse
+
 class PunishmentScopes:
     """Visibility scopes for the user model."""
 
     created: PunishmentScopeCreated
     status_changed: PunishmentScopeStatusChanged
+
+class PunishmentSchemaCreate(AwesomeBaseModel):
+    """create schema for Punishment model"""
+
+    updated_at: datetime
+    id: int
+    user_id: int
+    admin_id: Optional[int]
+    type: PunishmentType
+    status: PunishmentStatus
+    reason: Optional[str]
+    expires_at: Optional[datetime]
+    config_id: Optional[int]
+    punishment_metadata: Optional[Dict]
+
+class PunishmentSchemaUpdate(AwesomeBaseModel):
+    """update schema for Punishment model"""
+
+    updated_at: datetime
+    id: int
+    user_id: int
+    admin_id: Optional[int]
+    type: PunishmentType
+    status: PunishmentStatus
+    reason: Optional[str]
+    expires_at: Optional[datetime]
+    config_id: Optional[int]
+    punishment_metadata: Optional[Dict]
+
+class PunishmentSchemaResponse(AwesomeBaseModel):
+    """response schema for Punishment model"""
+
+    updated_at: datetime
+    id: int
+    user_id: int
+    admin_id: Optional[int]
+    type: PunishmentType
+    status: PunishmentStatus
+    reason: Optional[str]
+    expires_at: Optional[datetime]
+    config_id: Optional[int]
+    punishment_metadata: Optional[Dict]
 
 class PunishmentScopeCreated(AwesomeBaseModel):
     """created visibility scope for Punishment model"""
