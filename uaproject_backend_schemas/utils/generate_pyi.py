@@ -316,6 +316,44 @@ def _should_include_field(field: Any, permissions: list[str] = None) -> bool:
     return True
 
 
+def generate_schema_fields(model_cls: Type[AwesomeModel], permissions: list[str] = None) -> list[str]:
+    fields = []
+    for field_name, field in model_cls.model_fields.items():
+        if not _should_include_field(field, permissions):
+            continue
+        field_type = _get_field_type(field)
+        field_str = _get_field_str(field_name, field, field_type)
+        fields.append(field_str)
+    for name, value in inspect.getmembers(model_cls):
+        if isinstance(value, property) and getattr(value, "__computed_field__", False):
+            field_type = value.fget.__annotations__.get("return", Any)
+            fields.append(f"    {name}: {field_type.__name__}")
+    relationships = getattr(model_cls, "__relationships__", [])
+    for rel in relationships:
+        fields.append(f"    {rel}: Optional[Any] = None")
+    return fields
+
+
+def generate_with_permissions_method(class_name: str, all_permissions: set[str]) -> str:
+    permission_models = [
+        _format_permission_class_name(class_name, perm)
+        for perm in all_permissions
+    ]
+    permission_models.append(f"{class_name}WithPermissions")
+    return_type = (
+        " | ".join(permission_models)
+        if len(permission_models) > 1 else permission_models[0]
+    )
+    permissions_literal = " , ".join(f'"{p}"' for p in all_permissions)
+    return f"    def with_permissions(self, permissions: list[Literal[{permissions_literal}]]) -> {return_type}: ...\n\n"
+
+
+def generate_with_permissions_class(model_cls: Type[AwesomeModel], schema_name: str, fields: list[str]) -> str:
+    class_name = f"{model_cls.__name__}Schema{schema_name.capitalize()}WithPermissions"
+    docstring = f'    """{schema_name} schema for {model_cls.__name__} model with permissions"""\n'
+    return f"class {class_name}(AwesomeBaseModel):\n" + docstring + "\n".join(fields) + "\n\n"
+
+
 def generate_schema_class(
     model_cls: Type[AwesomeModel], schema_name: str, permissions: list[str] = None
 ) -> str:
@@ -328,40 +366,18 @@ def generate_schema_class(
             for p in sorted(permissions)
         )
 
-    fields = []
-    for field_name, field in model_cls.model_fields.items():
-        if not _should_include_field(field, permissions):
-            continue
-
-        field_type = _get_field_type(field)
-        field_str = _get_field_str(field_name, field, field_type)
-        fields.append(field_str)
-
-    for name, value in inspect.getmembers(model_cls):
-        if isinstance(value, property) and getattr(value, "__computed_field__", False):
-            field_type = value.fget.__annotations__.get("return", Any)
-            fields.append(f"    {name}: {field_type.__name__}")
-
-    relationships = getattr(model_cls, "__relationships__", [])
-    for rel in relationships:
-        fields.append(f"    {rel}: Optional[Any] = None")
-
+    fields = generate_schema_fields(model_cls, permissions)
     docstring = f'    """{schema_name} schema for {model_cls.__name__} model'
     if permissions:
         docstring += f" with permissions {', '.join(permissions)}"
     docstring += '"""\n'
-
     content = f"class {class_name}(AwesomeBaseModel):\n{docstring}" + "\n".join(fields) + "\n\n"
 
     all_permissions = get_permissions_from_model(model_cls)
     if all_permissions:
         if not permissions:
-            content += f"class {model_cls.__name__}Schema{schema_name.capitalize()}WithPermissions(AwesomeBaseModel):\n"
-            content += (
-                f'    """{schema_name} schema for {model_cls.__name__} model with permissions"""\n'
-            )
-            content += "\n".join(fields) + "\n\n"
-
+            content += generate_with_permissions_method(f"{model_cls.__name__}Schema{schema_name.capitalize()}", all_permissions)
+            content += generate_with_permissions_class(model_cls, schema_name, fields)
         permission_models = [
             _format_permission_class_name(
                 f"{model_cls.__name__}Schema{schema_name.capitalize()}", perm
@@ -372,12 +388,11 @@ def generate_schema_class(
             f"{model_cls.__name__}Schema{schema_name.capitalize()}WithPermissions"
         )
         return_type = (
-            " | ".join(permission_models) if len(permission_models) > 1 else permission_models[0]
+            " | ".join(permission_models)
+            if len(permission_models) > 1 else permission_models[0]
         )
-
         permissions_literal = " , ".join(f'"{p}"' for p in all_permissions)
         content += f"    def with_permissions(self, permissions: list[Literal[{permissions_literal}]]) -> {return_type}: ...\n\n"
-
     return content
 
 
@@ -493,9 +508,6 @@ def generate_pyi_for_model(model_cls: Type[AwesomeModel], module_path: str) -> s
     all_fields = list(model_cls.model_fields.keys())
 
     imports = get_required_imports(model_cls, all_fields)
-    # DEBUG: print imports to check what is being added
-    # print(f"[DEBUG] Imports for {model_cls.__name__}: {imports}")
-    # Сортуємо імпорти: std, typing, project
     std_imports = sorted(
         [
             imp
