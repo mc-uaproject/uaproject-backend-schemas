@@ -1,7 +1,6 @@
 import logging
 import re
 import threading
-import time
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -44,18 +43,22 @@ class UAIdGenerator:
 
     def generate(self, custom_date: Optional[datetime] = None) -> int:
         with self.lock:
-            now = int(
-                (custom_date.astimezone(timezone.utc) - self.epoch).total_seconds() * 1000
-            ) if custom_date else int(
-                (datetime.now(timezone.utc) - self.epoch).total_seconds() * 1000
+            now = (
+                int((custom_date.astimezone(timezone.utc) - self.epoch).total_seconds() * 1000)
+                if custom_date
+                else int((datetime.now(timezone.utc) - self.epoch).total_seconds() * 1000)
             )
             if now == self.last_timestamp:
-                self.sequence += 1
-                if self.sequence >= 10:
-                    time.sleep(0.001)
-                    return self.generate(custom_date)
+                self.sequence = (self.sequence + 1) & 0xFFF
+                if self.sequence == 0:
+                    while now <= self.last_timestamp:
+                        now = int((datetime.now(timezone.utc) - self.epoch).total_seconds() * 1000)
             else:
                 self.sequence = 0
                 self.last_timestamp = now
 
-            return now * 1000 + (self.replica_id * 10) + self.sequence
+            return (
+                ((now & 0x1FFFFFFFFFF) << 17)
+                | ((self.replica_id & 0x1F) << 12)
+                | (self.sequence & 0xFFF)
+            )

@@ -4,8 +4,8 @@ from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
 
+from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
-from uaproject_backend_schemas.awesome.utils import AwesomeBaseModel
 
 class Balance(AwesomeModel):
     """Base user model."""

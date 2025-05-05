@@ -2,8 +2,8 @@
 
 from datetime import datetime
 
+from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
-from uaproject_backend_schemas.awesome.utils import AwesomeBaseModel
 
 class UserRoles(AwesomeModel):
     """Base user model."""

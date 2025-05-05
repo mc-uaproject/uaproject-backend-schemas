@@ -5,9 +5,10 @@ from typing import TYPE_CHECKING, List, Optional
 from pydantic import model_validator
 from sqlmodel import BigInteger, Column, Relationship
 
+from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
-from uaproject_backend_schemas.awesome.utils import AwesomeField, ScopeDefinition
+from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
 from uaproject_backend_schemas.models.user_token import Token
 
 if TYPE_CHECKING:
@@ -102,3 +103,6 @@ class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
                 raise ValueError("Biography must be less than 2048 characters.")
 
         return values
+
+if __name__ == "__main__":
+    print(User.scopes.list())

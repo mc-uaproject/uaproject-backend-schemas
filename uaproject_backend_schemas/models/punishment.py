@@ -4,9 +4,10 @@ from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from sqlmodel import JSON, BigInteger, Column, DateTime, Enum, ForeignKey, Relationship
 
+from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
-from uaproject_backend_schemas.awesome.utils import AwesomeField, ScopeDefinition
+from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.models.punishment_config import PunishmentConfig

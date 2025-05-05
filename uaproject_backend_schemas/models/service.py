@@ -6,9 +6,9 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel
 from sqlmodel import DECIMAL, JSON, Column, Enum
 
+from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
-from uaproject_backend_schemas.awesome.utils import AwesomeField
 
 
 class ServiceCategory(StrEnum):

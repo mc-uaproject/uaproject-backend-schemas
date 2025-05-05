@@ -5,7 +5,7 @@ import inspect
 from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, List, Optional, Type, TypeVar
 
 if TYPE_CHECKING:
-    from uaproject_backend_schemas.awesome.model import AwesomeModel
+    from .model import AwesomeModel
 
 TModel = TypeVar("TModel", bound="AwesomeModel")
 

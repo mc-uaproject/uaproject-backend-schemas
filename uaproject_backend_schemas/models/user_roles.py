@@ -2,9 +2,9 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import Column, ForeignKey, Integer, Relationship
 
+from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
-from uaproject_backend_schemas.awesome.utils import AwesomeField
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.models.role import Role

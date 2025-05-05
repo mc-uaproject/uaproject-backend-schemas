@@ -4,8 +4,8 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Dict, Optional
 
+from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
-from uaproject_backend_schemas.awesome.utils import AwesomeBaseModel
 from uaproject_backend_schemas.models.transaction import TransactionType
 
 class Transaction(AwesomeModel):

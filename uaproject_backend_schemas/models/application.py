@@ -5,9 +5,10 @@ from typing import TYPE_CHECKING, Any, List, Optional
 from pydantic import model_validator
 from sqlmodel import ARRAY, BigInteger, Column, Enum, ForeignKey, Relationship, String
 
+from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
-from uaproject_backend_schemas.awesome.utils import AwesomeField, ScopeDefinition
+from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.models.user import User

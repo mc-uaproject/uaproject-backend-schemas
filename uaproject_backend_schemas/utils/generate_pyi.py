@@ -6,8 +6,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, List, Type
 
+from uaproject_backend_schemas.awesome.fields import AwesomeFieldInfo
 from uaproject_backend_schemas.awesome.model import AwesomeModel
-from uaproject_backend_schemas.awesome.utils import AwesomeFieldInfo
 
 
 def expand_wildcard_modules(module_path: str) -> List[str]:
@@ -261,11 +261,11 @@ def get_required_imports(model_cls: Type[AwesomeModel], fields: list[str]) -> se
         "UUID": "from uuid import UUID",
         "Decimal": "from decimal import Decimal",
         "datetime": "from datetime import datetime",
-        "AwesomeField": "from uaproject_backend_schemas.awesome.utils import AwesomeField",
+        "AwesomeField": "from uaproject_backend_schemas.awesome.fields import AwesomeField",
     }
     base_imports = {
         "from uaproject_backend_schemas.awesome.model import AwesomeModel",
-        "from uaproject_backend_schemas.awesome.utils import AwesomeBaseModel",
+        "from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel",
     }
     py_path = model_cls.__module__.replace(".", "/") + ".py"
     if not os.path.exists(py_path):

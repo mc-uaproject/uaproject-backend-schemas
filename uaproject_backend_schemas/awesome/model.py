@@ -4,15 +4,16 @@ from typing import Any, Callable, ClassVar, Optional, Type, TypeVar
 
 from sqlmodel import SQLModel
 
-from uaproject_backend_schemas.awesome.actions import AwesomeActions
-from uaproject_backend_schemas.awesome.events import AwesomeEvents
-from uaproject_backend_schemas.awesome.utils import AwesomeFieldInfo, AwesomeSchemas, AwesomeScopes
+from .actions import AwesomeActions
+from .events import AwesomeEvents
+from .fields import AwesomeFieldInfo
+from .schemas import AwesomeSchemas
+from .scopes import AwesomeScopes
 
 T = TypeVar("T")
 
 
 def classproperty(fget: Callable[[Type[Any]], T]) -> T:
-
     class ClassProperty:
         def __init__(self, fget: Callable[[Type[Any]], T]):
             self.fget = fget

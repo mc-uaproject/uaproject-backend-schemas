@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic import BaseModel, computed_field
 from sqlalchemy import BigInteger
 
-from uaproject_backend_schemas.awesome.utils import AwesomeField
+from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.utils.id_generator import UAIdGenerator
 
 id_generator = UAIdGenerator()

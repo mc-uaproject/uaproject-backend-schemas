@@ -3,8 +3,9 @@
 from datetime import datetime
 from typing import Dict, Optional
 
+from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
-from uaproject_backend_schemas.awesome.utils import AwesomeBaseModel, SerializableHttpUrl
+from uaproject_backend_schemas.awesome.types import SerializableHttpUrl
 from uaproject_backend_schemas.models.webhook import WebhookStatus
 
 class Webhook(AwesomeModel):
