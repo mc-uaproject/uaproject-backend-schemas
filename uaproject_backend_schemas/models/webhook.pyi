@@ -6,7 +6,7 @@ from typing import Dict, Optional
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.types import SerializableHttpUrl
-from uaproject_backend_schemas.models.webhook import WebhookStatus
+from uaproject_backend_schemas.models.schemas.webhook import WebhookStatus
 
 class Webhook(AwesomeModel):
     """Base user model."""

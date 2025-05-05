@@ -1,5 +1,4 @@
 from decimal import Decimal
-from enum import StrEnum
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from sqlmodel import DECIMAL, JSON, BigInteger, Column, Enum, ForeignKey, Relationship
@@ -7,21 +6,11 @@ from sqlmodel import DECIMAL, JSON, BigInteger, Column, Enum, ForeignKey, Relati
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
+from uaproject_backend_schemas.models.schemas.transaction import TransactionType
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.models.service import Service
     from uaproject_backend_schemas.models.user import User
-
-
-class TransactionType(StrEnum):
-    DEPOSIT = "deposit"
-    WITHDRAWAL = "withdrawal"
-    TRANSFER = "transfer"
-    PURCHASE = "purchase"
-    DONATION = "donation"
-    SYSTEM = "system"
-    REFUND = "refund"
-    ADJUSTMENT = "adjustment"
 
 
 class Transaction(AwesomeModel, IDMixin, TimestampsMixin, table=True):

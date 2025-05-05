@@ -1,5 +1,4 @@
 from datetime import datetime
-from enum import StrEnum
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from sqlmodel import JSON, BigInteger, Column, DateTime, Enum, ForeignKey, Relationship
@@ -8,24 +7,11 @@ from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
+from uaproject_backend_schemas.models.schemas.punishments import PunishmentStatus, PunishmentType
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.models.punishment_config import PunishmentConfig
     from uaproject_backend_schemas.models.user import User
-
-
-class PunishmentType(StrEnum):
-    WARN = "warn"
-    MUTE = "mute"
-    BAN = "ban"
-    KICK = "kick"
-    RESTRICTION = "restriction"
-
-
-class PunishmentStatus(StrEnum):
-    ACTIVE = "active"
-    EXPIRED = "expired"
-    REVOKED = "revoked"
 
 
 class Punishment(AwesomeModel, IDMixin, TimestampsMixin, table=True):

@@ -6,7 +6,7 @@ from typing import Dict, Optional
 
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
-from uaproject_backend_schemas.models.transaction import TransactionType
+from uaproject_backend_schemas.models.schemas.transaction import TransactionType
 
 class Transaction(AwesomeModel):
     """Base user model."""

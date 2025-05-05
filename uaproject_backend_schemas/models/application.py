@@ -1,5 +1,4 @@
 from datetime import datetime
-from enum import StrEnum
 from typing import TYPE_CHECKING, Any, List, Optional
 
 from pydantic import model_validator
@@ -9,6 +8,7 @@ from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
+from uaproject_backend_schemas.models.schemas.application import ApplicationStatus
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.models.user import User
@@ -22,14 +22,6 @@ DEFAULT_EDITABLE_FIELDS: List[str] = [
     "conflict_reaction",
     "quiz_answer",
 ]
-
-
-class ApplicationStatus(StrEnum):
-    ACCEPTED = "accepted"
-    DECLINED = "declined"
-    REVIEW = "review"
-    EDITING = "editing"
-    NOT_SENT = "not_sent"
 
 
 class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):

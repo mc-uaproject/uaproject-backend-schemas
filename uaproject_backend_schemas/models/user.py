@@ -1,5 +1,4 @@
 import re
-from enum import Enum
 from typing import TYPE_CHECKING, List, Optional
 
 from pydantic import model_validator
@@ -18,12 +17,6 @@ if TYPE_CHECKING:
     from uaproject_backend_schemas.models.role import Role
     from uaproject_backend_schemas.models.transaction import Transaction
     from uaproject_backend_schemas.models.webhook import Webhook
-
-
-class Status(Enum):
-    ACTIVE = "active"
-    INACTIVE = "inactive"
-    PENDING = "pending"
 
 
 class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
@@ -103,6 +96,7 @@ class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
                 raise ValueError("Biography must be less than 2048 characters.")
 
         return values
+
 
 if __name__ == "__main__":
     print(User.scopes.list())

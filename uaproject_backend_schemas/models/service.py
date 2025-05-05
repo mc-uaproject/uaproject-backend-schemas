@@ -1,37 +1,16 @@
-from datetime import datetime
 from decimal import Decimal
-from enum import StrEnum
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel
 from sqlmodel import DECIMAL, JSON, Column, Enum
 
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
-
-
-class ServiceCategory(StrEnum):
-    DONATION = "donation"
-    SERVICE = "service"
-
-
-class ServiceType(StrEnum):
-    ONE_TIME = "one_time"
-    SUBSCRIPTION = "subscription"
-
-
-class ServicePoint(BaseModel):
-    text: str
-    tooltip: Optional[str] = None
-
-
-class ServiceDiscount(BaseModel):
-    user_id: Optional[int] = None
-    discount_percent: float
-    start_date: datetime
-    end_date: Optional[datetime] = None
-    reason: Optional[str] = None
+from uaproject_backend_schemas.models.schemas.service import (
+    ServiceDiscount,
+    ServicePoint,
+    ServiceType,
+)
 
 
 class Service(AwesomeModel, IDMixin, TimestampsMixin, table=True):

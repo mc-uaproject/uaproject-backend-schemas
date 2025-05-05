@@ -1,4 +1,3 @@
-from enum import StrEnum
 from typing import TYPE_CHECKING, Dict, Optional
 
 from sqlmodel import JSON, BigInteger, Column, Enum, ForeignKey, Relationship
@@ -7,16 +6,10 @@ from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.types import SerializableHttpUrl
+from uaproject_backend_schemas.models.schemas.webhook import WebhookStatus
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.models.user import User
-
-
-class WebhookStatus(StrEnum):
-    ACTIVE = "active"
-    UNRESPONSIVE = "unresponsive"
-    PROCESSING = "processing"
-    ERROR = "error"
 
 
 class Webhook(AwesomeModel, IDMixin, TimestampsMixin, table=True):

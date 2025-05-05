@@ -269,7 +269,7 @@ def get_required_imports(model_cls: Type[AwesomeModel], fields: list[str]) -> se
     }
     py_path = model_cls.__module__.replace(".", "/") + ".py"
     if not os.path.exists(py_path):
-        py_path = os.path.join("uaproject_backend_schemas", "models", py_path.split("/")[-1])
+        py_path = os.path.join("uaproject_backend_schemas", "models.schemas", py_path.split("/")[-1])
     py_imports = parse_imports_from_py(py_path)
     used_types = extract_types_from_fields(model_cls, fields)
     imports = set(base_imports)
