@@ -4,7 +4,7 @@ import inspect
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Any, List, Type
+from typing import Any, List, Optional, Type, get_args, get_origin
 
 from uaproject_backend_schemas.awesome.fields import AwesomeFieldInfo
 from uaproject_backend_schemas.awesome.model import AwesomeModel
@@ -269,7 +269,9 @@ def get_required_imports(model_cls: Type[AwesomeModel], fields: list[str]) -> se
     }
     py_path = model_cls.__module__.replace(".", "/") + ".py"
     if not os.path.exists(py_path):
-        py_path = os.path.join("uaproject_backend_schemas", "models.schemas", py_path.split("/")[-1])
+        py_path = os.path.join(
+            "uaproject_backend_schemas", "models.schemas", py_path.split("/")[-1]
+        )
     py_imports = parse_imports_from_py(py_path)
     used_types = extract_types_from_fields(model_cls, fields)
     imports = set(base_imports)
@@ -316,7 +318,9 @@ def _should_include_field(field: Any, permissions: list[str] = None) -> bool:
     return True
 
 
-def generate_schema_fields(model_cls: Type[AwesomeModel], permissions: list[str] = None) -> list[str]:
+def generate_schema_fields(
+    model_cls: Type[AwesomeModel], permissions: list[str] = None
+) -> list[str]:
     fields = []
     for field_name, field in model_cls.model_fields.items():
         if not _should_include_field(field, permissions):
@@ -336,19 +340,19 @@ def generate_schema_fields(model_cls: Type[AwesomeModel], permissions: list[str]
 
 def generate_with_permissions_method(class_name: str, all_permissions: set[str]) -> str:
     permission_models = [
-        _format_permission_class_name(class_name, perm)
-        for perm in all_permissions
+        _format_permission_class_name(class_name, perm) for perm in all_permissions
     ]
     permission_models.append(f"{class_name}WithPermissions")
     return_type = (
-        " | ".join(permission_models)
-        if len(permission_models) > 1 else permission_models[0]
+        " | ".join(permission_models) if len(permission_models) > 1 else permission_models[0]
     )
     permissions_literal = " , ".join(f'"{p}"' for p in all_permissions)
     return f"    def with_permissions(self, permissions: list[Literal[{permissions_literal}]]) -> {return_type}: ...\n\n"
 
 
-def generate_with_permissions_class(model_cls: Type[AwesomeModel], schema_name: str, fields: list[str]) -> str:
+def generate_with_permissions_class(
+    model_cls: Type[AwesomeModel], schema_name: str, fields: list[str]
+) -> str:
     class_name = f"{model_cls.__name__}Schema{schema_name.capitalize()}WithPermissions"
     docstring = f'    """{schema_name} schema for {model_cls.__name__} model with permissions"""\n'
     return f"class {class_name}(AwesomeBaseModel):\n" + docstring + "\n".join(fields) + "\n\n"
@@ -367,7 +371,7 @@ def generate_schema_class(
         )
 
     fields = generate_schema_fields(model_cls, permissions)
-    docstring = f'    """{schema_name} schema for {model_cls.__name__} model'
+    docstring = f'    """{schema_name.capitalize()} schema for {model_cls.__name__} model'
     if permissions:
         docstring += f" with permissions {', '.join(permissions)}"
     docstring += '"""\n'
@@ -376,7 +380,9 @@ def generate_schema_class(
     all_permissions = get_permissions_from_model(model_cls)
     if all_permissions:
         if not permissions:
-            content += generate_with_permissions_method(f"{model_cls.__name__}Schema{schema_name.capitalize()}", all_permissions)
+            content += generate_with_permissions_method(
+                f"{model_cls.__name__}Schema{schema_name.capitalize()}", all_permissions
+            )
             content += generate_with_permissions_class(model_cls, schema_name, fields)
         permission_models = [
             _format_permission_class_name(
@@ -388,8 +394,7 @@ def generate_schema_class(
             f"{model_cls.__name__}Schema{schema_name.capitalize()}WithPermissions"
         )
         return_type = (
-            " | ".join(permission_models)
-            if len(permission_models) > 1 else permission_models[0]
+            " | ".join(permission_models) if len(permission_models) > 1 else permission_models[0]
         )
         permissions_literal = " , ".join(f'"{p}"' for p in all_permissions)
         content += f"    def with_permissions(self, permissions: list[Literal[{permissions_literal}]]) -> {return_type}: ...\n\n"
@@ -502,8 +507,139 @@ def ensure_stub_dir(module_path: str, project_root: Path) -> Path:
     return stub_dir
 
 
+def generate_filters_class(model_cls: Type[AwesomeModel]) -> str:
+    if not hasattr(model_cls, "filters") or not model_cls.filters:
+        return ""
+    content = f"class {model_cls.__name__}Filters:\n"
+    content += f'    """Declarative filters for the {model_cls.__name__} model."""\n'
+    for filter_key in model_cls.filters.list():
+        filter_cls = getattr(model_cls.Filters, filter_key)
+        content += f"    {filter_key}: type\n"
+    content += "\n"
+    for filter_key in model_cls.filters.list():
+        filter_cls = getattr(model_cls.Filters, filter_key)
+        content += f"class {model_cls.__name__}Filter{filter_key}(FilterDefinition):\n"
+        content += f'    """{getattr(filter_cls, "description", "")}"""\n'
+        content += f"    field: str = '{getattr(filter_cls, 'field', '')}'\n"
+        if hasattr(filter_cls, "type") and getattr(filter_cls, "type", None):
+            content += f"    type: type = {getattr(filter_cls, 'type').__name__}\n"
+        content += "\n"
+    return content
+
+
+def generate_sorts_class(model_cls: Type[AwesomeModel]) -> str:
+    if not hasattr(model_cls, "sorts") or not model_cls.sorts:
+        return ""
+    content = f"class {model_cls.__name__}Sorts:\n"
+    content += f'    """Declarative sorts for the {model_cls.__name__} model."""\n'
+    for sort_key in model_cls.sorts.list():
+        sort_cls = getattr(model_cls.Sorts, sort_key)
+        content += f"    {sort_key}: type\n"
+    content += "\n"
+    for sort_key in model_cls.sorts.list():
+        sort_cls = getattr(model_cls.Sorts, sort_key)
+        content += f"class {model_cls.__name__}Sort{sort_key}(SortDefinition):\n"
+        content += f'    """{getattr(sort_cls, "description", "")}"""\n'
+        content += f"    field: str = '{getattr(sort_cls, 'field', '')}'\n"
+        if hasattr(sort_cls, "direction") and getattr(sort_cls, "direction", None):
+            content += f"    direction: str = '{getattr(sort_cls, 'direction', 'asc')}'\n"
+        content += "\n"
+    return content
+
+
+def unwrap_optional(ann):
+    while get_origin(ann) is Optional and get_args(ann):
+        ann = get_args(ann)[0]
+    return ann
+
+
+def generate_filter_class(model_cls: Type[AwesomeModel]) -> str:
+    if not hasattr(model_cls, "filter") or not model_cls.filter:
+        return ""
+    filter_cls = model_cls.filter
+    content = f"class {model_cls.__name__}Filter(BaseModel):\n"
+    content += f'    """Pydantic-class for filtering the {model_cls.__name__} model."""\n'
+    for name, field in filter_cls.model_fields.items():
+        if name in model_cls.model_fields:
+            ann = model_cls.model_fields[name].annotation
+            typ = unwrap_optional(ann)
+            typ_str = typ.__name__ if hasattr(typ, "__name__") else str(typ)
+            content += f"    {name}: Optional[{typ_str}] = None\n"
+        else:
+            content += f"    {name}: Optional[Any] = None\n"
+    content += "\n"
+    return content
+
+
+def generate_sort_enum(model_cls: Type[AwesomeModel]) -> str:
+    if not hasattr(model_cls, "sort") or not model_cls.sort:
+        return ""
+    sort_cls = model_cls.sort
+    content = f"class {model_cls.__name__}Sort(StrEnum):\n"
+    content += f'    """Enum for sorting the {model_cls.__name__} model."""\n'
+    for member in sort_cls:
+        content += f"    {member.name} = '{member.value}'\n"
+    content += "\n"
+    return content
+
+
+def collect_additional_imports(generated_content: str) -> set[str]:
+    imports = set()
+    if "BaseModel" in generated_content:
+        imports.add("from pydantic import BaseModel")
+    if "StrEnum" in generated_content:
+        imports.add("from enum import StrEnum")
+    if "FilterDefinition" in generated_content:
+        imports.add("from uaproject_backend_schemas.awesome.filters import FilterDefinition")
+    if "SortDefinition" in generated_content:
+        imports.add("from uaproject_backend_schemas.awesome.sorts import SortDefinition")
+    if "Any" in generated_content:
+        imports.add("from typing import Any")
+    return imports
+
+
+def build_main_content(model_cls: Type[AwesomeModel], permissions: set[str]) -> str:
+    main_content = ""
+    main_content += f"class {model_cls.__name__}(AwesomeModel):\n"
+    main_content += '    """Base user model."""\n'
+    main_content += f"    schemas: {model_cls.__name__}Schemas\n"
+    main_content += f"    scopes: {model_cls.__name__}Scopes\n"
+    if hasattr(model_cls, "filters") and model_cls.filters:
+        main_content += f"    filters: {model_cls.__name__}Filters\n"
+    if hasattr(model_cls, "sorts") and model_cls.sorts:
+        main_content += f"    sorts: {model_cls.__name__}Sorts\n"
+    if hasattr(model_cls, "filter") and model_cls.filter:
+        main_content += f"    filter: type[{model_cls.__name__}Filter]\n"
+    if hasattr(model_cls, "sort") and model_cls.sort:
+        main_content += f"    sort: type[{model_cls.__name__}Sort]\n"
+    main_content += "\n"
+    main_content += f"class {model_cls.__name__}Schemas:\n"
+    main_content += '    """Schemas for the user model."""\n'
+    for schema_key in model_cls.schemas.list():
+        base_schema = f"{model_cls.__name__}Schema{schema_key.capitalize()}"
+        main_content += f"    {schema_key}: {base_schema}\n"
+    main_content += "\n"
+    main_content += f"class {model_cls.__name__}Scopes:\n"
+    main_content += '    """Visibility scopes for the user model."""\n'
+    for scope_key in model_cls.scopes.list():
+        scope_name_parts = scope_key.split("_")
+        scope_name_camel = "".join(word.capitalize() for word in scope_name_parts)
+        main_content += f"    {scope_key}: {model_cls.__name__}Scope{scope_name_camel}\n"
+    main_content += "\n"
+    main_content += generate_filters_class(model_cls)
+    main_content += generate_sorts_class(model_cls)
+    main_content += generate_filter_class(model_cls)
+    main_content += generate_sort_enum(model_cls)
+    for schema_key in model_cls.schemas.list():
+        main_content += generate_schema_class(model_cls, schema_key)
+        for perm in permissions:
+            main_content += generate_schema_class(model_cls, schema_key, [perm])
+    for scope_key in model_cls.scopes.list():
+        main_content += generate_scope_class(model_cls, scope_key)
+    return main_content
+
+
 def generate_pyi_for_model(model_cls: Type[AwesomeModel], module_path: str) -> str:
-    """Generate .pyi file content for a model (description of its schemas)."""
     permissions = get_permissions_from_model(model_cls)
     all_fields = list(model_cls.model_fields.keys())
 
@@ -522,39 +658,21 @@ def generate_pyi_for_model(model_cls: Type[AwesomeModel], module_path: str) -> s
         [imp for imp in imports if imp.startswith("from uaproject_backend_schemas")]
     )
     other_imports = sorted(imports - set(std_imports) - set(typing_imports) - set(project_imports))
-    content = "# AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.\n\n"
-    content += "\n".join(std_imports + typing_imports + project_imports + other_imports) + "\n\n"
+    content = (
+        PYI_HEADER
+        + "\n".join(std_imports + typing_imports + project_imports + other_imports)
+        + "\n\n"
+    )
 
-    content += f"class {model_cls.__name__}(AwesomeModel):\n"
-    content += '    """Base user model."""\n'
-    content += f"    schemas: {model_cls.__name__}Schemas\n"
-    content += f"    scopes: {model_cls.__name__}Scopes\n\n"
+    main_content = build_main_content(model_cls, permissions)
 
-    content += f"class {model_cls.__name__}Schemas:\n"
-    content += '    """Schemas for the user model."""\n'
-    for schema_key in model_cls.schemas.list():
-        base_schema = f"{model_cls.__name__}Schema{schema_key.capitalize()}"
-        content += f"    {schema_key}: {base_schema}\n"
+    additional_imports = collect_additional_imports(main_content)
+    already_imported = set(std_imports + typing_imports + project_imports + other_imports)
+    additional_imports = [imp for imp in additional_imports if imp not in already_imported]
+    if additional_imports:
+        content += "\n".join(additional_imports) + "\n\n"
 
-    content += "\n"
-
-    content += f"class {model_cls.__name__}Scopes:\n"
-    content += '    """Visibility scopes for the user model."""\n'
-    for scope_key in model_cls.scopes.list():
-        scope_name_parts = scope_key.split("_")
-        scope_name_camel = "".join(word.capitalize() for word in scope_name_parts)
-        content += f"    {scope_key}: {model_cls.__name__}Scope{scope_name_camel}\n"
-
-    content += "\n"
-
-    for schema_key in model_cls.schemas.list():
-        content += generate_schema_class(model_cls, schema_key)
-        for perm in permissions:
-            content += generate_schema_class(model_cls, schema_key, [perm])
-
-    for scope_key in model_cls.scopes.list():
-        content += generate_scope_class(model_cls, scope_key)
-
+    content += main_content
     return content
 
 

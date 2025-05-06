@@ -27,7 +27,7 @@ class WebhookScopes:
     full: WebhookScopeFull
 
 class WebhookSchemaCreate(AwesomeBaseModel):
-    """create schema for Webhook model"""
+    """Create schema for Webhook model"""
 
     updated_at: datetime
     id: int
@@ -38,7 +38,7 @@ class WebhookSchemaCreate(AwesomeBaseModel):
     authorization: Optional[str]
 
 class WebhookSchemaUpdate(AwesomeBaseModel):
-    """update schema for Webhook model"""
+    """Update schema for Webhook model"""
 
     updated_at: datetime
     id: int
@@ -49,7 +49,7 @@ class WebhookSchemaUpdate(AwesomeBaseModel):
     authorization: Optional[str]
 
 class WebhookSchemaResponse(AwesomeBaseModel):
-    """response schema for Webhook model"""
+    """Response schema for Webhook model"""
 
     updated_at: datetime
     id: int

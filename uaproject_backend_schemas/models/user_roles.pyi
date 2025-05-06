@@ -24,7 +24,7 @@ class UserRolesScopes:
     full: UserRolesScopeFull
 
 class UserRolesSchemaCreate(AwesomeBaseModel):
-    """create schema for UserRoles model"""
+    """Create schema for UserRoles model"""
 
     updated_at: datetime
     id: int
@@ -32,7 +32,7 @@ class UserRolesSchemaCreate(AwesomeBaseModel):
     role_id: int
 
 class UserRolesSchemaUpdate(AwesomeBaseModel):
-    """update schema for UserRoles model"""
+    """Update schema for UserRoles model"""
 
     updated_at: datetime
     id: int
@@ -40,7 +40,7 @@ class UserRolesSchemaUpdate(AwesomeBaseModel):
     role_id: int
 
 class UserRolesSchemaResponse(AwesomeBaseModel):
-    """response schema for UserRoles model"""
+    """Response schema for UserRoles model"""
 
     updated_at: datetime
     id: int

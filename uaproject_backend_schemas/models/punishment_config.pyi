@@ -25,7 +25,7 @@ class PunishmentConfigScopes:
     changed: PunishmentConfigScopeChanged
 
 class PunishmentConfigSchemaCreate(AwesomeBaseModel):
-    """create schema for PunishmentConfig model"""
+    """Create schema for PunishmentConfig model"""
 
     updated_at: datetime
     id: int
@@ -37,7 +37,7 @@ class PunishmentConfigSchemaCreate(AwesomeBaseModel):
     config_data: Dict
 
 class PunishmentConfigSchemaUpdate(AwesomeBaseModel):
-    """update schema for PunishmentConfig model"""
+    """Update schema for PunishmentConfig model"""
 
     updated_at: datetime
     id: int
@@ -49,7 +49,7 @@ class PunishmentConfigSchemaUpdate(AwesomeBaseModel):
     config_data: Dict
 
 class PunishmentConfigSchemaResponse(AwesomeBaseModel):
-    """response schema for PunishmentConfig model"""
+    """Response schema for PunishmentConfig model"""
 
     updated_at: datetime
     id: int

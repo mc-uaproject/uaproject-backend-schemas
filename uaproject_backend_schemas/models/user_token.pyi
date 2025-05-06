@@ -27,7 +27,7 @@ class TokenScopes:
     full: TokenScopeFull
 
 class TokenSchemaCreate(AwesomeBaseModel):
-    """create schema for Token model"""
+    """Create schema for Token model"""
 
     id: int
     updated_at: datetime
@@ -59,7 +59,7 @@ class TokenSchemaCreateWithPermissions(AwesomeBaseModel):
     ): ...
 
 class TokenSchemaCreateWithPermissionsTokenRead(AwesomeBaseModel):
-    """create schema for Token model with permissions token.read"""
+    """Create schema for Token model with permissions token.read"""
 
     token: UUID = AwesomeField(include_permissions=["token.read", "token.write"])
 
@@ -72,7 +72,7 @@ class TokenSchemaCreateWithPermissionsTokenRead(AwesomeBaseModel):
     ): ...
 
 class TokenSchemaCreateWithPermissionsTokenWrite(AwesomeBaseModel):
-    """create schema for Token model with permissions token.write"""
+    """Create schema for Token model with permissions token.write"""
 
     token: UUID = AwesomeField(include_permissions=["token.read", "token.write"])
 
@@ -85,7 +85,7 @@ class TokenSchemaCreateWithPermissionsTokenWrite(AwesomeBaseModel):
     ): ...
 
 class TokenSchemaUpdate(AwesomeBaseModel):
-    """update schema for Token model"""
+    """Update schema for Token model"""
 
     id: int
     updated_at: datetime
@@ -117,7 +117,7 @@ class TokenSchemaUpdateWithPermissions(AwesomeBaseModel):
     ): ...
 
 class TokenSchemaUpdateWithPermissionsTokenRead(AwesomeBaseModel):
-    """update schema for Token model with permissions token.read"""
+    """Update schema for Token model with permissions token.read"""
 
     token: UUID = AwesomeField(include_permissions=["token.read", "token.write"])
 
@@ -130,7 +130,7 @@ class TokenSchemaUpdateWithPermissionsTokenRead(AwesomeBaseModel):
     ): ...
 
 class TokenSchemaUpdateWithPermissionsTokenWrite(AwesomeBaseModel):
-    """update schema for Token model with permissions token.write"""
+    """Update schema for Token model with permissions token.write"""
 
     token: UUID = AwesomeField(include_permissions=["token.read", "token.write"])
 
@@ -143,7 +143,7 @@ class TokenSchemaUpdateWithPermissionsTokenWrite(AwesomeBaseModel):
     ): ...
 
 class TokenSchemaResponse(AwesomeBaseModel):
-    """response schema for Token model"""
+    """Response schema for Token model"""
 
     id: int
     updated_at: datetime
@@ -175,7 +175,7 @@ class TokenSchemaResponseWithPermissions(AwesomeBaseModel):
     ): ...
 
 class TokenSchemaResponseWithPermissionsTokenRead(AwesomeBaseModel):
-    """response schema for Token model with permissions token.read"""
+    """Response schema for Token model with permissions token.read"""
 
     token: UUID = AwesomeField(include_permissions=["token.read", "token.write"])
 
@@ -188,7 +188,7 @@ class TokenSchemaResponseWithPermissionsTokenRead(AwesomeBaseModel):
     ): ...
 
 class TokenSchemaResponseWithPermissionsTokenWrite(AwesomeBaseModel):
-    """response schema for Token model with permissions token.write"""
+    """Response schema for Token model with permissions token.write"""
 
     token: UUID = AwesomeField(include_permissions=["token.read", "token.write"])
 

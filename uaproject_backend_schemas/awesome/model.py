@@ -1,14 +1,18 @@
 from __future__ import annotations
 
+from enum import Enum
 from typing import Any, Callable, ClassVar, Optional, Type, TypeVar
 
+from pydantic import BaseModel
 from sqlmodel import SQLModel
 
 from .actions import AwesomeActions
 from .events import AwesomeEvents
 from .fields import AwesomeFieldInfo
+from .filters import AwesomeFilters
 from .schemas import AwesomeSchemas
 from .scopes import AwesomeScopes
+from .sorts import AwesomeSorts
 
 T = TypeVar("T")
 
@@ -44,6 +48,10 @@ class AwesomeModel(SQLModel):
     model_fields: ClassVar[dict[str, AwesomeFieldInfo]]
     scopes: ClassVar
     schemas: ClassVar
+    filters: ClassVar
+    filter: ClassVar
+    sorts: ClassVar
+    sort: ClassVar
 
     @classproperty
     def scopes(cls) -> None | AwesomeScopes | Type[AwesomeScopes]:
@@ -60,6 +68,38 @@ class AwesomeModel(SQLModel):
         if cls.__schemas__ is None:
             cls.__schemas__ = AwesomeSchemas(cls)
         return cls.__schemas__
+
+    @classproperty
+    def filters(cls) -> None | AwesomeFilters | Type[AwesomeFilters]:
+        """Get Filters instance."""
+        if not hasattr(cls, "__filters__") or cls.__filters__ is None:
+            filters_cls = getattr(cls, "Filters", None)
+            if filters_cls:
+                cls.__filters__ = filters_cls(cls)
+        return getattr(cls, "__filters__", None)
+
+    @classproperty
+    def sorts(cls) -> None | AwesomeSorts | Type[AwesomeSorts]:
+        """Get Sorts instance."""
+        if not hasattr(cls, "__sorts__") or cls.__sorts__ is None:
+            sorts_cls = getattr(cls, "Sorts", None)
+            if sorts_cls:
+                cls.__sorts__ = sorts_cls(cls)
+        return getattr(cls, "__sorts__", None)
+
+    @classproperty
+    def filter(cls) -> type[BaseModel] | None:
+        """Returns a Pydantic-class for filtering this model."""
+        if hasattr(cls, "Filters"):
+            return cls.Filters.get_pydantic_filter_class()
+        return None
+
+    @classproperty
+    def sort(cls) -> type[Enum] | None:
+        """Returns an Enum-class for sorting this model."""
+        if hasattr(cls, "Sorts"):
+            return cls.Sorts.get_enum_sort_class()
+        return None
 
     def __init_subclass__(cls, **kwargs):
         """Initialize Scopes, Schemas, Actions, Events subsystems when creating a subclass."""

@@ -29,7 +29,7 @@ class ApplicationScopes:
     full: ApplicationScopeFull
 
 class ApplicationSchemaCreate(AwesomeBaseModel):
-    """create schema for Application model"""
+    """Create schema for Application model"""
 
     id: int
     updated_at: datetime
@@ -45,7 +45,7 @@ class ApplicationSchemaCreate(AwesomeBaseModel):
     editable_fields: List[str]
 
 class ApplicationSchemaUpdate(AwesomeBaseModel):
-    """update schema for Application model"""
+    """Update schema for Application model"""
 
     id: int
     updated_at: datetime
@@ -61,7 +61,7 @@ class ApplicationSchemaUpdate(AwesomeBaseModel):
     editable_fields: List[str]
 
 class ApplicationSchemaResponse(AwesomeBaseModel):
-    """response schema for Application model"""
+    """Response schema for Application model"""
 
     id: int
     updated_at: datetime

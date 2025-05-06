@@ -27,7 +27,7 @@ class PunishmentScopes:
     status_changed: PunishmentScopeStatusChanged
 
 class PunishmentSchemaCreate(AwesomeBaseModel):
-    """create schema for Punishment model"""
+    """Create schema for Punishment model"""
 
     updated_at: datetime
     id: int
@@ -41,7 +41,7 @@ class PunishmentSchemaCreate(AwesomeBaseModel):
     punishment_metadata: Optional[Dict]
 
 class PunishmentSchemaUpdate(AwesomeBaseModel):
-    """update schema for Punishment model"""
+    """Update schema for Punishment model"""
 
     updated_at: datetime
     id: int
@@ -55,7 +55,7 @@ class PunishmentSchemaUpdate(AwesomeBaseModel):
     punishment_metadata: Optional[Dict]
 
 class PunishmentSchemaResponse(AwesomeBaseModel):
-    """response schema for Punishment model"""
+    """Response schema for Punishment model"""
 
     updated_at: datetime
     id: int

@@ -26,7 +26,7 @@ class BalanceScopes:
     full: BalanceScopeFull
 
 class BalanceSchemaCreate(AwesomeBaseModel):
-    """create schema for Balance model"""
+    """Create schema for Balance model"""
 
     updated_at: datetime
     id: int
@@ -35,7 +35,7 @@ class BalanceSchemaCreate(AwesomeBaseModel):
     amount: Decimal
 
 class BalanceSchemaUpdate(AwesomeBaseModel):
-    """update schema for Balance model"""
+    """Update schema for Balance model"""
 
     updated_at: datetime
     id: int
@@ -44,7 +44,7 @@ class BalanceSchemaUpdate(AwesomeBaseModel):
     amount: Decimal
 
 class BalanceSchemaResponse(AwesomeBaseModel):
-    """response schema for Balance model"""
+    """Response schema for Balance model"""
 
     updated_at: datetime
     id: int

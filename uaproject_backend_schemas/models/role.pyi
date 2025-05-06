@@ -25,7 +25,7 @@ class RoleScopes:
     full: RoleScopeFull
 
 class RoleSchemaCreate(AwesomeBaseModel):
-    """create schema for Role model"""
+    """Create schema for Role model"""
 
     updated_at: datetime
     id: int
@@ -34,7 +34,7 @@ class RoleSchemaCreate(AwesomeBaseModel):
     permissions: List[str]
 
 class RoleSchemaUpdate(AwesomeBaseModel):
-    """update schema for Role model"""
+    """Update schema for Role model"""
 
     updated_at: datetime
     id: int
@@ -43,7 +43,7 @@ class RoleSchemaUpdate(AwesomeBaseModel):
     permissions: List[str]
 
 class RoleSchemaResponse(AwesomeBaseModel):
-    """response schema for Role model"""
+    """Response schema for Role model"""
 
     updated_at: datetime
     id: int

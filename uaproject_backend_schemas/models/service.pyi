@@ -29,7 +29,7 @@ class ServiceScopes:
     full: ServiceScopeFull
 
 class ServiceSchemaCreate(AwesomeBaseModel):
-    """create schema for Service model"""
+    """Create schema for Service model"""
 
     updated_at: datetime
     id: int
@@ -50,7 +50,7 @@ class ServiceSchemaCreate(AwesomeBaseModel):
     discounts: Optional[List]
 
 class ServiceSchemaUpdate(AwesomeBaseModel):
-    """update schema for Service model"""
+    """Update schema for Service model"""
 
     updated_at: datetime
     id: int
@@ -71,7 +71,7 @@ class ServiceSchemaUpdate(AwesomeBaseModel):
     discounts: Optional[List]
 
 class ServiceSchemaResponse(AwesomeBaseModel):
-    """response schema for Service model"""
+    """Response schema for Service model"""
 
     updated_at: datetime
     id: int

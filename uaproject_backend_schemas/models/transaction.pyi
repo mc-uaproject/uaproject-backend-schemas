@@ -27,7 +27,7 @@ class TransactionScopes:
     full: TransactionScopeFull
 
 class TransactionSchemaCreate(AwesomeBaseModel):
-    """create schema for Transaction model"""
+    """Create schema for Transaction model"""
 
     updated_at: datetime
     id: int
@@ -40,7 +40,7 @@ class TransactionSchemaCreate(AwesomeBaseModel):
     transaction_metadata: Optional[Dict]
 
 class TransactionSchemaUpdate(AwesomeBaseModel):
-    """update schema for Transaction model"""
+    """Update schema for Transaction model"""
 
     updated_at: datetime
     id: int
@@ -53,7 +53,7 @@ class TransactionSchemaUpdate(AwesomeBaseModel):
     transaction_metadata: Optional[Dict]
 
 class TransactionSchemaResponse(AwesomeBaseModel):
-    """response schema for Transaction model"""
+    """Response schema for Transaction model"""
 
     updated_at: datetime
     id: int
