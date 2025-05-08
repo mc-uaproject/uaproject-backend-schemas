@@ -30,11 +30,11 @@ class UserRoles(
     role_id: int = Field(sa_column=Column(BigInteger(), ForeignKey("roles.id"), primary_key=True))
 
     user: Optional["User"] = Relationship(
-        back_populates="roles",
+        back_populates="user_roles",
         sa_relationship_kwargs={"foreign_keys": "[UserRoles.user_id]"},
     )
     role: Optional["Role"] = Relationship(
-        back_populates="users",
+        back_populates="user_roles",
         sa_relationship_kwargs={"foreign_keys": "[UserRoles.role_id]"},
     )
 
@@ -81,6 +81,10 @@ class Role(
     users: List["User"] = Relationship(
         back_populates="roles", sa_relationship_kwargs={"secondary": UserRoles.__table__}
     )
+
+    user_roles: List["UserRoles"] = Relationship(
+       back_populates="role"
+   )
 
     @classmethod
     def register_scopes(cls) -> None:

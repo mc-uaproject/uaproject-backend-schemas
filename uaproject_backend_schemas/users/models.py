@@ -47,6 +47,10 @@ class User(
         back_populates="users", sa_relationship_kwargs={"secondary": UserRoles.__table__}
     )
 
+    user_roles: List["UserRoles"] = Relationship(
+       back_populates="user"
+   )
+
     token: Optional["Token"] = Relationship(
         back_populates="user",
         sa_relationship_kwargs={
