@@ -1,13 +1,16 @@
 import logging
 from datetime import datetime
-from typing import Any, Dict, List, NamedTuple, Optional, Set, TypedDict, TypeVar, Union
+from email.message import _PayloadType
+from typing import Any, Dict, List, Literal, NamedTuple, Optional, Set, TypedDict, TypeVar, Union
 
 from pydantic import BaseModel
 from sqlalchemy import inspect
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapper
 
 from uaproject_backend_schemas.webhooks.mixins.base import WebhookBaseMixin, WebhookScopeFields
 from uaproject_backend_schemas.webhooks.mixins.temporal import WebhookTemporalMixin
+from uaproject_backend_schemas.webhooks.schemas import WebhookStage
 
 logger = logging.getLogger(__name__)
 
@@ -150,6 +153,51 @@ class WebhookChangesMixin(WebhookTemporalMixin, WebhookBaseMixin):
         self._check_temporal_expirations(scopes, triggered_scopes)
 
         return triggered_scopes
+
+    async def get_payload_for_scope(
+        self,
+        session: AsyncSession,
+        scope_name: str,
+        scope_changes: Dict[str, Dict[Literal["before", "after"], Any]],
+    ) -> _PayloadType:
+        """
+        Get payload for the specified scope according to its stage configuration.
+        """
+        scopes = self.__class__.get_webhook_scopes()
+        if scope_name not in scopes:
+            raise ValueError(f"Unknown scope: {scope_name}")
+
+        scope_config = scopes[scope_name]
+        relationships_to_load = scope_config.relationships or {}
+        model_fields = set(self.__table__.columns.keys())
+        relationship_names = set(self.__mapper__.relationships.keys())
+        fields_to_include = (
+            set(scope_config.fields)
+            if scope_config.fields is not None
+            else model_fields - relationship_names
+        )
+
+        async def build_payload(state: Literal["before", "after"]) -> dict:
+            payload = {}
+            changes = scope_changes or {}
+            for field in fields_to_include:
+                if field in relationship_names:
+                    continue
+                if field in changes and state in changes[field]:
+                    payload[field] = changes[field][state]
+                else:
+                    payload[field] = getattr(self, field)
+            if relationships_to_load:
+                await self._add_relationship_data(session, payload, relationships_to_load)
+            return payload
+
+        if scope_config.stage == WebhookStage.BOTH:
+            return {
+                "before": await build_payload("before"),
+                "after": await build_payload("after"),
+            }
+        state = "before" if scope_config.stage == WebhookStage.BEFORE else "after"
+        return await build_payload(state)
 
     def _check_temporal_expirations(
         self, scopes: Dict[str, WebhookScopeFields], triggered_scopes: Dict[str, Dict[str, Any]]
