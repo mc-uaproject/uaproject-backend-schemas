@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-from email.message import _PayloadType
 from typing import Any, Dict, List, Literal, NamedTuple, Optional, Set, TypedDict, TypeVar, Union
 
 from pydantic import BaseModel
@@ -159,7 +158,7 @@ class WebhookChangesMixin(WebhookTemporalMixin, WebhookBaseMixin):
         session: AsyncSession,
         scope_name: str,
         scope_changes: Dict[str, Dict[Literal["before", "after"], Any]],
-    ) -> _PayloadType:
+    ) -> Dict[str, Any]:
         """
         Get payload for the specified scope according to its stage configuration.
         """
