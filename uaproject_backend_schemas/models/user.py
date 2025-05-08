@@ -5,11 +5,11 @@ from pydantic import model_validator
 from sqlmodel import BigInteger, Column, Relationship
 
 from uaproject_backend_schemas.awesome.fields import AwesomeField
-from uaproject_backend_schemas.awesome.filters import AwesomeFilters, FilterDefinition
+from uaproject_backend_schemas.awesome.filters import AwesomeFilters
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
-from uaproject_backend_schemas.awesome.sorts import AwesomeSorts, SortDefinition
+from uaproject_backend_schemas.awesome.sorts import AwesomeSorts
 from uaproject_backend_schemas.models.user_token import Token
 
 if TYPE_CHECKING:
@@ -83,59 +83,9 @@ class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
             trigger_fields = ["access"]
             fields = ["id", "access"]
 
-    class Filters(AwesomeFilters):
-        class ById(FilterDefinition):
-            field = "id"
-            description = "Filtering by user ID"
+    class Filters(AwesomeFilters): ...
 
-        class ByDiscordId(FilterDefinition):
-            field = "discord_id"
-            description = "Filtering by Discord ID"
-
-        class ByMinecraftNickname(FilterDefinition):
-            field = "minecraft_nickname"
-            description = "Filtering by Minecraft nickname"
-
-        class ByIsSuperuser(FilterDefinition):
-            field = "is_superuser"
-            description = "Filtering by superuser status"
-
-        class ByRoleName(FilterDefinition):
-            field = "role_name"
-            description = "Filtering by role name"
-
-        class ByBiography(FilterDefinition):
-            field = "biography"
-            description = "Filtering by biography (search by substring)"
-
-        class ByAccess(FilterDefinition):
-            field = "access"
-            description = "Filtering by access"
-
-    class Sorts(AwesomeSorts):
-        class ById(SortDefinition):
-            field = "id"
-            description = "Sorting by ID"
-
-        class ByCreatedAt(SortDefinition):
-            field = "created_at"
-            description = "Sorting by creation date"
-
-        class ByUpdatedAt(SortDefinition):
-            field = "updated_at"
-            description = "Sorting by update date"
-
-        class ByMinecraftNickname(SortDefinition):
-            field = "minecraft_nickname"
-            description = "Sorting by Minecraft nickname"
-
-        class ByDiscordId(SortDefinition):
-            field = "discord_id"
-            description = "Sorting by Discord ID"
-
-        class ByRoleWeight(SortDefinition):
-            field = "role_weight"
-            description = "Sorting by role weight"
+    class Sorts(AwesomeSorts): ...
 
     @model_validator(mode="before")
     def validate_fields(cls, values: Optional[dict[str, str]]) -> Optional[dict[str, str]]:
