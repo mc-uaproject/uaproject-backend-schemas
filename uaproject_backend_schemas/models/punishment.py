@@ -7,7 +7,7 @@ from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
-from uaproject_backend_schemas.models.schemas.punishments import PunishmentStatus, PunishmentType
+from uaproject_backend_schemas.models.schemas.punishment import PunishmentStatus, PunishmentType
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.models.punishment_config import PunishmentConfig
