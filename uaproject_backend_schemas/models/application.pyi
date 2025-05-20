@@ -6,6 +6,7 @@ from typing import List, Optional
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.models.schemas.application import ApplicationStatus
+from uaproject_backend_schemas.models.user import User
 
 class Application(AwesomeModel):
     """Base user model."""
@@ -22,6 +23,7 @@ class Application(AwesomeModel):
     conflict_reaction: Optional[str]
     quiz_answer: Optional[str]
     editable_fields: List[str]
+    user: Optional[User]
     schemas: ApplicationSchemas
     scopes: ApplicationScopes
 

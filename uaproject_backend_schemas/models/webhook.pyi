@@ -7,6 +7,7 @@ from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.types import SerializableHttpUrl
 from uaproject_backend_schemas.models.schemas.webhook import WebhookStatus
+from uaproject_backend_schemas.models.user import User
 
 class Webhook(AwesomeModel):
     """Base user model."""
@@ -18,6 +19,7 @@ class Webhook(AwesomeModel):
     status: WebhookStatus
     webhook_scopes: Dict
     authorization: Optional[str]
+    user: Optional[User]
     schemas: WebhookSchemas
     scopes: WebhookScopes
 

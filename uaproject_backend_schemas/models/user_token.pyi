@@ -1,12 +1,13 @@
 # AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
 
 from datetime import datetime
-from typing import Literal
+from typing import Literal, Optional
 from uuid import UUID
 
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.model import AwesomeModel
+from uaproject_backend_schemas.models.user import User
 
 class Token(AwesomeModel):
     """Base user model."""
@@ -15,6 +16,7 @@ class Token(AwesomeModel):
     updated_at: datetime
     token: UUID
     user_id: int
+    user: Optional[User]
     schemas: TokenSchemas
     scopes: TokenScopes
 
@@ -39,10 +41,10 @@ class TokenSchemaCreate(AwesomeBaseModel):
     user_id: int
 
     def with_permissions(
-        self, permissions: list[Literal["token.read", "token.write"]]
+        self, permissions: list[Literal["token.write", "token.read"]]
     ) -> (
-        TokenSchemaCreateWithPermissionsTokenRead
-        | TokenSchemaCreateWithPermissionsTokenWrite
+        TokenSchemaCreateWithPermissionsTokenWrite
+        | TokenSchemaCreateWithPermissionsTokenRead
         | TokenSchemaCreateWithPermissions
     ): ...
 
@@ -55,23 +57,10 @@ class TokenSchemaCreateWithPermissions(AwesomeBaseModel):
     user_id: int
 
     def with_permissions(
-        self, permissions: list[Literal["token.read", "token.write"]]
+        self, permissions: list[Literal["token.write", "token.read"]]
     ) -> (
-        TokenSchemaCreateWithPermissionsTokenRead
-        | TokenSchemaCreateWithPermissionsTokenWrite
-        | TokenSchemaCreateWithPermissions
-    ): ...
-
-class TokenSchemaCreateWithPermissionsTokenRead(AwesomeBaseModel):
-    """Create schema for Token model with permissions token.read"""
-
-    token: UUID = AwesomeField(include_permissions=["token.read", "token.write"])
-
-    def with_permissions(
-        self, permissions: list[Literal["token.read", "token.write"]]
-    ) -> (
-        TokenSchemaCreateWithPermissionsTokenRead
-        | TokenSchemaCreateWithPermissionsTokenWrite
+        TokenSchemaCreateWithPermissionsTokenWrite
+        | TokenSchemaCreateWithPermissionsTokenRead
         | TokenSchemaCreateWithPermissions
     ): ...
 
@@ -81,10 +70,23 @@ class TokenSchemaCreateWithPermissionsTokenWrite(AwesomeBaseModel):
     token: UUID = AwesomeField(include_permissions=["token.read", "token.write"])
 
     def with_permissions(
-        self, permissions: list[Literal["token.read", "token.write"]]
+        self, permissions: list[Literal["token.write", "token.read"]]
     ) -> (
-        TokenSchemaCreateWithPermissionsTokenRead
-        | TokenSchemaCreateWithPermissionsTokenWrite
+        TokenSchemaCreateWithPermissionsTokenWrite
+        | TokenSchemaCreateWithPermissionsTokenRead
+        | TokenSchemaCreateWithPermissions
+    ): ...
+
+class TokenSchemaCreateWithPermissionsTokenRead(AwesomeBaseModel):
+    """Create schema for Token model with permissions token.read"""
+
+    token: UUID = AwesomeField(include_permissions=["token.read", "token.write"])
+
+    def with_permissions(
+        self, permissions: list[Literal["token.write", "token.read"]]
+    ) -> (
+        TokenSchemaCreateWithPermissionsTokenWrite
+        | TokenSchemaCreateWithPermissionsTokenRead
         | TokenSchemaCreateWithPermissions
     ): ...
 
@@ -97,10 +99,10 @@ class TokenSchemaUpdate(AwesomeBaseModel):
     user_id: int
 
     def with_permissions(
-        self, permissions: list[Literal["token.read", "token.write"]]
+        self, permissions: list[Literal["token.write", "token.read"]]
     ) -> (
-        TokenSchemaUpdateWithPermissionsTokenRead
-        | TokenSchemaUpdateWithPermissionsTokenWrite
+        TokenSchemaUpdateWithPermissionsTokenWrite
+        | TokenSchemaUpdateWithPermissionsTokenRead
         | TokenSchemaUpdateWithPermissions
     ): ...
 
@@ -113,23 +115,10 @@ class TokenSchemaUpdateWithPermissions(AwesomeBaseModel):
     user_id: int
 
     def with_permissions(
-        self, permissions: list[Literal["token.read", "token.write"]]
+        self, permissions: list[Literal["token.write", "token.read"]]
     ) -> (
-        TokenSchemaUpdateWithPermissionsTokenRead
-        | TokenSchemaUpdateWithPermissionsTokenWrite
-        | TokenSchemaUpdateWithPermissions
-    ): ...
-
-class TokenSchemaUpdateWithPermissionsTokenRead(AwesomeBaseModel):
-    """Update schema for Token model with permissions token.read"""
-
-    token: UUID = AwesomeField(include_permissions=["token.read", "token.write"])
-
-    def with_permissions(
-        self, permissions: list[Literal["token.read", "token.write"]]
-    ) -> (
-        TokenSchemaUpdateWithPermissionsTokenRead
-        | TokenSchemaUpdateWithPermissionsTokenWrite
+        TokenSchemaUpdateWithPermissionsTokenWrite
+        | TokenSchemaUpdateWithPermissionsTokenRead
         | TokenSchemaUpdateWithPermissions
     ): ...
 
@@ -139,10 +128,23 @@ class TokenSchemaUpdateWithPermissionsTokenWrite(AwesomeBaseModel):
     token: UUID = AwesomeField(include_permissions=["token.read", "token.write"])
 
     def with_permissions(
-        self, permissions: list[Literal["token.read", "token.write"]]
+        self, permissions: list[Literal["token.write", "token.read"]]
     ) -> (
-        TokenSchemaUpdateWithPermissionsTokenRead
-        | TokenSchemaUpdateWithPermissionsTokenWrite
+        TokenSchemaUpdateWithPermissionsTokenWrite
+        | TokenSchemaUpdateWithPermissionsTokenRead
+        | TokenSchemaUpdateWithPermissions
+    ): ...
+
+class TokenSchemaUpdateWithPermissionsTokenRead(AwesomeBaseModel):
+    """Update schema for Token model with permissions token.read"""
+
+    token: UUID = AwesomeField(include_permissions=["token.read", "token.write"])
+
+    def with_permissions(
+        self, permissions: list[Literal["token.write", "token.read"]]
+    ) -> (
+        TokenSchemaUpdateWithPermissionsTokenWrite
+        | TokenSchemaUpdateWithPermissionsTokenRead
         | TokenSchemaUpdateWithPermissions
     ): ...
 
@@ -155,10 +157,10 @@ class TokenSchemaResponse(AwesomeBaseModel):
     user_id: int
 
     def with_permissions(
-        self, permissions: list[Literal["token.read", "token.write"]]
+        self, permissions: list[Literal["token.write", "token.read"]]
     ) -> (
-        TokenSchemaResponseWithPermissionsTokenRead
-        | TokenSchemaResponseWithPermissionsTokenWrite
+        TokenSchemaResponseWithPermissionsTokenWrite
+        | TokenSchemaResponseWithPermissionsTokenRead
         | TokenSchemaResponseWithPermissions
     ): ...
 
@@ -171,23 +173,10 @@ class TokenSchemaResponseWithPermissions(AwesomeBaseModel):
     user_id: int
 
     def with_permissions(
-        self, permissions: list[Literal["token.read", "token.write"]]
+        self, permissions: list[Literal["token.write", "token.read"]]
     ) -> (
-        TokenSchemaResponseWithPermissionsTokenRead
-        | TokenSchemaResponseWithPermissionsTokenWrite
-        | TokenSchemaResponseWithPermissions
-    ): ...
-
-class TokenSchemaResponseWithPermissionsTokenRead(AwesomeBaseModel):
-    """Response schema for Token model with permissions token.read"""
-
-    token: UUID = AwesomeField(include_permissions=["token.read", "token.write"])
-
-    def with_permissions(
-        self, permissions: list[Literal["token.read", "token.write"]]
-    ) -> (
-        TokenSchemaResponseWithPermissionsTokenRead
-        | TokenSchemaResponseWithPermissionsTokenWrite
+        TokenSchemaResponseWithPermissionsTokenWrite
+        | TokenSchemaResponseWithPermissionsTokenRead
         | TokenSchemaResponseWithPermissions
     ): ...
 
@@ -197,10 +186,23 @@ class TokenSchemaResponseWithPermissionsTokenWrite(AwesomeBaseModel):
     token: UUID = AwesomeField(include_permissions=["token.read", "token.write"])
 
     def with_permissions(
-        self, permissions: list[Literal["token.read", "token.write"]]
+        self, permissions: list[Literal["token.write", "token.read"]]
     ) -> (
-        TokenSchemaResponseWithPermissionsTokenRead
-        | TokenSchemaResponseWithPermissionsTokenWrite
+        TokenSchemaResponseWithPermissionsTokenWrite
+        | TokenSchemaResponseWithPermissionsTokenRead
+        | TokenSchemaResponseWithPermissions
+    ): ...
+
+class TokenSchemaResponseWithPermissionsTokenRead(AwesomeBaseModel):
+    """Response schema for Token model with permissions token.read"""
+
+    token: UUID = AwesomeField(include_permissions=["token.read", "token.write"])
+
+    def with_permissions(
+        self, permissions: list[Literal["token.write", "token.read"]]
+    ) -> (
+        TokenSchemaResponseWithPermissionsTokenWrite
+        | TokenSchemaResponseWithPermissionsTokenRead
         | TokenSchemaResponseWithPermissions
     ): ...
 
@@ -220,20 +222,20 @@ class TokenScopeFullWithPermissions(AwesomeBaseModel):
     token: UUID
     user_id: int
 
-class TokenScopeFullWithPermissionsTokenRead(AwesomeBaseModel):
-    """full visibility scope for Token model with permissions token.read"""
-
-    token: UUID
-
 class TokenScopeFullWithPermissionsTokenWrite(AwesomeBaseModel):
     """full visibility scope for Token model with permissions token.write"""
 
     token: UUID
 
+class TokenScopeFullWithPermissionsTokenRead(AwesomeBaseModel):
+    """full visibility scope for Token model with permissions token.read"""
+
+    token: UUID
+
     def with_permissions(
-        self, permissions: list[Literal["token.read", "token.write"]]
+        self, permissions: list[Literal["token.write", "token.read"]]
     ) -> (
-        TokenScopeFullWithPermissionsTokenRead
-        | TokenScopeFullWithPermissionsTokenWrite
+        TokenScopeFullWithPermissionsTokenWrite
+        | TokenScopeFullWithPermissionsTokenRead
         | TokenScopeFullWithPermissions
     ): ...

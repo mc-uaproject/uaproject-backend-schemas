@@ -5,6 +5,7 @@ from typing import List, Optional
 
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
+from uaproject_backend_schemas.models.user import User
 
 class Role(AwesomeModel):
     """Base user model."""
@@ -14,6 +15,7 @@ class Role(AwesomeModel):
     name: str
     description: Optional[str]
     permissions: List[str]
+    users: Optional[List[User]]
     schemas: RoleSchemas
     scopes: RoleScopes
 

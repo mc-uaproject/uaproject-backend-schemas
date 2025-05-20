@@ -5,7 +5,9 @@ from typing import Dict, Optional
 
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
+from uaproject_backend_schemas.models.punishment_config import PunishmentConfig
 from uaproject_backend_schemas.models.schemas.punishment import PunishmentStatus, PunishmentType
+from uaproject_backend_schemas.models.user import User
 
 class Punishment(AwesomeModel):
     """Base user model."""
@@ -20,6 +22,9 @@ class Punishment(AwesomeModel):
     expires_at: Optional[datetime]
     config_id: Optional[int]
     punishment_metadata: Optional[Dict]
+    user: Optional[User]
+    admin: Optional[User]
+    config: Optional[PunishmentConfig]
     schemas: PunishmentSchemas
     scopes: PunishmentScopes
 

@@ -2,6 +2,7 @@ import ast
 import importlib
 import inspect
 import os
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Any, List, Optional, Type, get_args, get_origin
@@ -598,22 +599,104 @@ def collect_additional_imports(generated_content: str) -> set[str]:
     return imports
 
 
-def _generate_model_fields(model_cls: Type[AwesomeModel]) -> str:
+def _get_relationship_fields(model_cls: Type[AwesomeModel]) -> list[str]:
+    rels = []
+    for name in getattr(model_cls, "__annotations__", {}):
+        if name not in model_cls.model_fields:
+            rels.append(name)
+    return rels
+
+
+def _extract_clean_type(ann):
+    ann_str = str(ann)
+    if ann_str.startswith("sqlalchemy.orm.base.Mapped"):
+        inner = ann_str.split("[", 1)[1].rsplit("]", 1)[0]
+        inner = inner.replace("typing.", "")
+        inner = re.sub(r'ForwardRef\(["\\\']?([A-Za-z_][A-Za-z0-9_]*)["\\\']?\)', r"\1", inner)
+        if not inner.startswith("Optional["):
+            inner = f"Optional[{inner}]"
+        return inner
+    ann_str = ann_str.replace("typing.", "")
+    ann_str = re.sub(r'ForwardRef\(["\\\']?([A-Za-z_][A-Za-z0-9_]*)["\\\']?\)', r"\1", ann_str)
+    if not ann_str.startswith("Optional["):
+        ann_str = f"Optional[{ann_str}]"
+    return ann_str
+
+
+def camel_to_snake(name):
+    import re
+
+    s1 = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
+    return re.sub("([a-z0-9])([A-Z])", r"\1_\2", s1).lower()
+
+
+MODEL_IMPORT_OVERRIDES = {
+    "Token": "user_token",
+}
+
+
+def _generate_model_fields(model_cls: Type[AwesomeModel]) -> tuple[str, set]:
     lines = []
+    imports = set()
+    model_imports = set()
     for field_name, field in model_cls.model_fields.items():
         field_type = _get_field_type(field)
         lines.append(f"    {field_name}: {field_type}")
-    relationships = getattr(model_cls, "__relationships__", [])
-    for rel in relationships:
-        lines.append(f"    {rel}: Optional[Any] = None")
-    return "\n".join(lines) + "\n"
+    rels = _get_relationship_fields(model_cls)
+    for rel in rels:
+        ann = model_cls.__annotations__[rel]
+        type_str = _extract_clean_type(ann)
+        if "Optional" in type_str:
+            imports.add("from typing import Optional")
+        if "List" in type_str:
+            imports.add("from typing import List")
+        for match in re.findall(r"\b([A-Z][A-Za-z0-9_]*)\b", type_str):
+            if match not in {"Optional", "List", "Dict", "Any", "str", "int", "bool", "float"}:
+                filename = MODEL_IMPORT_OVERRIDES.get(match, camel_to_snake(match))
+                model_imports.add(
+                    f"from uaproject_backend_schemas.models.{filename} import {match}"
+                )
+        lines.append(f"    {rel}: {type_str}")
+    all_imports = imports | model_imports
+    return "\n".join(lines) + "\n", all_imports
+
+
+def _generate_model_sections(model_cls: Type[AwesomeModel], permissions: set[str]) -> str:
+    content = ""
+    content += f"class {model_cls.__name__}Schemas:\n"
+    content += '    """Schemas for the user model."""\n'
+    for schema_key in model_cls.schemas.list():
+        base_schema = f"{model_cls.__name__}Schema{schema_key.capitalize()}"
+        content += f"    {schema_key}: {base_schema}\n"
+    content += "\n"
+    content += f"class {model_cls.__name__}Scopes:\n"
+    content += '    """Visibility scopes for the user model."""\n'
+    for scope_key in model_cls.scopes.list():
+        scope_name_parts = scope_key.split("_")
+        scope_name_camel = "".join(word.capitalize() for word in scope_name_parts)
+        content += f"    {scope_key}: {model_cls.__name__}Scope{scope_name_camel}\n"
+    content += "\n"
+    content += generate_filters_class(model_cls)
+    content += generate_sorts_class(model_cls)
+    content += generate_filter_class(model_cls)
+    content += generate_sort_enum(model_cls)
+    for schema_key in model_cls.schemas.list():
+        content += generate_schema_class(model_cls, schema_key)
+        for perm in permissions:
+            content += generate_schema_class(model_cls, schema_key, [perm])
+    for scope_key in model_cls.scopes.list():
+        content += generate_scope_class(model_cls, scope_key)
+    return content
 
 
 def build_main_content(model_cls: Type[AwesomeModel], permissions: set[str]) -> str:
     main_content = ""
+    model_fields_str, all_imports = _generate_model_fields(model_cls)
+    if all_imports:
+        main_content += "\n".join(sorted(all_imports)) + "\n\n"
     main_content += f"class {model_cls.__name__}(AwesomeModel):\n"
     main_content += '    """Base user model."""\n'
-    main_content += _generate_model_fields(model_cls)
+    main_content += model_fields_str
     main_content += f"    schemas: {model_cls.__name__}Schemas\n"
     main_content += f"    scopes: {model_cls.__name__}Scopes\n"
     if hasattr(model_cls, "filters") and model_cls.filters:
@@ -625,29 +708,7 @@ def build_main_content(model_cls: Type[AwesomeModel], permissions: set[str]) -> 
     if hasattr(model_cls, "sort") and model_cls.sort:
         main_content += f"    sort: type[{model_cls.__name__}Sort]\n"
     main_content += "\n"
-    main_content += f"class {model_cls.__name__}Schemas:\n"
-    main_content += '    """Schemas for the user model."""\n'
-    for schema_key in model_cls.schemas.list():
-        base_schema = f"{model_cls.__name__}Schema{schema_key.capitalize()}"
-        main_content += f"    {schema_key}: {base_schema}\n"
-    main_content += "\n"
-    main_content += f"class {model_cls.__name__}Scopes:\n"
-    main_content += '    """Visibility scopes for the user model."""\n'
-    for scope_key in model_cls.scopes.list():
-        scope_name_parts = scope_key.split("_")
-        scope_name_camel = "".join(word.capitalize() for word in scope_name_parts)
-        main_content += f"    {scope_key}: {model_cls.__name__}Scope{scope_name_camel}\n"
-    main_content += "\n"
-    main_content += generate_filters_class(model_cls)
-    main_content += generate_sorts_class(model_cls)
-    main_content += generate_filter_class(model_cls)
-    main_content += generate_sort_enum(model_cls)
-    for schema_key in model_cls.schemas.list():
-        main_content += generate_schema_class(model_cls, schema_key)
-        for perm in permissions:
-            main_content += generate_schema_class(model_cls, schema_key, [perm])
-    for scope_key in model_cls.scopes.list():
-        main_content += generate_scope_class(model_cls, scope_key)
+    main_content += _generate_model_sections(model_cls, permissions)
     return main_content
 
 

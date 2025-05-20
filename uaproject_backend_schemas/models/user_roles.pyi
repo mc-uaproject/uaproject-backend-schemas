@@ -1,9 +1,12 @@
 # AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
 
 from datetime import datetime
+from typing import Optional
 
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
+from uaproject_backend_schemas.models.role import Role
+from uaproject_backend_schemas.models.user import User
 
 class UserRoles(AwesomeModel):
     """Base user model."""
@@ -12,6 +15,8 @@ class UserRoles(AwesomeModel):
     id: int
     user_id: int
     role_id: int
+    user: Optional[User]
+    role: Optional[Role]
     schemas: UserRolesSchemas
     scopes: UserRolesScopes
 

@@ -1,10 +1,17 @@
 # AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
 
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
+from uaproject_backend_schemas.models.application import Application
+from uaproject_backend_schemas.models.balance import Balance
+from uaproject_backend_schemas.models.punishment import Punishment
+from uaproject_backend_schemas.models.role import Role
+from uaproject_backend_schemas.models.transaction import Transaction
+from uaproject_backend_schemas.models.user_token import Token
+from uaproject_backend_schemas.models.webhook import Webhook
 
 class User(AwesomeModel):
     """Base user model."""
@@ -16,6 +23,14 @@ class User(AwesomeModel):
     is_superuser: Optional[bool]
     biography: Optional[str]
     access: Optional[bool]
+    roles: Optional[List[Role]]
+    token: Optional[Token]
+    punishments: Optional[List[Punishment]]
+    balance: Optional[Balance]
+    application: Optional[Application]
+    transactions: Optional[List[Transaction]]
+    received_transactions: Optional[List[Transaction]]
+    webhooks: Optional[List[Webhook]]
     schemas: UserSchemas
     scopes: UserScopes
 

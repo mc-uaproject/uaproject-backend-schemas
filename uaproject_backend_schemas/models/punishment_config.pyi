@@ -1,10 +1,11 @@
 # AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
 
 from datetime import datetime
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
+from uaproject_backend_schemas.models.punishment import Punishment
 
 class PunishmentConfig(AwesomeModel):
     """Base user model."""
@@ -17,6 +18,7 @@ class PunishmentConfig(AwesomeModel):
     warn_threshold: int
     warn_decay_days: int
     config_data: Dict
+    punishments: Optional[List[Punishment]]
     schemas: PunishmentConfigSchemas
     scopes: PunishmentConfigScopes
 

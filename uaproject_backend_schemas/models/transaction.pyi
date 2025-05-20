@@ -7,6 +7,8 @@ from typing import Dict, Optional
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.models.schemas.transaction import TransactionType
+from uaproject_backend_schemas.models.service import Service
+from uaproject_backend_schemas.models.user import User
 
 class Transaction(AwesomeModel):
     """Base user model."""
@@ -20,6 +22,9 @@ class Transaction(AwesomeModel):
     recipient_id: int
     service_id: Optional[int]
     transaction_metadata: Optional[Dict]
+    service: Optional[Service]
+    user: Optional[User]
+    recipient: Optional[User]
     schemas: TransactionSchemas
     scopes: TransactionScopes
 

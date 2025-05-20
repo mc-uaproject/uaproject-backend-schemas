@@ -2,10 +2,12 @@
 
 from datetime import datetime
 from decimal import Decimal
+from typing import Optional
 from uuid import UUID
 
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
+from uaproject_backend_schemas.models.user import User
 
 class Balance(AwesomeModel):
     """Base user model."""
@@ -15,6 +17,7 @@ class Balance(AwesomeModel):
     user_id: int
     identifier: UUID
     amount: Decimal
+    user: Optional[User]
     schemas: BalanceSchemas
     scopes: BalanceScopes
 
