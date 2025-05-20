@@ -372,3 +372,9 @@ class AwesomeSchemas:
                 ):
                     names.append(camel_to_snake(attr_name))
         return names
+
+    def __repr__(self):
+        cls_name = self.__class__.__name__
+        model_name = getattr(self.model_cls, '__name__', str(self.model_cls))
+        schemas = self.list()
+        return f"<{cls_name} for {model_name}, schemas={schemas}>"

@@ -13,6 +13,23 @@ from uaproject_backend_schemas.models.schemas.service import (
 class Service(AwesomeModel):
     """Base user model."""
 
+    updated_at: datetime
+    id: int
+    name: str
+    display_name: Optional[str]
+    description: Optional[str]
+    points: Optional[List]
+    image: Optional[str]
+    price: Decimal
+    is_active: bool
+    category: Optional[str]
+    type: ServiceType
+    duration_months: Optional[int]
+    is_upgradable: bool
+    upgrade_from: Optional[str]
+    upgrade_to: Optional[str]
+    service_metadata: Optional[Dict]
+    discounts: Optional[List]
     schemas: ServiceSchemas
     scopes: ServiceScopes
 

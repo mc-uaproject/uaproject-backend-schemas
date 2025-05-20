@@ -127,3 +127,9 @@ class AwesomeScopes:
                     continue
                 scopes.append(camel_to_snake(attr_name))
         return scopes
+
+    def __repr__(self):
+        cls_name = self.__class__.__name__
+        model_name = getattr(self.model_cls, '__name__', str(self.model_cls))
+        scopes = self.list()
+        return f"<{cls_name} for {model_name}, scopes={scopes}>"

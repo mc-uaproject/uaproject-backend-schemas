@@ -10,6 +10,18 @@ from uaproject_backend_schemas.models.schemas.application import ApplicationStat
 class Application(AwesomeModel):
     """Base user model."""
 
+    id: int
+    updated_at: datetime
+    user_id: int
+    status: ApplicationStatus
+    birth_date: Optional[datetime]
+    launcher: Optional[str]
+    server_source: Optional[str]
+    private_server_experience: Optional[str]
+    useful_skills: Optional[str]
+    conflict_reaction: Optional[str]
+    quiz_answer: Optional[str]
+    editable_fields: List[str]
     schemas: ApplicationSchemas
     scopes: ApplicationScopes
 

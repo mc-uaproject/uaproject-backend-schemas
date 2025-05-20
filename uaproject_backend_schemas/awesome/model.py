@@ -111,3 +111,15 @@ class AwesomeModel(SQLModel):
             for base in cls.__bases__:
                 if hasattr(base, "model_fields"):
                     cls.model_fields.update(base.model_fields)
+
+    def __repr__(self):
+        cls_name = self.__class__.__name__
+        id_val = getattr(self, "id", None)
+        field_names = [f for f in getattr(self, "model_fields", {}).keys() if f != "id"]
+        field_strs = []
+        for name in field_names[:3]:
+            val = getattr(self, name, None)
+            field_strs.append(f"{name}={val!r}")
+        id_part = f" id={id_val}" if id_val is not None else ""
+        fields_part = (", " + ", ".join(field_strs)) if field_strs else ""
+        return f"<{cls_name}{id_part}{fields_part}>"

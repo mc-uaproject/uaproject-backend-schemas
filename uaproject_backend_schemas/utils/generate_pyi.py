@@ -598,10 +598,22 @@ def collect_additional_imports(generated_content: str) -> set[str]:
     return imports
 
 
+def _generate_model_fields(model_cls: Type[AwesomeModel]) -> str:
+    lines = []
+    for field_name, field in model_cls.model_fields.items():
+        field_type = _get_field_type(field)
+        lines.append(f"    {field_name}: {field_type}")
+    relationships = getattr(model_cls, "__relationships__", [])
+    for rel in relationships:
+        lines.append(f"    {rel}: Optional[Any] = None")
+    return "\n".join(lines) + "\n"
+
+
 def build_main_content(model_cls: Type[AwesomeModel], permissions: set[str]) -> str:
     main_content = ""
     main_content += f"class {model_cls.__name__}(AwesomeModel):\n"
     main_content += '    """Base user model."""\n'
+    main_content += _generate_model_fields(model_cls)
     main_content += f"    schemas: {model_cls.__name__}Schemas\n"
     main_content += f"    scopes: {model_cls.__name__}Scopes\n"
     if hasattr(model_cls, "filters") and model_cls.filters:

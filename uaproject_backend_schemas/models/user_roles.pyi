@@ -8,6 +8,10 @@ from uaproject_backend_schemas.awesome.model import AwesomeModel
 class UserRoles(AwesomeModel):
     """Base user model."""
 
+    updated_at: datetime
+    id: int
+    user_id: int
+    role_id: int
     schemas: UserRolesSchemas
     scopes: UserRolesScopes
 

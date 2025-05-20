@@ -11,6 +11,10 @@ from uaproject_backend_schemas.awesome.model import AwesomeModel
 class Token(AwesomeModel):
     """Base user model."""
 
+    id: int
+    updated_at: datetime
+    token: UUID
+    user_id: int
     schemas: TokenSchemas
     scopes: TokenScopes
 

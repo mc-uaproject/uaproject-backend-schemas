@@ -11,6 +11,15 @@ from uaproject_backend_schemas.models.schemas.transaction import TransactionType
 class Transaction(AwesomeModel):
     """Base user model."""
 
+    updated_at: datetime
+    id: int
+    user_id: int
+    amount: Decimal
+    type: TransactionType
+    description: Optional[str]
+    recipient_id: int
+    service_id: Optional[int]
+    transaction_metadata: Optional[Dict]
     schemas: TransactionSchemas
     scopes: TransactionScopes
 

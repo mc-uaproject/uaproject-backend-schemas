@@ -5,11 +5,9 @@ from pydantic import model_validator
 from sqlmodel import BigInteger, Column, Relationship
 
 from uaproject_backend_schemas.awesome.fields import AwesomeField
-from uaproject_backend_schemas.awesome.filters import AwesomeFilters
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
-from uaproject_backend_schemas.awesome.sorts import AwesomeSorts
 from uaproject_backend_schemas.models.user_token import Token
 
 if TYPE_CHECKING:
@@ -82,10 +80,6 @@ class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
         class Access(ScopeDefinition):
             trigger_fields = ["access"]
             fields = ["id", "access"]
-
-    class Filters(AwesomeFilters): ...
-
-    class Sorts(AwesomeSorts): ...
 
     @model_validator(mode="before")
     def validate_fields(cls, values: Optional[dict[str, str]]) -> Optional[dict[str, str]]:

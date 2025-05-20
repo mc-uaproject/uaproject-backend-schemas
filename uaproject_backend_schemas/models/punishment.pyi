@@ -10,6 +10,16 @@ from uaproject_backend_schemas.models.schemas.punishment import PunishmentStatus
 class Punishment(AwesomeModel):
     """Base user model."""
 
+    updated_at: datetime
+    id: int
+    user_id: int
+    admin_id: Optional[int]
+    type: PunishmentType
+    status: PunishmentStatus
+    reason: Optional[str]
+    expires_at: Optional[datetime]
+    config_id: Optional[int]
+    punishment_metadata: Optional[Dict]
     schemas: PunishmentSchemas
     scopes: PunishmentScopes
 

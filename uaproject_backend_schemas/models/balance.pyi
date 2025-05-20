@@ -10,6 +10,11 @@ from uaproject_backend_schemas.awesome.model import AwesomeModel
 class Balance(AwesomeModel):
     """Base user model."""
 
+    updated_at: datetime
+    id: int
+    user_id: int
+    identifier: UUID
+    amount: Decimal
     schemas: BalanceSchemas
     scopes: BalanceScopes
 

@@ -9,6 +9,14 @@ from uaproject_backend_schemas.awesome.model import AwesomeModel
 class PunishmentConfig(AwesomeModel):
     """Base user model."""
 
+    updated_at: datetime
+    id: int
+    name: str
+    description: Optional[str]
+    is_active: bool
+    warn_threshold: int
+    warn_decay_days: int
+    config_data: Dict
     schemas: PunishmentConfigSchemas
     scopes: PunishmentConfigScopes
 

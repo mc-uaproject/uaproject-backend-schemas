@@ -11,6 +11,13 @@ from uaproject_backend_schemas.models.schemas.webhook import WebhookStatus
 class Webhook(AwesomeModel):
     """Base user model."""
 
+    updated_at: datetime
+    id: int
+    endpoint: SerializableHttpUrl
+    user_id: Optional[int]
+    status: WebhookStatus
+    webhook_scopes: Dict
+    authorization: Optional[str]
     schemas: WebhookSchemas
     scopes: WebhookScopes
 
