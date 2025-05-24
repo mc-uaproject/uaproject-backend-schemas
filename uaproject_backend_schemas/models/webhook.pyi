@@ -1,7 +1,9 @@
 # AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
 
 from datetime import datetime
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
+
+from pydantic import BaseModel
 
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
@@ -22,6 +24,8 @@ class Webhook(AwesomeModel):
     user: Optional[User]
     schemas: WebhookSchemas
     scopes: WebhookScopes
+    filters: WebhookFilters
+    filter: type[WebhookFilter]
 
 class WebhookSchemas:
     """Schemas for the user model."""
@@ -34,6 +38,26 @@ class WebhookScopes:
     """Visibility scopes for the user model."""
 
     full: WebhookScopeFull
+
+class WebhookFilters:
+    """Declarative filters for the Webhook model."""
+
+class WebhookFilter(BaseModel):
+    """Pydantic-class for filtering the Webhook model."""
+
+    updated_at: Optional[datetime] = None
+    min_updated_at: Optional[Any] = None
+    max_updated_at: Optional[Any] = None
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
+    endpoint: Optional[SerializableHttpUrl] = None
+    user_id: Optional[int] = None
+    min_user_id: Optional[Any] = None
+    max_user_id: Optional[Any] = None
+    status: Optional[WebhookStatus] = None
+    webhook_scopes: Optional[Dict] = None
+    authorization: Optional[str] = None
 
 class WebhookSchemaCreate(AwesomeBaseModel):
     """Create schema for Webhook model"""

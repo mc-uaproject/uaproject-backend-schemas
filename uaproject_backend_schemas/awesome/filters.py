@@ -1,5 +1,14 @@
 from datetime import date, datetime
-from typing import Any, List, Optional, Type, TypeVar, get_args, get_origin
+from typing import (
+    Any,
+    List,
+    Optional,
+    Type,
+    TypeVar,
+    Union,
+    get_args,
+    get_origin,
+)
 
 from pydantic import BaseModel, create_model
 
@@ -34,7 +43,7 @@ class AwesomeFilters:
     Manager of filters for the model. Allows to get all available filters.
     """
 
-    exclude: List[str] = []  # Можна перевизначити у нащадку
+    exclude: List[str] = []
 
     def __init__(self, model_cls: Type[TModel]):
         self.model_cls: Type[TModel] = model_cls
@@ -79,37 +88,48 @@ class AwesomeFilters:
         for name, field in getattr(model_cls, "model_fields", {}).items():
             if name in exclude:
                 continue
-            typ = field.annotation
-            if get_origin(typ) is Optional:
-                typ = get_args(typ)[0]
-            fields[name] = (Optional[typ], None)
-            if typ in (int, float, datetime, date):
-                fields[f"min_{name}"] = (Optional[typ], None)
-                fields[f"max_{name}"] = (Optional[typ], None)
+            typ = getattr(field, "type_", field.annotation)
+            typ = cls.ensure_single_optional(typ)
+            fields[name] = (typ, None)
+            base_type = cls._unwrap_optional(typ)
+            if not isinstance(base_type, type):
+                base_type = getattr(field, "type_", Any)
+            if base_type in (int, float, datetime, date):
+                fields[f"min_{name}"] = (Optional[base_type], None)
+                fields[f"max_{name}"] = (Optional[base_type], None)
         return fields
 
     @classmethod
-    def _build_fields_from_mro(cls, model_cls, exclude, fields):
-        for mixin in model_cls.__mro__:
-            for mixin_field, typ in getattr(mixin, "__annotations__", {}).items():
-                if mixin_field in fields or mixin_field in exclude:
-                    continue
-                fields[mixin_field] = (Optional[typ], None)
-                if typ in (int, float, datetime, date):
-                    fields[f"min_{mixin_field}"] = (Optional[typ], None)
-                    fields[f"max_{mixin_field}"] = (Optional[typ], None)
-        return fields
+    def ensure_single_optional(cls, typ):
+        origin = get_origin(typ)
+        if origin is Union and type(None) in get_args(typ):
+            return typ
+        return Optional[typ]
+
+    @classmethod
+    def _unwrap_optional(cls, typ):
+        origin = get_origin(typ)
+        if origin is Union:
+            args = get_args(typ)
+            non_none = [a for a in args if a is not type(None)]
+            if non_none:
+                return non_none[0]
+            return Any
+        return typ
 
     @classmethod
     def _build_fields_from_relations(cls, model_cls, exclude, fields):
         for name, attr in model_cls.__dict__.items():
-            if hasattr(attr, "property") and hasattr(attr.property, "direction"):
-                rel_model = attr.property.mapper.class_
-                for rel_field in getattr(rel_model, "model_fields", {}):
-                    if rel_field in ("name", "id"):
-                        rel_filter_name = f"{name}_{rel_field}"
-                        if rel_filter_name not in exclude:
-                            fields[rel_filter_name] = (Optional[Any], None)
+            try:
+                if hasattr(attr, "property") and hasattr(attr.property, "direction"):
+                    rel_model = attr.property.mapper.class_
+                    for rel_field in getattr(rel_model, "model_fields", {}):
+                        if rel_field in ("name", "id"):
+                            rel_filter_name = f"{name}_{rel_field}"
+                            if rel_filter_name not in exclude:
+                                fields[rel_filter_name] = (Optional[Any], None)
+            except Exception:
+                continue
         return fields
 
     @classmethod
@@ -126,8 +146,7 @@ class AwesomeFilters:
         exclude = set(getattr(cls, "exclude", []) or [])
         model_cls = cls._get_model_cls()
         fields = cls._build_fields_from_model_fields(model_cls, exclude)
-        fields = cls._build_fields_from_mro(model_cls, exclude, fields)
         fields = cls._build_fields_from_relations(model_cls, exclude, fields)
         fields = cls._add_custom_filters(exclude, fields)
-        model: Type[BaseModel] = create_model(f"{model_cls.__name__}AutoFilter", **fields)
+        model: Type[BaseModel] = create_model(f"{model_cls.__name__}Filter", **fields)
         return model

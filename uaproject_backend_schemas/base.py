@@ -9,6 +9,7 @@ CreateSchemaType = TypeVar("CreateSchemaType", bound=AwesomeBaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=AwesomeBaseModel)
 FilterSchemaType = TypeVar("FilterSchemaType", bound=AwesomeBaseModel)
 
+
 class SortOrder(StrEnum):
     ASC = "asc"
     DESC = "desc"

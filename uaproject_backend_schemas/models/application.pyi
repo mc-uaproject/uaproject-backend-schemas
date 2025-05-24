@@ -1,7 +1,9 @@
 # AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
 
 from datetime import datetime
-from typing import List, Optional
+from typing import Any, List, Optional
+
+from pydantic import BaseModel
 
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
@@ -26,6 +28,8 @@ class Application(AwesomeModel):
     user: Optional[User]
     schemas: ApplicationSchemas
     scopes: ApplicationScopes
+    filters: ApplicationFilters
+    filter: type[ApplicationFilter]
 
 class ApplicationSchemas:
     """Schemas for the user model."""
@@ -41,6 +45,33 @@ class ApplicationScopes:
     editable_fields: ApplicationScopeEditableFields
     form: ApplicationScopeForm
     full: ApplicationScopeFull
+
+class ApplicationFilters:
+    """Declarative filters for the Application model."""
+
+class ApplicationFilter(BaseModel):
+    """Pydantic-class for filtering the Application model."""
+
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
+    updated_at: Optional[datetime] = None
+    min_updated_at: Optional[Any] = None
+    max_updated_at: Optional[Any] = None
+    user_id: Optional[int] = None
+    min_user_id: Optional[Any] = None
+    max_user_id: Optional[Any] = None
+    status: Optional[ApplicationStatus] = None
+    birth_date: Optional[datetime] = None
+    min_birth_date: Optional[Any] = None
+    max_birth_date: Optional[Any] = None
+    launcher: Optional[str] = None
+    server_source: Optional[str] = None
+    private_server_experience: Optional[str] = None
+    useful_skills: Optional[str] = None
+    conflict_reaction: Optional[str] = None
+    quiz_answer: Optional[str] = None
+    editable_fields: Optional[List] = None
 
 class ApplicationSchemaCreate(AwesomeBaseModel):
     """Create schema for Application model"""

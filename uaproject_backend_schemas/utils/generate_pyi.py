@@ -5,7 +5,7 @@ import os
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Any, List, Optional, Type, get_args, get_origin
+from typing import Any, List, Type, Union, get_args, get_origin
 
 from uaproject_backend_schemas.awesome.fields import AwesomeFieldInfo
 from uaproject_backend_schemas.awesome.model import AwesomeModel
@@ -549,8 +549,12 @@ def generate_sorts_class(model_cls: Type[AwesomeModel]) -> str:
 
 
 def unwrap_optional(ann):
-    while get_origin(ann) is Optional and get_args(ann):
-        ann = get_args(ann)[0]
+    origin = get_origin(ann)
+    if origin is Union:
+        args = [a for a in get_args(ann) if a is not type(None)]
+        if args:
+            return args[0]
+        return ann
     return ann
 
 
@@ -676,9 +680,10 @@ def _generate_model_sections(model_cls: Type[AwesomeModel], permissions: set[str
         scope_name_camel = "".join(word.capitalize() for word in scope_name_parts)
         content += f"    {scope_key}: {model_cls.__name__}Scope{scope_name_camel}\n"
     content += "\n"
-    content += generate_filters_class(model_cls)
+    if getattr(model_cls, "filter", None):
+        content += generate_filters_class(model_cls)
+        content += generate_filter_class(model_cls)
     content += generate_sorts_class(model_cls)
-    content += generate_filter_class(model_cls)
     content += generate_sort_enum(model_cls)
     for schema_key in model_cls.schemas.list():
         content += generate_schema_class(model_cls, schema_key)
@@ -699,11 +704,11 @@ def build_main_content(model_cls: Type[AwesomeModel], permissions: set[str]) -> 
     main_content += model_fields_str
     main_content += f"    schemas: {model_cls.__name__}Schemas\n"
     main_content += f"    scopes: {model_cls.__name__}Scopes\n"
-    if hasattr(model_cls, "filters") and model_cls.filters:
+    if getattr(model_cls, "filter", None):
         main_content += f"    filters: {model_cls.__name__}Filters\n"
     if hasattr(model_cls, "sorts") and model_cls.sorts:
         main_content += f"    sorts: {model_cls.__name__}Sorts\n"
-    if hasattr(model_cls, "filter") and model_cls.filter:
+    if getattr(model_cls, "filter", None):
         main_content += f"    filter: type[{model_cls.__name__}Filter]\n"
     if hasattr(model_cls, "sort") and model_cls.sort:
         main_content += f"    sort: type[{model_cls.__name__}Sort]\n"

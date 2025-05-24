@@ -1,7 +1,9 @@
 # AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
 
 from datetime import datetime
-from typing import List, Optional
+from typing import Any, List, Optional
+
+from pydantic import BaseModel
 
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
@@ -33,6 +35,8 @@ class User(AwesomeModel):
     webhooks: Optional[List[Webhook]]
     schemas: UserSchemas
     scopes: UserScopes
+    filters: UserFilters
+    filter: type[UserFilter]
 
 class UserSchemas:
     """Schemas for the user model."""
@@ -48,6 +52,26 @@ class UserScopes:
     discord_id: UserScopeDiscordId
     superuser: UserScopeSuperuser
     access: UserScopeAccess
+
+class UserFilters:
+    """Declarative filters for the User model."""
+
+class UserFilter(BaseModel):
+    """Pydantic-class for filtering the User model."""
+
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
+    updated_at: Optional[datetime] = None
+    min_updated_at: Optional[Any] = None
+    max_updated_at: Optional[Any] = None
+    discord_id: Optional[int] = None
+    min_discord_id: Optional[Any] = None
+    max_discord_id: Optional[Any] = None
+    minecraft_nickname: Optional[str] = None
+    is_superuser: Optional[bool] = None
+    biography: Optional[str] = None
+    access: Optional[bool] = None
 
 class UserSchemaCreate(AwesomeBaseModel):
     """Create schema for User model"""

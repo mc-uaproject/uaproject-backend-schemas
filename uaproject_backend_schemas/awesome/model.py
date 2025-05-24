@@ -90,9 +90,12 @@ class AwesomeModel(SQLModel):
     @classproperty
     def filter(cls) -> type[BaseModel] | None:
         """Returns a Pydantic-class for filtering this model."""
-        if hasattr(cls, "Filters"):
-            return cls.Filters.get_pydantic_filter_class()
-        return None
+        filters_cls = getattr(cls, "Filters", None)
+        if filters_cls is None:
+            from uaproject_backend_schemas.awesome.filters import AwesomeFilters
+            filters_cls = type(f"{cls.__name__}Filters", (AwesomeFilters,), {"model_cls": cls})
+            setattr(cls, "Filters", filters_cls)
+        return filters_cls.get_pydantic_filter_class()
 
     @classproperty
     def sort(cls) -> type[Enum] | None:
