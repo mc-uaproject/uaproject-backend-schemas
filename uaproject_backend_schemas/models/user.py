@@ -13,6 +13,7 @@ from uaproject_backend_schemas.models.user_token import Token
 if TYPE_CHECKING:
     from uaproject_backend_schemas.models.application import Application
     from uaproject_backend_schemas.models.balance import Balance
+    from uaproject_backend_schemas.models.claim import Claim
     from uaproject_backend_schemas.models.punishment import Punishment
     from uaproject_backend_schemas.models.role import Role
     from uaproject_backend_schemas.models.transaction import Transaction
@@ -62,6 +63,12 @@ class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     )
     webhooks: List["Webhook"] = Relationship(
         back_populates="user", sa_relationship_kwargs={"foreign_keys": "[Webhook.user_id]"}
+    )
+    claims_as_claimant: List["Claim"] = Relationship(
+        back_populates="claimants", sa_relationship_kwargs={"secondary": "claim_claimant_link"}
+    )
+    claims_as_defendant: List["Claim"] = Relationship(
+        back_populates="defendants", sa_relationship_kwargs={"secondary": "claim_defendant_link"}
     )
 
     class Scopes(AwesomeModel.Scopes):
