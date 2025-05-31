@@ -39,19 +39,62 @@ class User(AwesomeModel):
     filter: type[UserFilter]
 
 class UserSchemas:
-    """Schemas for the user model."""
-
-    create: UserSchemaCreate
-    update: UserSchemaUpdate
-    response: UserSchemaResponse
+    """Schemas for the User model."""
 
 class UserScopes:
-    """Visibility scopes for the user model."""
+    """Scopes for the User model."""
 
     minecraft_nickname: UserScopeMinecraftNickname
+
+class UserScopeMinecraftNickname(AwesomeBaseModel):
+    """minecraft_nickname schema for User model"""
+
+    id: int
+    updated_at: datetime
+    discord_id: Optional[int]
+    minecraft_nickname: Optional[str]
+    is_superuser: Optional[bool]
+    biography: Optional[str]
+    access: Optional[bool]
+
     discord_id: UserScopeDiscordId
+
+class UserScopeDiscordId(AwesomeBaseModel):
+    """discord_id schema for User model"""
+
+    id: int
+    updated_at: datetime
+    discord_id: Optional[int]
+    minecraft_nickname: Optional[str]
+    is_superuser: Optional[bool]
+    biography: Optional[str]
+    access: Optional[bool]
+
     superuser: UserScopeSuperuser
+
+class UserScopeSuperuser(AwesomeBaseModel):
+    """superuser schema for User model"""
+
+    id: int
+    updated_at: datetime
+    discord_id: Optional[int]
+    minecraft_nickname: Optional[str]
+    is_superuser: Optional[bool]
+    biography: Optional[str]
+    access: Optional[bool]
+
     access: UserScopeAccess
+
+class UserScopeAccess(AwesomeBaseModel):
+    """access schema for User model"""
+
+    id: int
+    updated_at: datetime
+    discord_id: Optional[int]
+    minecraft_nickname: Optional[str]
+    is_superuser: Optional[bool]
+    biography: Optional[str]
+    access: Optional[bool]
 
 class UserFilters:
     """Declarative filters for the User model."""
@@ -72,63 +115,3 @@ class UserFilter(BaseModel):
     is_superuser: Optional[bool] = None
     biography: Optional[str] = None
     access: Optional[bool] = None
-
-class UserSchemaCreate(AwesomeBaseModel):
-    """Create schema for User model"""
-
-    id: int
-    updated_at: datetime
-    discord_id: Optional[int]
-    minecraft_nickname: Optional[str]
-    is_superuser: Optional[bool]
-    biography: Optional[str]
-    access: Optional[bool]
-
-class UserSchemaUpdate(AwesomeBaseModel):
-    """Update schema for User model"""
-
-    id: int
-    updated_at: datetime
-    discord_id: Optional[int]
-    minecraft_nickname: Optional[str]
-    is_superuser: Optional[bool]
-    biography: Optional[str]
-    access: Optional[bool]
-
-class UserSchemaResponse(AwesomeBaseModel):
-    """Response schema for User model"""
-
-    id: int
-    updated_at: datetime
-    discord_id: Optional[int]
-    minecraft_nickname: Optional[str]
-    is_superuser: Optional[bool]
-    biography: Optional[str]
-    access: Optional[bool]
-
-class UserScopeMinecraftNickname(AwesomeBaseModel):
-    """minecraft_nickname visibility scope for User model"""
-
-    id: int
-    minecraft_nickname: Optional[str]
-
-class UserScopeDiscordId(AwesomeBaseModel):
-    """discord_id visibility scope for User model"""
-
-    id: int
-    discord_id: Optional[int]
-
-class UserScopeSuperuser(AwesomeBaseModel):
-    """superuser visibility scope for User model"""
-
-    id: int
-    discord_id: Optional[int]
-    minecraft_nickname: Optional[str]
-    is_superuser: Optional[bool]
-    updated_at: datetime
-
-class UserScopeAccess(AwesomeBaseModel):
-    """access visibility scope for User model"""
-
-    id: int
-    access: Optional[bool]

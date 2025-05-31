@@ -26,7 +26,8 @@ class Balance(AwesomeModel, IDMixin, TimestampsMixin, table=True):
 
     user: "User" = Relationship(back_populates="balance")
 
-    class Amount(ScopeDefinition):
-        trigger_fields = ["amount"]
-        fields = ["id", "user_id", "amount"]
-        permissions = ["read"]
+    class Scopes(AwesomeModel.Scopes):
+        class Amount(ScopeDefinition):
+            trigger_fields = ["amount"]
+            fields = ["id", "user_id", "amount"]
+            permissions = ["read"]

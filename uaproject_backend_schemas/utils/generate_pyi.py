@@ -9,6 +9,7 @@ from typing import Any, List, Type, Union, get_args, get_origin
 
 from uaproject_backend_schemas.awesome.fields import AwesomeFieldInfo
 from uaproject_backend_schemas.awesome.model import AwesomeModel
+from uaproject_backend_schemas.awesome.utils import snake_to_camel
 
 
 def expand_wildcard_modules(module_path: str) -> List[str]:
@@ -68,10 +69,8 @@ def get_permissions_from_model(model_cls: Type[AwesomeModel]) -> set[str]:
     permissions = set()
 
     for field in model_cls.model_fields.values():
-        if hasattr(field, "exclude_permissions"):
-            permissions.update(field.exclude_permissions)
-        if hasattr(field, "include_permissions"):
-            permissions.update(field.include_permissions)
+        if hasattr(field, "required_permissions"):
+            permissions.update(field.required_permissions)
 
     permissions.update(_get_schema_permissions(model_cls))
 
@@ -85,9 +84,7 @@ def _check_field_needs(field_info: Any, needs: dict) -> str:
     needs["list"] |= "List" in field_type
     needs["dict"] |= "Dict" in field_type
     needs["datetime"] |= "datetime" in field_type
-    needs["awesome_field"] |= hasattr(field_info, "exclude_permissions") or hasattr(
-        field_info, "include_permissions"
-    )
+    needs["awesome_field"] |= hasattr(field_info, "required_permissions")
     return field_type
 
 
@@ -231,18 +228,13 @@ def collect_imports_from_types(used_types, std_types, py_imports, model_cls) -> 
 def collect_imports_from_generated_content(model_cls, std_types) -> set:
     imports = set()
     all_content = []
-    for schema_key in (
-        getattr(model_cls, "schemas", []).list()
-        if hasattr(getattr(model_cls, "schemas", None), "list")
-        else []
-    ):
-        all_content.append(generate_schema_class(model_cls, schema_key))
-    for scope_key in (
-        getattr(model_cls, "scopes", []).list()
-        if hasattr(getattr(model_cls, "scopes", None), "list")
-        else []
-    ):
-        all_content.append(generate_scope_class(model_cls, scope_key))
+    for _type in [("Schema", "schemas"), ("Scope", "scopes")]:
+        for schema_key in (
+            getattr(model_cls, _type[1], []).list()
+            if hasattr(getattr(model_cls, _type[1], None), "list")
+            else []
+        ):
+            all_content.append(generate_class(model_cls, schema_key, _type=_type[0]))
     content_str = "\n".join(all_content)
     if "AwesomeField(" in content_str:
         imports.add(std_types["AwesomeField"])
@@ -292,15 +284,13 @@ def _get_field_type(field: Any) -> str:
 
 
 def _get_field_str(
-    field_name: str, field: Any, field_type: str, include_relationships: bool = False
+    field_name: str, field: Any, field_type: str
 ) -> str:
     """Get string representation of a field."""
     field_str = f"    {field_name}: {field_type}"
     if isinstance(field, AwesomeFieldInfo):
-        if field.exclude_permissions:
-            field_str += f" = AwesomeField(exclude_permissions={field.exclude_permissions})"
-        elif field.include_permissions:
-            field_str += f" = AwesomeField(include_permissions={field.include_permissions})"
+        if field.required_permissions:
+            field_str += f" = AwesomeField(required_permissions={field.required_permissions})"
     return field_str
 
 
@@ -308,20 +298,14 @@ def _should_include_field(field: Any, permissions: list[str] = None) -> bool:
     """Check if a field should be included considering permissions."""
     if not permissions:
         return True
-    if hasattr(field, "exclude_permissions") and any(
-        p in permissions for p in field.exclude_permissions
-    ):
-        return False
-    if hasattr(field, "include_permissions") and not any(
-        p in permissions for p in field.include_permissions
+    if hasattr(field, "required_permissions") and all(
+        p not in permissions for p in field.required_permissions
     ):
         return False
     return True
 
 
-def generate_schema_fields(
-    model_cls: Type[AwesomeModel], permissions: list[str] = None
-) -> list[str]:
+def generate_fields(model_cls: Type[AwesomeModel], permissions: list[str] = None) -> list[str]:
     fields = []
     for field_name, field in model_cls.model_fields.items():
         if not _should_include_field(field, permissions):
@@ -340,30 +324,19 @@ def generate_schema_fields(
 
 
 def generate_with_permissions_method(class_name: str, all_permissions: set[str]) -> str:
-    permission_models = [
-        _format_permission_class_name(class_name, perm) for perm in all_permissions
-    ]
-    permission_models.append(f"{class_name}WithPermissions")
-    return_type = (
-        " | ".join(permission_models) if len(permission_models) > 1 else permission_models[0]
-    )
     permissions_literal = " , ".join(f'"{p}"' for p in all_permissions)
-    return f"    def with_permissions(self, permissions: list[Literal[{permissions_literal}]]) -> {return_type}: ...\n\n"
+    return f"    def with_permissions(self, permissions: list[Literal[{permissions_literal}]]) -> {class_name}: ...\n\n"
 
 
-def generate_with_permissions_class(
-    model_cls: Type[AwesomeModel], schema_name: str, fields: list[str]
-) -> str:
-    class_name = f"{model_cls.__name__}Schema{schema_name.capitalize()}WithPermissions"
-    docstring = f'    """{schema_name} schema for {model_cls.__name__} model with permissions"""\n'
-    return f"class {class_name}(AwesomeBaseModel):\n" + docstring + "\n".join(fields) + "\n\n"
-
-
-def generate_schema_class(
-    model_cls: Type[AwesomeModel], schema_name: str, permissions: list[str] = None
+def generate_class(
+    model_cls: Type[AwesomeModel],
+    schema_name: str,
+    permissions: list[str] = None,
+    _type: str = "Schema",
 ) -> str:
     """Generate schema class with permissions."""
-    class_name = f"{model_cls.__name__}Schema{schema_name.capitalize()}"
+    camel_schema_name = snake_to_camel(schema_name)
+    class_name = f"{model_cls.__name__}{_type}{camel_schema_name}"
     if permissions:
         class_name += "WithPermissions"
         class_name += "".join(
@@ -371,8 +344,8 @@ def generate_schema_class(
             for p in sorted(permissions)
         )
 
-    fields = generate_schema_fields(model_cls, permissions)
-    docstring = f'    """{schema_name.capitalize()} schema for {model_cls.__name__} model'
+    fields = generate_fields(model_cls, permissions)
+    docstring = f'    """{schema_name} schema for {model_cls.__name__} model'
     if permissions:
         docstring += f" with permissions {', '.join(permissions)}"
     docstring += '"""\n'
@@ -380,123 +353,14 @@ def generate_schema_class(
 
     all_permissions = get_permissions_from_model(model_cls)
     if all_permissions:
-        if not permissions:
-            content += generate_with_permissions_method(
-                f"{model_cls.__name__}Schema{schema_name.capitalize()}", all_permissions
-            )
-            content += generate_with_permissions_class(model_cls, schema_name, fields)
-        permission_models = [
-            _format_permission_class_name(
-                f"{model_cls.__name__}Schema{schema_name.capitalize()}", perm
-            )
-            for perm in all_permissions
-        ]
-        permission_models.append(
-            f"{model_cls.__name__}Schema{schema_name.capitalize()}WithPermissions"
-        )
-        return_type = (
-            " | ".join(permission_models) if len(permission_models) > 1 else permission_models[0]
-        )
         permissions_literal = " , ".join(f'"{p}"' for p in all_permissions)
-        content += f"    def with_permissions(self, permissions: list[Literal[{permissions_literal}]]) -> {return_type}: ...\n\n"
+        content += f"    def with_permissions(self, permissions: list[Literal[{permissions_literal}]]) -> {class_name}: ...\n\n"
     return content
-
-
-def _get_field_str_for_scope(model_cls: Type[AwesomeModel], field: str) -> str:
-    """Get field string representation for scope."""
-    if hasattr(model_cls, field):
-        field_value = getattr(model_cls, field)
-        if isinstance(field_value, property) and getattr(field_value, "__computed_field__", False):
-            field_type = field_value.fget.__annotations__.get("return", Any)
-            return f"    {field}: {field_type.__name__}"
-
-    if field in model_cls.model_fields:
-        field_info = model_cls.model_fields[field]
-        field_type = _get_field_type(field_info)
-        return f"    {field}: {field_type}"
-    return ""
-
-
-def _get_scope_fields(
-    model_cls: Type[AwesomeModel], fields: List[str], perm: str = None
-) -> List[str]:
-    """Get field strings for scope."""
-    field_strs = []
-    for field in fields:
-        field_str = _get_field_str_for_scope(model_cls, field)
-        if not field_str:
-            continue
-        if perm and field in model_cls.model_fields:
-            field_info = model_cls.model_fields[field]
-            if not _should_include_field(field_info, [perm]):
-                continue
-        field_strs.append(field_str)
-    return field_strs
 
 
 def _format_permission_class_name(base_name: str, perm: str) -> str:
     """Format permission class name, replacing dots with underscores."""
     return f"{base_name}WithPermissions{''.join(p.capitalize() for p in perm.replace('.', '_').split('_'))}"
-
-
-def generate_scope_class(model_cls: Type[AwesomeModel], scope_name: str) -> str:
-    """Generate visibility scope class."""
-    scope_name_camel = "".join(word.capitalize() for word in scope_name.split("_"))
-    class_name = f"{model_cls.__name__}Scope{scope_name_camel}"
-    fields = model_cls.scopes.resolve_fields(model_cls, scope_name)
-
-    field_strs = _get_scope_fields(model_cls, fields)
-
-    for rel in getattr(model_cls, "__relationships__", []):
-        field_strs.append(f"    {rel}: Optional[Any] = None")
-
-    content = [
-        f"class {class_name}(AwesomeBaseModel):",
-        f'    """{scope_name} visibility scope for {model_cls.__name__} model"""',
-        *field_strs,
-        "",
-    ]
-
-    all_permissions = get_permissions_from_model(model_cls)
-    if all_permissions:
-        base_perm_class = f"{model_cls.__name__}Scope{scope_name_camel}WithPermissions"
-        content.extend(
-            [
-                f"class {base_perm_class}(AwesomeBaseModel):",
-                f'    """{scope_name} visibility scope for {model_cls.__name__} model with permissions"""',
-                *field_strs,
-                "",
-            ]
-        )
-
-        for perm in all_permissions:
-            perm_class = _format_permission_class_name(
-                f"{model_cls.__name__}Scope{scope_name_camel}", perm
-            )
-            perm_fields = _get_scope_fields(model_cls, fields, perm)
-            content.extend(
-                [
-                    f"class {perm_class}(AwesomeBaseModel):",
-                    f'    """{scope_name} visibility scope for {model_cls.__name__} model with permissions {perm}"""',
-                    *perm_fields,
-                    "",
-                ]
-            )
-
-        permission_models = [
-            _format_permission_class_name(f"{model_cls.__name__}Scope{scope_name_camel}", p)
-            for p in all_permissions
-        ]
-        permission_models.append(base_perm_class)
-        return_type = (
-            " | ".join(permission_models) if len(permission_models) > 1 else permission_models[0]
-        )
-        permissions_literal = ", ".join(f'"{p}"' for p in all_permissions)
-        content.append(
-            f"    def with_permissions(self, permissions: list[Literal[{permissions_literal}]]) -> {return_type}: ..."
-        )
-
-    return "\n".join(content) + "\n\n"
 
 
 def ensure_stub_dir(module_path: str, project_root: Path) -> Path:
@@ -639,6 +503,17 @@ MODEL_IMPORT_OVERRIDES = {
 }
 
 
+def _collect_computed_fields(cls: Type[AwesomeModel]) -> dict[str, Any]:
+    fields = {}
+    for base in cls.__mro__:
+        if not inspect.isclass(base) or not issubclass(base, AwesomeModel):
+            continue
+        for name, value in inspect.getmembers(base):
+            if isinstance(value, property) and getattr(value, "__computed_field__", False):
+                fields[name] = value
+    return fields
+
+
 def _generate_model_fields(model_cls: Type[AwesomeModel]) -> tuple[str, set]:
     lines = []
     imports = set()
@@ -667,30 +542,33 @@ def _generate_model_fields(model_cls: Type[AwesomeModel]) -> tuple[str, set]:
 
 def _generate_model_sections(model_cls: Type[AwesomeModel], permissions: set[str]) -> str:
     content = ""
-    content += f"class {model_cls.__name__}Schemas:\n"
-    content += '    """Schemas for the user model."""\n'
-    for schema_key in model_cls.schemas.list():
-        base_schema = f"{model_cls.__name__}Schema{schema_key.capitalize()}"
-        content += f"    {schema_key}: {base_schema}\n"
-    content += "\n"
-    content += f"class {model_cls.__name__}Scopes:\n"
-    content += '    """Visibility scopes for the user model."""\n'
-    for scope_key in model_cls.scopes.list():
-        scope_name_parts = scope_key.split("_")
-        scope_name_camel = "".join(word.capitalize() for word in scope_name_parts)
-        content += f"    {scope_key}: {model_cls.__name__}Scope{scope_name_camel}\n"
-    content += "\n"
+    for _type in ["schemas", "scopes"]:
+        _type_instance = getattr(model_cls, _type, None)
+
+        content += f"class {model_cls.__name__}{_type.capitalize()}:\n"
+        content += f'    """{_type.capitalize()} for the {model_cls.__name__} model."""\n'
+
+        if not _type_instance:
+            raise ValueError(f"No {_type[:-1]} found for {model_cls.__name__}")
+
+        print(f"\n\n{model_cls.__name__}\n{_type_instance}\n\n")
+        for _type_key in _type_instance.list():
+            base_schema = (
+                f"{model_cls.__name__}{_type.capitalize()[:-1]}{snake_to_camel(_type_key)}"
+            )
+            content += f"    {_type_key}: {base_schema}\n"
+
+            content += generate_class(model_cls, _type_key, _type=_type.capitalize()[:-1])
+            for perm in permissions:
+                content += generate_class(
+                    model_cls, _type_key, [perm], _type=_type.capitalize()[:-1]
+                )
+
     if getattr(model_cls, "filter", None):
         content += generate_filters_class(model_cls)
         content += generate_filter_class(model_cls)
     content += generate_sorts_class(model_cls)
     content += generate_sort_enum(model_cls)
-    for schema_key in model_cls.schemas.list():
-        content += generate_schema_class(model_cls, schema_key)
-        for perm in permissions:
-            content += generate_schema_class(model_cls, schema_key, [perm])
-    for scope_key in model_cls.scopes.list():
-        content += generate_scope_class(model_cls, scope_key)
     return content
 
 

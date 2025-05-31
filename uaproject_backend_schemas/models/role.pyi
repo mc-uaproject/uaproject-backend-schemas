@@ -1,11 +1,10 @@
 # AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
 
 from datetime import datetime
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
 
-from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.models.user import User
 
@@ -16,7 +15,8 @@ class Role(AwesomeModel):
     id: int
     name: str
     description: Optional[str]
-    permissions: List[str]
+    permissions: List[Dict]
+    weight: int
     users: Optional[List[User]]
     schemas: RoleSchemas
     scopes: RoleScopes
@@ -24,16 +24,10 @@ class Role(AwesomeModel):
     filter: type[RoleFilter]
 
 class RoleSchemas:
-    """Schemas for the user model."""
-
-    create: RoleSchemaCreate
-    update: RoleSchemaUpdate
-    response: RoleSchemaResponse
+    """Schemas for the Role model."""
 
 class RoleScopes:
-    """Visibility scopes for the user model."""
-
-    full: RoleScopeFull
+    """Scopes for the Role model."""
 
 class RoleFilters:
     """Declarative filters for the Role model."""
@@ -50,39 +44,6 @@ class RoleFilter(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     permissions: Optional[List] = None
-
-class RoleSchemaCreate(AwesomeBaseModel):
-    """Create schema for Role model"""
-
-    updated_at: datetime
-    id: int
-    name: str
-    description: Optional[str]
-    permissions: List[str]
-
-class RoleSchemaUpdate(AwesomeBaseModel):
-    """Update schema for Role model"""
-
-    updated_at: datetime
-    id: int
-    name: str
-    description: Optional[str]
-    permissions: List[str]
-
-class RoleSchemaResponse(AwesomeBaseModel):
-    """Response schema for Role model"""
-
-    updated_at: datetime
-    id: int
-    name: str
-    description: Optional[str]
-    permissions: List[str]
-
-class RoleScopeFull(AwesomeBaseModel):
-    """full visibility scope for Role model"""
-
-    updated_at: datetime
-    id: int
-    name: str
-    description: Optional[str]
-    permissions: List[str]
+    weight: Optional[int] = None
+    min_weight: Optional[Any] = None
+    max_weight: Optional[Any] = None

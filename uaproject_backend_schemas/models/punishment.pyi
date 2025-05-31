@@ -33,17 +33,42 @@ class Punishment(AwesomeModel):
     filter: type[PunishmentFilter]
 
 class PunishmentSchemas:
-    """Schemas for the user model."""
-
-    create: PunishmentSchemaCreate
-    update: PunishmentSchemaUpdate
-    response: PunishmentSchemaResponse
+    """Schemas for the Punishment model."""
 
 class PunishmentScopes:
-    """Visibility scopes for the user model."""
+    """Scopes for the Punishment model."""
 
     created: PunishmentScopeCreated
+
+class PunishmentScopeCreated(AwesomeBaseModel):
+    """created schema for Punishment model"""
+
+    updated_at: datetime
+    id: int
+    user_id: int
+    admin_id: Optional[int]
+    type: PunishmentType
+    status: PunishmentStatus
+    reason: Optional[str]
+    expires_at: Optional[datetime]
+    config_id: Optional[int]
+    punishment_metadata: Optional[Dict]
+
     status_changed: PunishmentScopeStatusChanged
+
+class PunishmentScopeStatusChanged(AwesomeBaseModel):
+    """status_changed schema for Punishment model"""
+
+    updated_at: datetime
+    id: int
+    user_id: int
+    admin_id: Optional[int]
+    type: PunishmentType
+    status: PunishmentStatus
+    reason: Optional[str]
+    expires_at: Optional[datetime]
+    config_id: Optional[int]
+    punishment_metadata: Optional[Dict]
 
 class PunishmentFilters:
     """Declarative filters for the Punishment model."""
@@ -73,65 +98,3 @@ class PunishmentFilter(BaseModel):
     min_config_id: Optional[Any] = None
     max_config_id: Optional[Any] = None
     punishment_metadata: Optional[Dict] = None
-
-class PunishmentSchemaCreate(AwesomeBaseModel):
-    """Create schema for Punishment model"""
-
-    updated_at: datetime
-    id: int
-    user_id: int
-    admin_id: Optional[int]
-    type: PunishmentType
-    status: PunishmentStatus
-    reason: Optional[str]
-    expires_at: Optional[datetime]
-    config_id: Optional[int]
-    punishment_metadata: Optional[Dict]
-
-class PunishmentSchemaUpdate(AwesomeBaseModel):
-    """Update schema for Punishment model"""
-
-    updated_at: datetime
-    id: int
-    user_id: int
-    admin_id: Optional[int]
-    type: PunishmentType
-    status: PunishmentStatus
-    reason: Optional[str]
-    expires_at: Optional[datetime]
-    config_id: Optional[int]
-    punishment_metadata: Optional[Dict]
-
-class PunishmentSchemaResponse(AwesomeBaseModel):
-    """Response schema for Punishment model"""
-
-    updated_at: datetime
-    id: int
-    user_id: int
-    admin_id: Optional[int]
-    type: PunishmentType
-    status: PunishmentStatus
-    reason: Optional[str]
-    expires_at: Optional[datetime]
-    config_id: Optional[int]
-    punishment_metadata: Optional[Dict]
-
-class PunishmentScopeCreated(AwesomeBaseModel):
-    """created visibility scope for Punishment model"""
-
-    id: int
-    user_id: int
-
-class PunishmentScopeStatusChanged(AwesomeBaseModel):
-    """status_changed visibility scope for Punishment model"""
-
-    updated_at: datetime
-    id: int
-    user_id: int
-    admin_id: Optional[int]
-    type: PunishmentType
-    status: PunishmentStatus
-    reason: Optional[str]
-    expires_at: Optional[datetime]
-    config_id: Optional[int]
-    punishment_metadata: Optional[Dict]

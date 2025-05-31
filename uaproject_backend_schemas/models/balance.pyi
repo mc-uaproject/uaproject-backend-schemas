@@ -26,16 +26,21 @@ class Balance(AwesomeModel):
     filter: type[BalanceFilter]
 
 class BalanceSchemas:
-    """Schemas for the user model."""
-
-    create: BalanceSchemaCreate
-    update: BalanceSchemaUpdate
-    response: BalanceSchemaResponse
+    """Schemas for the Balance model."""
 
 class BalanceScopes:
-    """Visibility scopes for the user model."""
+    """Scopes for the Balance model."""
 
-    full: BalanceScopeFull
+    amount: BalanceScopeAmount
+
+class BalanceScopeAmount(AwesomeBaseModel):
+    """amount schema for Balance model"""
+
+    updated_at: datetime
+    id: int
+    user_id: int
+    identifier: UUID
+    amount: Decimal
 
 class BalanceFilters:
     """Declarative filters for the Balance model."""
@@ -54,39 +59,3 @@ class BalanceFilter(BaseModel):
     max_user_id: Optional[Any] = None
     identifier: Optional[UUID] = None
     amount: Optional[Decimal] = None
-
-class BalanceSchemaCreate(AwesomeBaseModel):
-    """Create schema for Balance model"""
-
-    updated_at: datetime
-    id: int
-    user_id: int
-    identifier: UUID
-    amount: Decimal
-
-class BalanceSchemaUpdate(AwesomeBaseModel):
-    """Update schema for Balance model"""
-
-    updated_at: datetime
-    id: int
-    user_id: int
-    identifier: UUID
-    amount: Decimal
-
-class BalanceSchemaResponse(AwesomeBaseModel):
-    """Response schema for Balance model"""
-
-    updated_at: datetime
-    id: int
-    user_id: int
-    identifier: UUID
-    amount: Decimal
-
-class BalanceScopeFull(AwesomeBaseModel):
-    """full visibility scope for Balance model"""
-
-    updated_at: datetime
-    id: int
-    user_id: int
-    identifier: UUID
-    amount: Decimal

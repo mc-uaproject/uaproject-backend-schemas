@@ -6,7 +6,6 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
 
-from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.models.schemas.service import (
     ServiceType,
@@ -38,16 +37,10 @@ class Service(AwesomeModel):
     filter: type[ServiceFilter]
 
 class ServiceSchemas:
-    """Schemas for the user model."""
-
-    create: ServiceSchemaCreate
-    update: ServiceSchemaUpdate
-    response: ServiceSchemaResponse
+    """Schemas for the Service model."""
 
 class ServiceScopes:
-    """Visibility scopes for the user model."""
-
-    full: ServiceScopeFull
+    """Scopes for the Service model."""
 
 class ServiceFilters:
     """Declarative filters for the Service model."""
@@ -78,87 +71,3 @@ class ServiceFilter(BaseModel):
     upgrade_to: Optional[str] = None
     service_metadata: Optional[Dict] = None
     discounts: Optional[List] = None
-
-class ServiceSchemaCreate(AwesomeBaseModel):
-    """Create schema for Service model"""
-
-    updated_at: datetime
-    id: int
-    name: str
-    display_name: Optional[str]
-    description: Optional[str]
-    points: Optional[List]
-    image: Optional[str]
-    price: Decimal
-    is_active: bool
-    category: Optional[str]
-    type: ServiceType
-    duration_months: Optional[int]
-    is_upgradable: bool
-    upgrade_from: Optional[str]
-    upgrade_to: Optional[str]
-    service_metadata: Optional[Dict]
-    discounts: Optional[List]
-
-class ServiceSchemaUpdate(AwesomeBaseModel):
-    """Update schema for Service model"""
-
-    updated_at: datetime
-    id: int
-    name: str
-    display_name: Optional[str]
-    description: Optional[str]
-    points: Optional[List]
-    image: Optional[str]
-    price: Decimal
-    is_active: bool
-    category: Optional[str]
-    type: ServiceType
-    duration_months: Optional[int]
-    is_upgradable: bool
-    upgrade_from: Optional[str]
-    upgrade_to: Optional[str]
-    service_metadata: Optional[Dict]
-    discounts: Optional[List]
-
-class ServiceSchemaResponse(AwesomeBaseModel):
-    """Response schema for Service model"""
-
-    updated_at: datetime
-    id: int
-    name: str
-    display_name: Optional[str]
-    description: Optional[str]
-    points: Optional[List]
-    image: Optional[str]
-    price: Decimal
-    is_active: bool
-    category: Optional[str]
-    type: ServiceType
-    duration_months: Optional[int]
-    is_upgradable: bool
-    upgrade_from: Optional[str]
-    upgrade_to: Optional[str]
-    service_metadata: Optional[Dict]
-    discounts: Optional[List]
-
-class ServiceScopeFull(AwesomeBaseModel):
-    """full visibility scope for Service model"""
-
-    updated_at: datetime
-    id: int
-    name: str
-    display_name: Optional[str]
-    description: Optional[str]
-    points: Optional[List]
-    image: Optional[str]
-    price: Decimal
-    is_active: bool
-    category: Optional[str]
-    type: ServiceType
-    duration_months: Optional[int]
-    is_upgradable: bool
-    upgrade_from: Optional[str]
-    upgrade_to: Optional[str]
-    service_metadata: Optional[Dict]
-    discounts: Optional[List]

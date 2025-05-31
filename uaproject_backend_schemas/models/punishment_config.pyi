@@ -27,16 +27,24 @@ class PunishmentConfig(AwesomeModel):
     filter: type[PunishmentConfigFilter]
 
 class PunishmentConfigSchemas:
-    """Schemas for the user model."""
-
-    create: PunishmentConfigSchemaCreate
-    update: PunishmentConfigSchemaUpdate
-    response: PunishmentConfigSchemaResponse
+    """Schemas for the PunishmentConfig model."""
 
 class PunishmentConfigScopes:
-    """Visibility scopes for the user model."""
+    """Scopes for the PunishmentConfig model."""
 
     changed: PunishmentConfigScopeChanged
+
+class PunishmentConfigScopeChanged(AwesomeBaseModel):
+    """changed schema for PunishmentConfig model"""
+
+    updated_at: datetime
+    id: int
+    name: str
+    description: Optional[str]
+    is_active: bool
+    warn_threshold: int
+    warn_decay_days: int
+    config_data: Dict
 
 class PunishmentConfigFilters:
     """Declarative filters for the PunishmentConfig model."""
@@ -60,51 +68,3 @@ class PunishmentConfigFilter(BaseModel):
     min_warn_decay_days: Optional[Any] = None
     max_warn_decay_days: Optional[Any] = None
     config_data: Optional[Dict] = None
-
-class PunishmentConfigSchemaCreate(AwesomeBaseModel):
-    """Create schema for PunishmentConfig model"""
-
-    updated_at: datetime
-    id: int
-    name: str
-    description: Optional[str]
-    is_active: bool
-    warn_threshold: int
-    warn_decay_days: int
-    config_data: Dict
-
-class PunishmentConfigSchemaUpdate(AwesomeBaseModel):
-    """Update schema for PunishmentConfig model"""
-
-    updated_at: datetime
-    id: int
-    name: str
-    description: Optional[str]
-    is_active: bool
-    warn_threshold: int
-    warn_decay_days: int
-    config_data: Dict
-
-class PunishmentConfigSchemaResponse(AwesomeBaseModel):
-    """Response schema for PunishmentConfig model"""
-
-    updated_at: datetime
-    id: int
-    name: str
-    description: Optional[str]
-    is_active: bool
-    warn_threshold: int
-    warn_decay_days: int
-    config_data: Dict
-
-class PunishmentConfigScopeChanged(AwesomeBaseModel):
-    """changed visibility scope for PunishmentConfig model"""
-
-    updated_at: datetime
-    id: int
-    name: str
-    description: Optional[str]
-    is_active: bool
-    warn_threshold: int
-    warn_decay_days: int
-    config_data: Dict

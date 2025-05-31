@@ -1,7 +1,7 @@
 import re
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional
 
-from pydantic import model_validator
+from pydantic import computed_field, model_validator
 from sqlmodel import BigInteger, Column, Relationship
 
 from uaproject_backend_schemas.awesome.fields import AwesomeField
@@ -97,7 +97,16 @@ class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
 
         return values
 
+    @property
+    @computed_field
+    def permissions(self) -> List[Dict[str, bool]]:
+        sorted_roles = sorted(self.roles, key=lambda r: r.weight, reverse=True)
+        permissions = []
+        for role in sorted_roles:
+            permissions.extend(role.permissions)
+        return permissions
+
 
 if __name__ == "__main__":
-    print(User.filter)
+    print(User.schemas.list())
     print(User.sort)

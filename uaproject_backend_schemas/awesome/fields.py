@@ -10,21 +10,17 @@ class AwesomeFieldInfo(SQLModelFieldInfo):
     def __init__(
         self,
         *args,
-        exclude_permissions: List[str] = None,
-        include_permissions: List[str] = None,
+        required_permissions: List[str] = None,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
-        self.exclude_permissions = exclude_permissions or []
-        self.include_permissions = include_permissions or []
+        self.required_permissions = required_permissions or []
 
     def __repr__(self) -> str:
         parent_repr = super().__repr__()
         attrs = []
-        if self.exclude_permissions:
-            attrs.append(f"exclude_permissions={self.exclude_permissions}")
-        if self.include_permissions:
-            attrs.append(f"include_permissions={self.include_permissions}")
+        if self.required_permissions:
+            attrs.append(f"required_permissions={self.required_permissions}")
         return f"{parent_repr[:-1]}, {', '.join(attrs)})" if attrs else parent_repr
 
 
@@ -45,8 +41,7 @@ def AwesomeField(  # noqa: N802
     ge: Optional[float] = None,
     lt: Optional[float] = None,
     le: Optional[float] = None,
-    exclude_permissions: List[str] = None,
-    include_permissions: List[str] = None,
+    required_permissions: List[str] = None,
     multiple_of: Optional[float] = None,
     max_digits: Optional[int] = None,
     decimal_places: Optional[int] = None,
@@ -80,8 +75,7 @@ def AwesomeField(  # noqa: N802
         description=description,
         exclude=exclude,
         include=include,
-        exclude_permissions=exclude_permissions,
-        include_permissions=include_permissions,
+        required_permissions=required_permissions,
         const=const,
         gt=gt,
         ge=ge,

@@ -32,19 +32,64 @@ class Application(AwesomeModel):
     filter: type[ApplicationFilter]
 
 class ApplicationSchemas:
-    """Schemas for the user model."""
-
-    create: ApplicationSchemaCreate
-    update: ApplicationSchemaUpdate
-    response: ApplicationSchemaResponse
+    """Schemas for the Application model."""
 
 class ApplicationScopes:
-    """Visibility scopes for the user model."""
+    """Scopes for the Application model."""
 
     status: ApplicationScopeStatus
+
+class ApplicationScopeStatus(AwesomeBaseModel):
+    """status schema for Application model"""
+
+    id: int
+    updated_at: datetime
+    user_id: int
+    status: ApplicationStatus
+    birth_date: Optional[datetime]
+    launcher: Optional[str]
+    server_source: Optional[str]
+    private_server_experience: Optional[str]
+    useful_skills: Optional[str]
+    conflict_reaction: Optional[str]
+    quiz_answer: Optional[str]
+    editable_fields: List[str]
+
     editable_fields: ApplicationScopeEditableFields
+
+class ApplicationScopeEditableFields(AwesomeBaseModel):
+    """editable_fields schema for Application model"""
+
+    id: int
+    updated_at: datetime
+    user_id: int
+    status: ApplicationStatus
+    birth_date: Optional[datetime]
+    launcher: Optional[str]
+    server_source: Optional[str]
+    private_server_experience: Optional[str]
+    useful_skills: Optional[str]
+    conflict_reaction: Optional[str]
+    quiz_answer: Optional[str]
+    editable_fields: List[str]
+
     form: ApplicationScopeForm
-    full: ApplicationScopeFull
+
+class ApplicationScopeForm(AwesomeBaseModel):
+    """form schema for Application model"""
+
+    id: int
+    updated_at: datetime
+    user_id: int
+    status: ApplicationStatus
+    birth_date: Optional[datetime]
+    launcher: Optional[str]
+    server_source: Optional[str]
+    private_server_experience: Optional[str]
+    useful_skills: Optional[str]
+    conflict_reaction: Optional[str]
+    quiz_answer: Optional[str]
+    editable_fields: List[str]
 
 class ApplicationFilters:
     """Declarative filters for the Application model."""
@@ -72,94 +117,3 @@ class ApplicationFilter(BaseModel):
     conflict_reaction: Optional[str] = None
     quiz_answer: Optional[str] = None
     editable_fields: Optional[List] = None
-
-class ApplicationSchemaCreate(AwesomeBaseModel):
-    """Create schema for Application model"""
-
-    id: int
-    updated_at: datetime
-    user_id: int
-    status: ApplicationStatus
-    birth_date: Optional[datetime]
-    launcher: Optional[str]
-    server_source: Optional[str]
-    private_server_experience: Optional[str]
-    useful_skills: Optional[str]
-    conflict_reaction: Optional[str]
-    quiz_answer: Optional[str]
-    editable_fields: List[str]
-
-class ApplicationSchemaUpdate(AwesomeBaseModel):
-    """Update schema for Application model"""
-
-    id: int
-    updated_at: datetime
-    user_id: int
-    status: ApplicationStatus
-    birth_date: Optional[datetime]
-    launcher: Optional[str]
-    server_source: Optional[str]
-    private_server_experience: Optional[str]
-    useful_skills: Optional[str]
-    conflict_reaction: Optional[str]
-    quiz_answer: Optional[str]
-    editable_fields: List[str]
-
-class ApplicationSchemaResponse(AwesomeBaseModel):
-    """Response schema for Application model"""
-
-    id: int
-    updated_at: datetime
-    user_id: int
-    status: ApplicationStatus
-    birth_date: Optional[datetime]
-    launcher: Optional[str]
-    server_source: Optional[str]
-    private_server_experience: Optional[str]
-    useful_skills: Optional[str]
-    conflict_reaction: Optional[str]
-    quiz_answer: Optional[str]
-    editable_fields: List[str]
-
-class ApplicationScopeStatus(AwesomeBaseModel):
-    """status visibility scope for Application model"""
-
-    id: int
-    user_id: int
-    status: ApplicationStatus
-
-class ApplicationScopeEditableFields(AwesomeBaseModel):
-    """editable_fields visibility scope for Application model"""
-
-    id: int
-    user_id: int
-    editable_fields: List[str]
-
-class ApplicationScopeForm(AwesomeBaseModel):
-    """form visibility scope for Application model"""
-
-    id: int
-    user_id: int
-    birth_date: Optional[datetime]
-    launcher: Optional[str]
-    server_source: Optional[str]
-    private_server_experience: Optional[str]
-    useful_skills: Optional[str]
-    conflict_reaction: Optional[str]
-    quiz_answer: Optional[str]
-
-class ApplicationScopeFull(AwesomeBaseModel):
-    """full visibility scope for Application model"""
-
-    id: int
-    updated_at: datetime
-    user_id: int
-    status: ApplicationStatus
-    birth_date: Optional[datetime]
-    launcher: Optional[str]
-    server_source: Optional[str]
-    private_server_experience: Optional[str]
-    useful_skills: Optional[str]
-    conflict_reaction: Optional[str]
-    quiz_answer: Optional[str]
-    editable_fields: List[str]

@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 from sqlmodel import JSON, Column, Relationship
 
@@ -16,7 +16,8 @@ class Role(AwesomeModel, IDMixin, TimestampsMixin, table=True):
 
     name: str = AwesomeField(max_length=100)
     description: Optional[str] = AwesomeField(default=None)
-    permissions: List[str] = AwesomeField(default=[], sa_column=Column(JSON))
+    permissions: List[Dict[str, bool]] = AwesomeField(default=[], sa_column=Column(JSON))
+    weight: int = AwesomeField(default=0)
 
     users: List["User"] = Relationship(
         back_populates="roles",

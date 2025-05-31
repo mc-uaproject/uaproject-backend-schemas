@@ -5,7 +5,6 @@ from typing import Any, Dict, Optional
 
 from pydantic import BaseModel
 
-from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.types import SerializableHttpUrl
 from uaproject_backend_schemas.models.schemas.webhook import WebhookStatus
@@ -28,16 +27,10 @@ class Webhook(AwesomeModel):
     filter: type[WebhookFilter]
 
 class WebhookSchemas:
-    """Schemas for the user model."""
-
-    create: WebhookSchemaCreate
-    update: WebhookSchemaUpdate
-    response: WebhookSchemaResponse
+    """Schemas for the Webhook model."""
 
 class WebhookScopes:
-    """Visibility scopes for the user model."""
-
-    full: WebhookScopeFull
+    """Scopes for the Webhook model."""
 
 class WebhookFilters:
     """Declarative filters for the Webhook model."""
@@ -58,47 +51,3 @@ class WebhookFilter(BaseModel):
     status: Optional[WebhookStatus] = None
     webhook_scopes: Optional[Dict] = None
     authorization: Optional[str] = None
-
-class WebhookSchemaCreate(AwesomeBaseModel):
-    """Create schema for Webhook model"""
-
-    updated_at: datetime
-    id: int
-    endpoint: SerializableHttpUrl
-    user_id: Optional[int]
-    status: WebhookStatus
-    webhook_scopes: Dict
-    authorization: Optional[str]
-
-class WebhookSchemaUpdate(AwesomeBaseModel):
-    """Update schema for Webhook model"""
-
-    updated_at: datetime
-    id: int
-    endpoint: SerializableHttpUrl
-    user_id: Optional[int]
-    status: WebhookStatus
-    webhook_scopes: Dict
-    authorization: Optional[str]
-
-class WebhookSchemaResponse(AwesomeBaseModel):
-    """Response schema for Webhook model"""
-
-    updated_at: datetime
-    id: int
-    endpoint: SerializableHttpUrl
-    user_id: Optional[int]
-    status: WebhookStatus
-    webhook_scopes: Dict
-    authorization: Optional[str]
-
-class WebhookScopeFull(AwesomeBaseModel):
-    """full visibility scope for Webhook model"""
-
-    updated_at: datetime
-    id: int
-    endpoint: SerializableHttpUrl
-    user_id: Optional[int]
-    status: WebhookStatus
-    webhook_scopes: Dict
-    authorization: Optional[str]

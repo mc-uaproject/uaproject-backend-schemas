@@ -5,7 +5,6 @@ from typing import Any, Optional
 
 from pydantic import BaseModel
 
-from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.models.role import Role
 from uaproject_backend_schemas.models.user import User
@@ -25,16 +24,10 @@ class UserRoles(AwesomeModel):
     filter: type[UserRolesFilter]
 
 class UserRolesSchemas:
-    """Schemas for the user model."""
-
-    create: UserRolesSchemaCreate
-    update: UserRolesSchemaUpdate
-    response: UserRolesSchemaResponse
+    """Schemas for the UserRoles model."""
 
 class UserRolesScopes:
-    """Visibility scopes for the user model."""
-
-    full: UserRolesScopeFull
+    """Scopes for the UserRoles model."""
 
 class UserRolesFilters:
     """Declarative filters for the UserRoles model."""
@@ -54,35 +47,3 @@ class UserRolesFilter(BaseModel):
     role_id: Optional[int] = None
     min_role_id: Optional[Any] = None
     max_role_id: Optional[Any] = None
-
-class UserRolesSchemaCreate(AwesomeBaseModel):
-    """Create schema for UserRoles model"""
-
-    updated_at: datetime
-    id: int
-    user_id: int
-    role_id: int
-
-class UserRolesSchemaUpdate(AwesomeBaseModel):
-    """Update schema for UserRoles model"""
-
-    updated_at: datetime
-    id: int
-    user_id: int
-    role_id: int
-
-class UserRolesSchemaResponse(AwesomeBaseModel):
-    """Response schema for UserRoles model"""
-
-    updated_at: datetime
-    id: int
-    user_id: int
-    role_id: int
-
-class UserRolesScopeFull(AwesomeBaseModel):
-    """full visibility scope for UserRoles model"""
-
-    updated_at: datetime
-    id: int
-    user_id: int
-    role_id: int

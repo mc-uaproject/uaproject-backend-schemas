@@ -77,31 +77,8 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
             fields = ["id", "user_id", *DEFAULT_EDITABLE_FIELDS]
             permissions = ["read"]
 
-    @classmethod
-    def _validate_text_length(
-        cls, field_name: str, value: Optional[str], max_length: int = 1024
-    ) -> None:
-        """Validate text field length."""
-        if value and len(value) > max_length:
-            raise ValueError(f"{field_name} must be less than {max_length} characters")
-
-    @classmethod
-    def _validate_choice_field(
-        cls, field_name: str, value: Optional[str], choices: list[str]
-    ) -> None:
-        """Validate choice field."""
-        if value and value not in choices:
-            raise ValueError(f"Invalid {field_name}")
-
     @model_validator(mode="before")
     def validate_fields(cls, values: dict[str, Any]) -> dict[str, Any]:
-        cls._validate_choice_field(
-            "launcher", values.get("launcher"), ["vanilla", "forge", "fabric"]
-        )
-        cls._validate_choice_field(
-            "server_source", values.get("server_source"), ["vanilla", "forge", "fabric"]
-        )
-
         for field in [
             "private_server_experience",
             "useful_skills",

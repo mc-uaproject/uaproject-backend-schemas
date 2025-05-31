@@ -1,5 +1,5 @@
 import inspect
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Type, TypeVar
 
 from pydantic import BaseModel, create_model
 
@@ -46,12 +46,27 @@ class AwesomeSchemas:
     """Schema/Pydantic model manager for a specific model class.
     When accessing an attribute, creates (or returns cached) a Pydantic model."""
 
-    def __init__(self, model_cls: Type["AwesomeModel"]):
+    def __init__(
+        self,
+        model_cls: Type["AwesomeModel"],
+        definition: Type[FieldsDefinitionBase] = SchemaDefinition,
+        home: str = "Schemas",
+    ):
         self.model_cls = model_cls
         self._cache: Dict[str, Type[BaseModel]] = {}
         self._names: Dict[str, str] = {}
+        self._definition = definition
 
-        if not hasattr(self.model_cls.Schemas, "Create"):
+        if hasattr(self.model_cls, home):
+            self._home = getattr(self.model_cls, home)
+        else:
+            raise AttributeError(f"Model {self.model_cls.__name__} has no attribute {home}")
+
+        if self._home != "Schemas":
+            return
+
+        print(self._definition)
+        if not hasattr(self._home, "Create"):
 
             class Create(SchemaDefinition):
                 fields_exclude = ["id"]
@@ -60,7 +75,7 @@ class AwesomeSchemas:
 
             setattr(self.model_cls.Schemas, "Create", Create)
 
-        if not hasattr(self.model_cls.Schemas, "Update"):
+        if not hasattr(self._home, "Update"):
 
             class Update(SchemaDefinition):
                 fields_exclude = ["id"]
@@ -69,12 +84,15 @@ class AwesomeSchemas:
 
             setattr(self.model_cls.Schemas, "Update", Update)
 
-        if not hasattr(self.model_cls.Schemas, "Response"):
+        if not hasattr(self._home, "Response"):
 
             class Response(SchemaDefinition):
                 permissions = ["{model_cls.__scope_prefix__}.read"]
 
-            setattr(self.model_cls.Schemas, "Response", Response)
+            setattr(self._home, "Response", Response)
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(self.model_cls.schemas.list())
 
     @classmethod
     def _get_all_fields(cls, model_cls: Type[TModel]) -> List[str]:
@@ -92,26 +110,26 @@ class AwesomeSchemas:
 
         return fields
 
-    @classmethod
-    def _get_schema_fields(cls, model_cls: Type[TModel], schema_name: str) -> List[str]:
+    def _get_schema_fields(self, model_cls: Type[TModel], schema_name: str) -> List[str]:
         """Get fields from schema."""
+        print(model_cls)
+        print(schema_name)
         schema_cls = None
-        if hasattr(model_cls, "Schemas"):
-            for attr in dir(model_cls.Schemas):
-                if camel_to_snake(attr) == camel_to_snake(schema_name):
-                    schema_cls = getattr(model_cls.Schemas, attr)
-                    break
+        for attr in dir(model_cls.Schemas):
+            if camel_to_snake(attr) == camel_to_snake(schema_name):
+                schema_cls = getattr(model_cls.Schemas, attr)
+                break
         if schema_cls is None:
             raise AttributeError(f"Schema '{schema_name}' not found")
 
-        all_fields = cls._get_all_fields(model_cls)
+        all_fields = self._get_all_fields(model_cls)
         if inspect.isclass(schema_cls) and issubclass(schema_cls, BaseModel):
             return (
                 list(schema_cls.model_fields.keys())
                 if hasattr(schema_cls, "model_fields")
                 else list(schema_cls.__annotations__.keys())
             )
-        elif inspect.isclass(schema_cls) and issubclass(schema_cls, SchemaDefinition):
+        elif inspect.isclass(schema_cls) and issubclass(schema_cls, self._definition):
             if schema_cls.fields is not None:
                 fields = list(schema_cls.fields)
             elif schema_cls.fields_exclude is not None:
@@ -129,33 +147,21 @@ class AwesomeSchemas:
 
     def _get_schema_definition(self, name_lower: str) -> Optional[Type[BaseModel]]:
         """Get schema definition."""
-        if not hasattr(self.model_cls, "Schemas"):
-            return None
-        for attr in dir(self.model_cls.Schemas):
+        for attr in dir(self._home):
             if camel_to_snake(attr) == name_lower:
-                schema_attr = getattr(self.model_cls.Schemas, attr)
+                schema_attr = getattr(self._home, attr)
                 if inspect.isclass(schema_attr) and issubclass(schema_attr, BaseModel):
                     return schema_attr
         return None
 
     def _should_include_field(self, field: Any, permissions: Optional[List[str]] = None) -> bool:
         """Check if field should be included based on permissions."""
-        if not hasattr(field, "exclude_permissions") and not hasattr(field, "include_permissions"):
+        required_permissions = getattr(field, "required_permissions", None)
+        if required_permissions is None:
             return True
 
-        if permissions:
-            if (
-                hasattr(field, "exclude_permissions")
-                and field.exclude_permissions
-                and any(p in permissions for p in field.exclude_permissions)
-            ):
-                return False
-            if (
-                hasattr(field, "include_permissions")
-                and field.include_permissions
-                and all(p not in permissions for p in field.include_permissions)
-            ):
-                return False
+        if permissions and all(p not in permissions for p in required_permissions):
+            return False
         return True
 
     def _get_field_type(
@@ -259,25 +265,20 @@ class AwesomeSchemas:
                 continue
 
             if permissions:
-                if field_info.exclude_permissions and any(
-                    p in permissions for p in field_info.exclude_permissions
-                ):
-                    continue
-                if field_info.include_permissions and all(
-                    p not in permissions for p in field_info.include_permissions
+                if field_info.required_permissions and all(
+                    p not in permissions for p in field_info.required_permissions
                 ):
                     continue
 
             new_field_info = AwesomeFieldInfo(
                 annotation=t,
                 default=field_info.default,
-                exclude_permissions=field_info.exclude_permissions,
-                include_permissions=field_info.include_permissions,
+                required_permissions=field_info.required_permissions,
                 **{
                     k: v
                     for k, v in field_info.__dict__.items()
                     if k
-                    not in ["annotation", "default", "exclude_permissions", "include_permissions"]
+                    not in ["annotation", "default", "required_permissions"]
                 },
             )
             filtered_fields[f] = (t, new_field_info)
@@ -320,9 +321,9 @@ class AwesomeSchemas:
             return schema_model
 
         schema_cls = None
-        for attr in dir(self.model_cls.Schemas):
+        for attr in dir(self._home):
             if camel_to_snake(attr) == name_lower:
-                schema_cls = getattr(self.model_cls.Schemas, attr)
+                schema_cls = getattr(self._home, attr)
                 break
         if schema_cls is None:
             raise AttributeError(
@@ -330,12 +331,22 @@ class AwesomeSchemas:
             )
 
         if hasattr(schema_cls, "permissions") and schema_cls.permissions:
-            schema_cls.permissions = SchemaDefinition.format_permissions(
+            schema_cls.permissions = self._definition.format_permissions(
                 schema_cls.permissions, self.model_cls
             )
 
         fields = self._get_schema_fields(self.model_cls, name)
         relationships = getattr(schema_cls, "relationships", {})
+
+        if relationships is None:
+            relationships = {}
+
+        if (
+            not isinstance(relationships, dict)
+            and not isinstance(relationships, list)
+            and not isinstance(relationships, tuple)
+        ):
+            raise ValueError("Relationships must be a dictionary, list or tuple")
 
         schema_model = self._create_schema_model(fields, relationships, name)
         self._cache[name_lower] = schema_model
@@ -349,32 +360,29 @@ class AwesomeSchemas:
 
         name = self._current_schema
         fields = self._get_schema_fields(self.model_cls, name)
-        relationships = getattr(
-            getattr(self.model_cls.Schemas, name.capitalize()), "relationships", {}
-        )
+        relationships = getattr(getattr(self._home, name.capitalize()), "relationships", {})
 
-        formatted_permissions = SchemaDefinition.format_permissions(permissions, self.model_cls)
+        formatted_permissions = self._definition.format_permissions(permissions, self.model_cls)
         return self._create_schema_model(fields, relationships, name, formatted_permissions)
 
-    def get(self, name: str) -> Type[BaseModel]:
+    def get(self, name: str) -> Type[FieldsDefinitionBase]:
         """Get Pydantic model by name (alias for attribute access)."""
         return getattr(self, name)
 
     def list(self) -> list[str]:
         """Get a list of all available schemas (in snake_case)."""
         names = []
-        if hasattr(self.model_cls, "Schemas"):
-            for attr_name, attr_value in self.model_cls.Schemas.__dict__.items():
-                if attr_name.startswith("_"):
-                    continue
-                if inspect.isclass(attr_value) and (
-                    issubclass(attr_value, SchemaDefinition) or issubclass(attr_value, BaseModel)
-                ):
-                    names.append(camel_to_snake(attr_name))
+        for attr_name, attr_value in self._home.__dict__.items():
+            if attr_name.startswith("_"):
+                continue
+            if inspect.isclass(attr_value) and (
+                issubclass(attr_value, self._definition) or issubclass(attr_value, BaseModel)
+            ):
+                names.append(camel_to_snake(attr_name))
         return names
 
     def __repr__(self):
         cls_name = self.__class__.__name__
-        model_name = getattr(self.model_cls, '__name__', str(self.model_cls))
+        model_name = getattr(self.model_cls, "__name__", str(self.model_cls))
         schemas = self.list()
         return f"<{cls_name} for {model_name}, schemas={schemas}>"
