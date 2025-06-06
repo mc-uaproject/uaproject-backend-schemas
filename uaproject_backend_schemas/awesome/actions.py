@@ -39,6 +39,26 @@ class AwesomeActions(Generic[TModel]):
         """Return a list of names of all registered actions."""
         return list(self._actions.keys())
 
+    def get_actions_info(self) -> Dict[str, Dict[str, Any]]:
+        """Return detailed information about all registered actions."""
+        return self._actions_meta.copy()
+
+    def has_action(self, name: str) -> bool:
+        """Check if action exists."""
+        return name in self._actions
+
+    def __len__(self) -> int:
+        """Return number of registered actions."""
+        return len(self._actions)
+
+    def __contains__(self, name: str) -> bool:
+        """Check if action exists (supports 'in' operator)."""
+        return name in self._actions
+
+    def __repr__(self) -> str:
+        """String representation of actions manager."""
+        return f"<AwesomeActions for {self.model_cls.__name__}: {len(self._actions)} actions>"
+
     async def run(self, instance: TModel):
         """Asynchronously execute all registered actions for the given model instance."""
         tasks = []

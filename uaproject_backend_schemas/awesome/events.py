@@ -28,6 +28,35 @@ class AwesomeEvents(Generic[TModel]):
             self._listeners[event] = []
         self._listeners[event].append(handler)
 
+    def list_events(self) -> List[str]:
+        """Return a list of all registered event names."""
+        return list(self._listeners.keys())
+
+    def get_event_handlers(self, event: str) -> List[Callable]:
+        """Get all handlers for a specific event."""
+        return self._listeners.get(event, [])
+
+    def has_event(self, event: str) -> bool:
+        """Check if event has any handlers."""
+        return event in self._listeners and len(self._listeners[event]) > 0
+
+    def get_events_info(self) -> Dict[str, int]:
+        """Return information about all events and their handler counts."""
+        return {event: len(handlers) for event, handlers in self._listeners.items()}
+
+    def __len__(self) -> int:
+        """Return total number of event handlers across all events."""
+        return sum(len(handlers) for handlers in self._listeners.values())
+
+    def __contains__(self, event: str) -> bool:
+        """Check if event exists (supports 'in' operator)."""
+        return event in self._listeners
+
+    def __repr__(self) -> str:
+        """String representation of events manager."""
+        total_handlers = len(self)
+        return f"<AwesomeEvents for {self.model_cls.__name__}: {len(self._listeners)} events, {total_handlers} handlers>"
+
     async def trigger(self, event: str, instance: TModel):
         """Trigger (asynchronously) the specified event for the given model instance.
         Sequentially runs all Actions subscribed to the event, and then other handlers."""

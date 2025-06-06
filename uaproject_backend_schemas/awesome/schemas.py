@@ -62,34 +62,61 @@ class AwesomeSchemas:
         else:
             raise AttributeError(f"Model {self.model_cls.__name__} has no attribute {home}")
 
-        if self._home != "Schemas":
+        # Check if model has custom schema definitions
+        # If it has custom schemas, don't add default ones
+        has_custom_schemas = any(
+            hasattr(self._home, attr) and 
+            inspect.isclass(getattr(self._home, attr)) and 
+            (issubclass(getattr(self._home, attr), self._definition) or 
+             issubclass(getattr(self._home, attr), BaseModel))
+            for attr in dir(self._home) 
+            if not attr.startswith('_') and attr not in ['get', 'list', 'with_permissions']
+        )
+        
+        if has_custom_schemas:
             return
 
-        print(self._definition)
-        if not hasattr(self._home, "Create"):
+        # Add default schemas if none exist
+        try:
+            if not hasattr(self._home, "Create"):
+                class Create(SchemaDefinition):
+                    fields_exclude = ["id"]
+                    optional = True
+                    permissions = ["{model_cls.__scope_prefix__}.write"]
 
-            class Create(SchemaDefinition):
-                fields_exclude = ["id"]
-                optional = True
-                permissions = ["{model_cls.__scope_prefix__}.write"]
+                setattr(self._home, "Create", Create)
 
-            setattr(self.model_cls.Schemas, "Create", Create)
+            if not hasattr(self._home, "Update"):
+                class Update(SchemaDefinition):
+                    fields_exclude = ["id"]
+                    optional = True
+                    permissions = ["{model_cls.__scope_prefix__}.write"]
 
-        if not hasattr(self._home, "Update"):
+                setattr(self._home, "Update", Update)
 
-            class Update(SchemaDefinition):
-                fields_exclude = ["id"]
-                optional = True
-                permissions = ["{model_cls.__scope_prefix__}.write"]
+            if not hasattr(self._home, "Response"):
+                class Response(SchemaDefinition):
+                    permissions = ["{model_cls.__scope_prefix__}.read"]
 
-            setattr(self.model_cls.Schemas, "Update", Update)
+                setattr(self._home, "Response", Response)
+        except Exception as e:
+            # Fallback to basic schemas without permissions if there's an error
+            if not hasattr(self._home, "Create"):
+                class Create(SchemaDefinition):
+                    fields_exclude = ["id"]
+                    optional = True
+                setattr(self._home, "Create", Create)
 
-        if not hasattr(self._home, "Response"):
+            if not hasattr(self._home, "Update"):
+                class Update(SchemaDefinition):
+                    fields_exclude = ["id"]
+                    optional = True
+                setattr(self._home, "Update", Update)
 
-            class Response(SchemaDefinition):
-                permissions = ["{model_cls.__scope_prefix__}.read"]
-
-            setattr(self._home, "Response", Response)
+            if not hasattr(self._home, "Response"):
+                class Response(SchemaDefinition):
+                    pass
+                setattr(self._home, "Response", Response)
 
     def __iter__(self) -> Iterator[str]:
         return iter(self.model_cls.schemas.list())
@@ -112,8 +139,6 @@ class AwesomeSchemas:
 
     def _get_schema_fields(self, model_cls: Type[TModel], schema_name: str) -> List[str]:
         """Get fields from schema."""
-        print(model_cls)
-        print(schema_name)
         schema_cls = None
         for attr in dir(model_cls.Schemas):
             if camel_to_snake(attr) == camel_to_snake(schema_name):

@@ -85,6 +85,12 @@ class AwesomeModel(SQLModel):
             sorts_cls = getattr(cls, "Sorts", None)
             if sorts_cls:
                 cls.__sorts__ = sorts_cls(cls)
+            else:
+                # Auto-generate Sorts class if none exists
+                from uaproject_backend_schemas.awesome.sorts import AwesomeSorts
+                sorts_cls = type(f"{cls.__name__}Sorts", (AwesomeSorts,), {"model_cls": cls})
+                setattr(cls, "Sorts", sorts_cls)
+                cls.__sorts__ = sorts_cls(cls)
         return getattr(cls, "__sorts__", None)
 
     @classproperty
@@ -100,9 +106,13 @@ class AwesomeModel(SQLModel):
     @classproperty
     def sort(cls) -> type[Enum] | None:
         """Returns an Enum-class for sorting this model."""
-        if hasattr(cls, "Sorts"):
-            return cls.Sorts.get_enum_sort_class()
-        return None
+        sorts_cls = getattr(cls, "Sorts", None)
+        if sorts_cls is None:
+            # Auto-generate Sorts class if none exists
+            from uaproject_backend_schemas.awesome.sorts import AwesomeSorts
+            sorts_cls = type(f"{cls.__name__}Sorts", (AwesomeSorts,), {"model_cls": cls})
+            setattr(cls, "Sorts", sorts_cls)
+        return sorts_cls.get_enum_sort_class()
 
     def __init_subclass__(cls, **kwargs):
         """Initialize Scopes, Schemas, Actions, Events subsystems when creating a subclass."""
