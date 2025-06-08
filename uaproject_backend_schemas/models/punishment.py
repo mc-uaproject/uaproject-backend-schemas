@@ -53,8 +53,6 @@ class Punishment(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     )
     config: Optional["PunishmentConfig"] = Relationship(back_populates="punishments")
 
-    user: "User" = Relationship(back_populates="punishments")
-
     class Scopes(AwesomeModel.Scopes):
         class Created(ScopeDefinition):
             trigger_fields = ["created_at"]
