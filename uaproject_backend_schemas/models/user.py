@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import re
 from typing import TYPE_CHECKING, Dict, List, Optional
 
@@ -40,7 +38,8 @@ class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     roles: List["Role"] = Relationship(
         back_populates="users",
         sa_relationship_kwargs={
-            "secondary": "user_roles"
+            "secondary": "user_roles",
+            "lazy": "select"
         },
     )
     token: Optional["Token"] = Relationship(

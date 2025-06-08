@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import TYPE_CHECKING, Dict, List, Optional
 
 from sqlmodel import JSON, Column, Relationship
@@ -24,6 +22,7 @@ class Role(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     users: List["User"] = Relationship(
         back_populates="roles",
         sa_relationship_kwargs={
-            "secondary": "user_roles"
+            "secondary": "user_roles",
+            "lazy": "select"
         },
     )
