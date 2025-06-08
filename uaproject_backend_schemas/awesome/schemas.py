@@ -65,57 +65,68 @@ class AwesomeSchemas:
         # Check if model has custom schema definitions
         # If it has custom schemas, don't add default ones
         has_custom_schemas = any(
-            hasattr(self._home, attr) and 
-            inspect.isclass(getattr(self._home, attr)) and 
-            (issubclass(getattr(self._home, attr), self._definition) or 
-             issubclass(getattr(self._home, attr), BaseModel))
-            for attr in dir(self._home) 
-            if not attr.startswith('_') and attr not in ['get', 'list', 'with_permissions']
+            hasattr(self._home, attr)
+            and inspect.isclass(getattr(self._home, attr))
+            and (
+                issubclass(getattr(self._home, attr), self._definition)
+                or issubclass(getattr(self._home, attr), BaseModel)
+            )
+            for attr in dir(self._home)
+            if not attr.startswith("_") and attr not in ["get", "list", "with_permissions"]
         )
-        
+
         if has_custom_schemas:
             return
 
         # Add default schemas if none exist
         try:
             if not hasattr(self._home, "Create"):
+
                 class Create(SchemaDefinition):
-                    fields_exclude = ["id"]
+                    fields_exclude = ["id", "created_at", "updated_at"]
                     optional = True
                     permissions = ["{model_cls.__scope_prefix__}.write"]
 
                 setattr(self._home, "Create", Create)
 
             if not hasattr(self._home, "Update"):
+
                 class Update(SchemaDefinition):
-                    fields_exclude = ["id"]
+                    fields_exclude = ["id", "created_at", "updated_at"]
                     optional = True
                     permissions = ["{model_cls.__scope_prefix__}.write"]
 
                 setattr(self._home, "Update", Update)
 
             if not hasattr(self._home, "Response"):
+
                 class Response(SchemaDefinition):
                     permissions = ["{model_cls.__scope_prefix__}.read"]
 
                 setattr(self._home, "Response", Response)
-        except Exception as e:
+        except Exception:
             # Fallback to basic schemas without permissions if there's an error
             if not hasattr(self._home, "Create"):
+
                 class Create(SchemaDefinition):
-                    fields_exclude = ["id"]
+                    fields_exclude = ["id", "created_at", "updated_at"]
                     optional = True
+
                 setattr(self._home, "Create", Create)
 
             if not hasattr(self._home, "Update"):
+
                 class Update(SchemaDefinition):
-                    fields_exclude = ["id"]
+                    fields_exclude = ["id", "created_at", "updated_at"]
                     optional = True
+
                 setattr(self._home, "Update", Update)
 
             if not hasattr(self._home, "Response"):
+
                 class Response(SchemaDefinition):
                     pass
+
                 setattr(self._home, "Response", Response)
 
     def __iter__(self) -> Iterator[str]:
@@ -302,8 +313,7 @@ class AwesomeSchemas:
                 **{
                     k: v
                     for k, v in field_info.__dict__.items()
-                    if k
-                    not in ["annotation", "default", "required_permissions"]
+                    if k not in ["annotation", "default", "required_permissions"]
                 },
             )
             filtered_fields[f] = (t, new_field_info)
