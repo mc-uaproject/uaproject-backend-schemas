@@ -90,8 +90,13 @@ class AwesomeFilters:
                 continue
             typ = getattr(field, "type_", field.annotation)
             typ = cls.ensure_single_optional(typ)
-            fields[name] = (typ, None)
+            
+            # Skip complex types that can't be used as query parameters
             base_type = cls._unwrap_optional(typ)
+            if cls._is_complex_type(base_type):
+                continue
+                
+            fields[name] = (typ, None)
             if not isinstance(base_type, type):
                 base_type = getattr(field, "type_", Any)
             if base_type in (int, float, datetime, date):
@@ -118,6 +123,22 @@ class AwesomeFilters:
         return typ
 
     @classmethod
+    def _is_complex_type(cls, typ):
+        """Check if type is too complex for query parameters (List, Dict, Any, etc.)"""
+        if typ is Any:
+            return True
+        
+        origin = get_origin(typ)
+        if origin in (list, List, dict, tuple, set):
+            return True
+            
+        # Check for complex generic types
+        if hasattr(typ, "__origin__"):
+            return True
+            
+        return False
+
+    @classmethod
     def _build_fields_from_relations(cls, model_cls, exclude, fields):
         for name, attr in model_cls.__dict__.items():
             try:
@@ -127,7 +148,11 @@ class AwesomeFilters:
                         if rel_field in ("name", "id"):
                             rel_filter_name = f"{name}_{rel_field}"
                             if rel_filter_name not in exclude:
-                                fields[rel_filter_name] = (Optional[Any], None)
+                                # Use appropriate simple type instead of Any
+                                if rel_field == "id":
+                                    fields[rel_filter_name] = (Optional[int], None)
+                                elif rel_field == "name":
+                                    fields[rel_filter_name] = (Optional[str], None)
             except Exception:
                 continue
         return fields
@@ -137,7 +162,10 @@ class AwesomeFilters:
         for filter_name in cls.list():
             filter_cls: Type[FilterDefinition] = getattr(cls, filter_name)
             if filter_cls.field and filter_cls.field not in exclude:
-                typ: Any = getattr(filter_cls, "type", None) or Optional[Any]
+                typ: Any = getattr(filter_cls, "type", None)
+                if typ is None or cls._is_complex_type(cls._unwrap_optional(typ)):
+                    # Skip custom filters with complex or Any types
+                    continue
                 fields[filter_cls.field] = (typ, None)
         return fields
 
