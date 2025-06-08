@@ -1,3 +1,4 @@
+from enum import StrEnum
 from typing import List, Optional
 
 from sqlmodel import BigInteger, Column, Enum, ForeignKey, Relationship, Table
@@ -9,7 +10,7 @@ from uaproject_backend_schemas.models.judging import Judging
 from uaproject_backend_schemas.models.user import User
 
 
-class ClaimStatus(str, Enum):
+class ClaimStatus(StrEnum):
     OPEN = "open"
     CLOSED = "closed"
     REJECTED = "rejected"
