@@ -36,7 +36,10 @@ class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     access: Optional[bool] = AwesomeField(default=False, nullable=True)
 
     roles: List["Role"] = Relationship(
-        back_populates="users", sa_relationship_kwargs={"secondary": "user_roles"}
+        back_populates="users",
+        sa_relationship_kwargs={
+            "secondary": "user_roles"
+        },
     )
     token: Optional["Token"] = Relationship(
         back_populates="user",

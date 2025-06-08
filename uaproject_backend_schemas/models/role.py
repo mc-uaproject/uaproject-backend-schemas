@@ -15,15 +15,13 @@ class Role(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __scope_prefix__ = "role"
 
     name: str = AwesomeField(max_length=100)
-    description: Optional[str] = AwesomeField(default=None)
+    display_name: Optional[str] = AwesomeField(default=None)
     permissions: List[Dict[str, bool]] = AwesomeField(default=[], sa_column=Column(JSON))
     weight: int = AwesomeField(default=0)
 
     users: List["User"] = Relationship(
         back_populates="roles",
         sa_relationship_kwargs={
-            "secondary": lambda: __import__(
-                "uaproject_backend_schemas.models.user_roles"
-            ).models.user_roles.UserRoles.__table__
+            "secondary": "user_roles"
         },
     )

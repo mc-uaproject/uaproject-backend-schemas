@@ -57,52 +57,55 @@ class AwesomeSorts:
         Generates an Enum-class for sorting based on declarative SortDefinition.
         """
         members: Dict[str, Any] = {}
-        
+
         # Add custom sort definitions
         for sort_name in cls.list():
             sort_cls: Type[SortDefinition] = getattr(cls, sort_name)
             members[sort_name.upper()] = sort_cls.field
-        
+
         # If no custom sorts defined, add default sorts for common fields
-        if not members and hasattr(cls, 'model_cls'):
+        if not members and hasattr(cls, "model_cls"):
             model_fields = []
             computed_fields = []
-            
+
             # Get regular model fields
             if hasattr(cls.model_cls, "model_fields"):
                 model_fields = list(cls.model_cls.model_fields.keys())
             elif hasattr(cls.model_cls, "__annotations__"):
                 model_fields = list(cls.model_cls.__annotations__.keys())
-            
+
             # Get computed fields (like created_at) from Pydantic model_computed_fields
-            if hasattr(cls.model_cls, 'model_computed_fields'):
+            if hasattr(cls.model_cls, "model_computed_fields"):
                 computed_fields = list(cls.model_cls.model_computed_fields.keys())
-            
+
             # Also check for properties with ComputedFieldInfo (for Pydantic computed fields)
             for attr_name in dir(cls.model_cls):
-                if not attr_name.startswith('_') and attr_name not in computed_fields:
+                if not attr_name.startswith("_") and attr_name not in computed_fields:
                     try:
                         attr = getattr(cls.model_cls, attr_name)
                         if isinstance(attr, property):
                             # Check if it's a Pydantic computed field
-                            fget = getattr(attr, 'fget', None)
-                            if fget and hasattr(fget, 'decorator_info'):
+                            fget = getattr(attr, "fget", None)
+                            if fget and hasattr(fget, "decorator_info"):
                                 from pydantic.fields import ComputedFieldInfo
-                                if isinstance(getattr(fget, 'decorator_info', None), ComputedFieldInfo):
+
+                                if isinstance(
+                                    getattr(fget, "decorator_info", None), ComputedFieldInfo
+                                ):
                                     computed_fields.append(attr_name)
                     except (AttributeError, RecursionError, ImportError):
                         # Skip attributes that cause issues
                         continue
-            
+
             # Combine all available fields
             all_fields = model_fields + computed_fields
-            
+
             # Add common sortable fields with separate ASC/DESC options
-            common_sortable_fields = ['id', 'created_at', 'updated_at', 'name', 'title']
+            common_sortable_fields = ["id", "created_at", "updated_at", "name", "title"]
             for field in common_sortable_fields:
                 if field in all_fields:
                     members[f"{field.upper()}_ASC"] = field
                     members[f"{field.upper()}_DESC"] = f"-{field}"
-        
+
         enum_cls: Type[Enum] = Enum(f"{cls.__name__}AutoSort", members)
         return enum_cls
