@@ -1,3 +1,4 @@
+from enum import StrEnum
 from typing import TYPE_CHECKING, List, Optional
 
 from sqlmodel import BigInteger, Column, Enum, ForeignKey, Relationship
@@ -11,7 +12,7 @@ if TYPE_CHECKING:
     from uaproject_backend_schemas.models.claim import Claim
 
 
-class JudgingVerdict(str, Enum):
+class JudgingVerdict(StrEnum):
     APPROVED = "approved"
     REJECTED = "rejected"
     PARTIALLY_APPROVED = "partially_approved"
