@@ -90,12 +90,12 @@ class AwesomeFilters:
                 continue
             typ = getattr(field, "type_", field.annotation)
             typ = cls.ensure_single_optional(typ)
-            
+
             # Skip complex types that can't be used as query parameters
             base_type = cls._unwrap_optional(typ)
             if cls._is_complex_type(base_type):
                 continue
-                
+
             fields[name] = (typ, None)
             if not isinstance(base_type, type):
                 base_type = getattr(field, "type_", Any)
@@ -127,15 +127,15 @@ class AwesomeFilters:
         """Check if type is too complex for query parameters (List, Dict, Any, etc.)"""
         if typ is Any:
             return True
-        
+
         origin = get_origin(typ)
         if origin in (list, List, dict, tuple, set):
             return True
-            
+
         # Check for complex generic types
         if hasattr(typ, "__origin__"):
             return True
-            
+
         return False
 
     @classmethod
