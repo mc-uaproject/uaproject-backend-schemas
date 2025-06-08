@@ -50,11 +50,11 @@ class Claim(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     )
 
     claimants: List[User] = Relationship(
-        sa_relationship=claim_claimant_link,
         back_populates="claims_as_claimant",
+        sa_relationship_kwargs={"secondary": claim_claimant_link},
     )
     defendants: List[User] = Relationship(
-        sa_relationship=claim_defendant_link,
         back_populates="claims_as_defendant",
+        sa_relationship_kwargs={"secondary": claim_defendant_link},
     )
     judging: Optional[Judging] = Relationship(back_populates="claims")
