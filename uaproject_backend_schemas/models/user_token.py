@@ -1,7 +1,8 @@
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
-from sqlmodel import Column, ForeignKey, Integer, Relationship
+from sqlalchemy import BigInteger
+from sqlmodel import Column, ForeignKey, Relationship
 
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
@@ -24,7 +25,7 @@ class Token(AwesomeModel, TimestampsMixin, IDMixin, table=True):
         unique=True,
     )
 
-    user_id: int = AwesomeField(sa_column=Column(Integer, ForeignKey("users.id")))
+    user_id: int = AwesomeField(sa_column=Column(BigInteger, ForeignKey("users.id")))
     user: "User" = Relationship(back_populates="token")
 
     class Scopes(AwesomeModel.Scopes):
