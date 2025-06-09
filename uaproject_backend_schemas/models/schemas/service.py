@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Optional
 
-from pydantic import BaseModel
+from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 
 
 class ServiceCategory(StrEnum):
@@ -15,12 +15,12 @@ class ServiceType(StrEnum):
     SUBSCRIPTION = "subscription"
 
 
-class ServicePoint(BaseModel):
+class ServicePoint(AwesomeBaseModel):
     text: str
     tooltip: Optional[str] = None
 
 
-class ServiceDiscount(BaseModel):
+class ServiceDiscount(AwesomeBaseModel):
     user_id: Optional[int] = None
     discount_percent: float
     start_date: datetime

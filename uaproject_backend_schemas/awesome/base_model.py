@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import TYPE_CHECKING, ClassVar, Dict, List, Optional, Type
 
 from pydantic import BaseModel
@@ -35,3 +36,6 @@ class AwesomeBaseModel(BaseModel):
     def __call__(cls, *args, **kwargs) -> Type["AwesomeBaseModel"]:
         """Create a new model instance."""
         return cls._create_model(cls, cls._permissions, **kwargs)
+
+    class Config:
+        json_encoders = {datetime: lambda dt: dt.isoformat()}
