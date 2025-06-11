@@ -1,5 +1,5 @@
 from enum import StrEnum
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -28,6 +28,6 @@ class WebhookScopeConfig(BaseModel):
     trigger_fields: List[WebhookTriggerFields] = Field(
         default_factory=list, description="Field configurations for different models"
     )
-    filters: Optional[Dict[str, any]] = Field(
+    filters: Optional[Dict[str, Any]] = Field(
         default=None, description="Additional filters for this scope"
     )
