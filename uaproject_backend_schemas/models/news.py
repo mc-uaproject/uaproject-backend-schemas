@@ -1,5 +1,4 @@
 from datetime import datetime
-from enum import StrEnum
 from typing import List, Optional
 
 from sqlmodel import (
@@ -17,32 +16,8 @@ from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.schemas import SchemaDefinition
+from uaproject_backend_schemas.models.schemas.news import ImportanceType, NewsType
 from uaproject_backend_schemas.models.user import User
-
-
-class NewsType(StrEnum):
-    UPDATE = "update"
-    CRITICAL = "critical"
-    WARNING = "warning"
-    INFO = "info"
-    OTHER = "other"
-    PERSONAL = "personal"
-    CONGRATULATION = "congratulation"
-    TECHNICAL = "technical"
-    ANNOUNCEMENT = "announcement"
-    EVENT = "event"
-    QUEST = "quest"
-    RECRUITMENT = "recruitment"
-    HOLIDAY = "holiday"
-
-
-class ImportanceType(StrEnum):
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
-    CRITICAL = "critical"
-    URGENT = "urgent"
-    EMERGENCY = "emergency"
 
 
 class NewsImage(AwesomeModel, IDMixin, table=True):
@@ -72,21 +47,16 @@ class News(AwesomeModel, IDMixin, TimestampsMixin, table=True):
         sa_column=Column(BigInteger, ForeignKey("users.id"), nullable=False)
     )
 
-    # Social media integration
     discord_message_id: Optional[str] = AwesomeField(max_length=255, nullable=True)
     telegram_message_id: Optional[str] = AwesomeField(max_length=255, nullable=True)
 
-    # Content organization
     tags: List[str] = AwesomeField(sa_column=Column(JSON, nullable=False, default=list))
 
-    # Event-specific fields
     event_time: Optional[datetime] = AwesomeField(sa_column=Column(DateTime, nullable=True))
 
-    # Content management
     is_pinned: bool = AwesomeField(default=False, nullable=False)
     is_archived: bool = AwesomeField(default=False, nullable=False)
 
-    # Classification
     type: NewsType = AwesomeField(
         sa_column=Column(
             Enum(NewsType, native_enum=False),
@@ -102,7 +72,6 @@ class News(AwesomeModel, IDMixin, TimestampsMixin, table=True):
         )
     )
 
-    # Relationships
     author: Optional[User] = Relationship(back_populates="news")
     images: List[NewsImage] = Relationship(back_populates="news")
 
