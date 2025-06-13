@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from uaproject_backend_schemas.models.application import Application
     from uaproject_backend_schemas.models.balance import Balance
     from uaproject_backend_schemas.models.claim import Claim
+    from uaproject_backend_schemas.models.news import News
     from uaproject_backend_schemas.models.punishment import Punishment
     from uaproject_backend_schemas.models.role import Role
     from uaproject_backend_schemas.models.transaction import Transaction
@@ -73,6 +74,9 @@ class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     )
     claims_as_defendant: List["Claim"] = Relationship(
         back_populates="defendants", sa_relationship_kwargs={"secondary": "claim_defendant_link"}
+    )
+    news: List["News"] = Relationship(
+        back_populates="author", sa_relationship_kwargs={"foreign_keys": "[News.author_id]"}
     )
 
     class Scopes(AwesomeModel.Scopes):

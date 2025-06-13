@@ -62,7 +62,7 @@ class Claim(AwesomeModel, IDMixin, TimestampsMixin, table=True):
 
     class Schemas:
         class Create(SchemaDefinition):
-            fields = ["title", "description"]
+            fields = ["title", "description", "claimants", "defendants"]
             fields_exclude = ["id", "status", "judging_id", "created_at", "updated_at"]
 
         class Response(SchemaDefinition):
