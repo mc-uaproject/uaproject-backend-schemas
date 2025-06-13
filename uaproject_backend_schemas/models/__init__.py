@@ -1,8 +1,10 @@
 # Import all models
+
 from .application import Application
 from .balance import Balance
 from .claim import Claim
 from .judging import Judging
+from .news import News
 from .punishment import Punishment
 from .punishment_config import PunishmentConfig
 from .role import Role
@@ -18,6 +20,7 @@ Application.model_rebuild()
 Balance.model_rebuild()
 Claim.model_rebuild()
 Judging.model_rebuild()
+News.model_rebuild()
 Punishment.model_rebuild()
 PunishmentConfig.model_rebuild()
 Role.model_rebuild()
@@ -33,6 +36,7 @@ __all__ = [
     "Balance",
     "Claim",
     "Judging",
+    "News",
     "Punishment",
     "PunishmentConfig",
     "Role",
