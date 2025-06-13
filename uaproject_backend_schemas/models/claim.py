@@ -38,7 +38,7 @@ class Claim(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     model_config = {"arbitrary_types_allowed": True}
 
     title: str = AwesomeField(max_length=255, nullable=False)
-    description: Optional[str] = AwesomeField(max_length=2000, nullable=True)
+    description: str = AwesomeField(max_length=2000, nullable=True)
     status: ClaimStatus = AwesomeField(
         sa_column=Column(
             Enum(ClaimStatus, native_enum=False),
@@ -66,7 +66,7 @@ class Claim(AwesomeModel, IDMixin, TimestampsMixin, table=True):
             fields_exclude = ["id", "status", "judging_id", "created_at", "updated_at"]
 
         class Response(SchemaDefinition):
-            pass
+            relationships = ["claimants", "defendants", "judging"]
 
         class Update(SchemaDefinition):
             fields = ["title", "description", "status"]

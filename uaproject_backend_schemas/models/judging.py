@@ -41,7 +41,7 @@ class Judging(AwesomeModel, IDMixin, TimestampsMixin, table=True):
             fields_exclude = ["id", "judge_id", "created_at", "updated_at"]
 
         class Response(SchemaDefinition):
-            pass
+            relationships = ["judge", "claims"]
 
         class Update(SchemaDefinition):
             fields = ["decision", "verdict"]
