@@ -15,7 +15,6 @@ from sqlmodel import (
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
-from uaproject_backend_schemas.awesome.schemas import SchemaDefinition
 from uaproject_backend_schemas.models.schemas.news import ImportanceType, NewsType
 from uaproject_backend_schemas.models.user import User
 
@@ -74,82 +73,3 @@ class News(AwesomeModel, IDMixin, TimestampsMixin, table=True):
 
     author: Optional[User] = Relationship(back_populates="news")
     images: List[NewsImage] = Relationship(back_populates="news")
-
-    class Schemas:
-        class Create(SchemaDefinition):
-            fields = ["title", "summary", "content", "type", "importance", "tags", "event_time"]
-            fields_exclude = [
-                "id",
-                "author_id",
-                "is_published",
-                "discord_message_id",
-                "telegram_message_id",
-                "is_pinned",
-                "is_archived",
-                "created_at",
-                "updated_at",
-            ]
-
-        class Update(SchemaDefinition):
-            fields = [
-                "title",
-                "summary",
-                "content",
-                "type",
-                "importance",
-                "tags",
-                "event_time",
-                "is_published",
-                "is_pinned",
-                "is_archived",
-            ]
-            optional = True
-
-        class Response(SchemaDefinition):
-            relationships = ["author", "images"]
-
-        class Public(SchemaDefinition):
-            fields = [
-                "id",
-                "title",
-                "summary",
-                "content",
-                "type",
-                "importance",
-                "tags",
-                "event_time",
-                "created_at",
-                "updated_at",
-            ]
-            relationships = ["author", "images"]
-            fields_exclude = [
-                "is_published",
-                "discord_message_id",
-                "telegram_message_id",
-                "is_pinned",
-                "is_archived",
-                "author_id",
-            ]
-
-        class List(SchemaDefinition):
-            fields = [
-                "id",
-                "title",
-                "summary",
-                "type",
-                "importance",
-                "is_pinned",
-                "created_at",
-                "updated_at",
-            ]
-            relationships = ["author"]
-            fields_exclude = [
-                "content",
-                "discord_message_id",
-                "telegram_message_id",
-                "is_published",
-                "is_archived",
-                "author_id",
-                "tags",
-                "event_time",
-            ]
