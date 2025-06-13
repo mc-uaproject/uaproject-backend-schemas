@@ -37,8 +37,8 @@ class Judging(AwesomeModel, IDMixin, TimestampsMixin, table=True):
 
     class Schemas:
         class Create(SchemaDefinition):
-            fields = ["decision", "verdict"]
-            fields_exclude = ["id", "judge_id", "created_at", "updated_at"]
+            fields = ["decision", "verdict", "judge_id"]
+            fields_exclude = ["id", "created_at", "updated_at"]
 
         class Response(SchemaDefinition):
             relationships = ["judge", "claims"]
