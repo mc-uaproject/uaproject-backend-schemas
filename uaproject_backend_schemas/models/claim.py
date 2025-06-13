@@ -6,6 +6,7 @@ from sqlmodel import BigInteger, Column, Enum, ForeignKey, Relationship, Table
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
+from uaproject_backend_schemas.awesome.schemas import SchemaDefinition
 from uaproject_backend_schemas.models.judging import Judging
 from uaproject_backend_schemas.models.user import User
 
@@ -58,3 +59,15 @@ class Claim(AwesomeModel, IDMixin, TimestampsMixin, table=True):
         sa_relationship_kwargs={"secondary": claim_defendant_link},
     )
     judging: Optional[Judging] = Relationship(back_populates="claims")
+
+    class Schemas:
+        class Create(SchemaDefinition):
+            fields = ["title", "description"]
+            fields_exclude = ["id", "status", "judging_id", "created_at", "updated_at"]
+
+        class Response(SchemaDefinition):
+            pass
+
+        class Update(SchemaDefinition):
+            fields = ["title", "description", "status"]
+            optional = True
