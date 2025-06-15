@@ -7,6 +7,7 @@ from sqlmodel import BigInteger, Column, Relationship
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
+from uaproject_backend_schemas.awesome.schemas import SchemaDefinition
 from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
 from uaproject_backend_schemas.models.user_token import Token
 
@@ -17,6 +18,7 @@ if TYPE_CHECKING:
     from uaproject_backend_schemas.models.news import News
     from uaproject_backend_schemas.models.punishment import Punishment
     from uaproject_backend_schemas.models.role import Role
+    from uaproject_backend_schemas.models.ticket import Ticket
     from uaproject_backend_schemas.models.transaction import Transaction
     from uaproject_backend_schemas.models.webhook import Webhook
 
@@ -32,16 +34,17 @@ class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     minecraft_nickname: Optional[str] = AwesomeField(
         default=None, index=True, nullable=True, max_length=16
     )
-    is_superuser: Optional[bool] = AwesomeField(default=False, nullable=True)
+    is_superuser: Optional[bool] = AwesomeField(
+        default=False, nullable=True, required_permissions=[".admin"]
+    )
     biography: Optional[str] = AwesomeField(default=None, nullable=True, max_length=2048)
-    access: Optional[bool] = AwesomeField(default=False, nullable=True)
+    access: Optional[bool] = AwesomeField(
+        default=False, nullable=True, required_permissions=[".admin"]
+    )
 
     roles: List["Role"] = Relationship(
         back_populates="users",
-        sa_relationship_kwargs={
-            "secondary": "user_roles",
-            "lazy": "select"
-        },
+        sa_relationship_kwargs={"secondary": "user_roles", "lazy": "selectin"},
     )
     token: Optional["Token"] = Relationship(
         back_populates="user",
@@ -51,7 +54,7 @@ class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
         },
     )
     punishments: List["Punishment"] = Relationship(
-        back_populates="user", sa_relationship_kwargs={"foreign_keys": "[Punishment.user_id]"}
+        back_populates="user", sa_relationship_kwargs={"foreign_keys": "[Punishment.user_id]", "lazy": "subquery"}
     )
     balance: Optional["Balance"] = Relationship(
         back_populates="user", sa_relationship_kwargs={"uselist": False, "lazy": "joined"}
@@ -60,24 +63,53 @@ class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
         back_populates="user", sa_relationship_kwargs={"uselist": False, "lazy": "joined"}
     )
     transactions: List["Transaction"] = Relationship(
-        back_populates="user", sa_relationship_kwargs={"foreign_keys": "[Transaction.user_id]"}
+        back_populates="user", sa_relationship_kwargs={"foreign_keys": "[Transaction.user_id]", "lazy": "subquery"}
     )
     received_transactions: List["Transaction"] = Relationship(
         back_populates="recipient",
-        sa_relationship_kwargs={"foreign_keys": "[Transaction.recipient_id]"},
+        sa_relationship_kwargs={"foreign_keys": "[Transaction.recipient_id]", "lazy": "subquery"},
     )
     webhooks: List["Webhook"] = Relationship(
-        back_populates="user", sa_relationship_kwargs={"foreign_keys": "[Webhook.user_id]"}
+        back_populates="user", sa_relationship_kwargs={"foreign_keys": "[Webhook.user_id]", "lazy": "selectin"}
     )
     claims_as_claimant: List["Claim"] = Relationship(
-        back_populates="claimants", sa_relationship_kwargs={"secondary": "claim_claimant_link"}
+        back_populates="claimants", sa_relationship_kwargs={"secondary": "claim_claimant_link", "lazy": "selectin"}
     )
     claims_as_defendant: List["Claim"] = Relationship(
-        back_populates="defendants", sa_relationship_kwargs={"secondary": "claim_defendant_link"}
+        back_populates="defendants", sa_relationship_kwargs={"secondary": "claim_defendant_link", "lazy": "selectin"}
     )
     news: List["News"] = Relationship(
-        back_populates="author", sa_relationship_kwargs={"foreign_keys": "[News.author_id]"}
+        back_populates="author", sa_relationship_kwargs={"foreign_keys": "[News.author_id]", "lazy": "selectin"}
     )
+    authored_tickets: List["Ticket"] = Relationship(
+        back_populates="author", sa_relationship_kwargs={"foreign_keys": "[Ticket.author_id]", "lazy": "selectin"}
+    )
+    assigned_tickets: List["Ticket"] = Relationship(
+        back_populates="assigned_to",
+        sa_relationship_kwargs={"foreign_keys": "[Ticket.assigned_to_id]", "lazy": "selectin"},
+    )
+
+    class Schemas(AwesomeModel.Schemas):
+        class Create(SchemaDefinition):
+            fields_exclude = ["id", "created_at", "updated_at", "is_superuser", "access"]
+            optional = True
+            permissions = [".write"]
+
+        class Update(SchemaDefinition):
+            fields_exclude = ["id", "created_at", "updated_at", "is_superuser", "access"]
+            optional = True
+            permissions = [".write"]
+
+        class UpdateAdmin(SchemaDefinition):
+            fields_exclude = ["id", "created_at", "updated_at"]
+            optional = True
+            permissions = [".admin"]
+
+        class Response(SchemaDefinition):
+            permissions = [".read.other"]
+
+        class ResponseSelf(SchemaDefinition):
+            permissions = [".read.self"]
 
     class Scopes(AwesomeModel.Scopes):
         class MinecraftNickname(ScopeDefinition):
@@ -115,11 +147,15 @@ class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     @property
     @computed_field
     def permissions(self) -> List[Dict[str, bool]]:
-        sorted_roles = sorted(self.roles, key=lambda r: r.weight, reverse=True)
-        permissions = []
-        for role in sorted_roles:
-            permissions.extend(role.permissions)
-        return permissions
+        """Computed permissions with caching for performance."""
+        # Cache computed permissions to avoid repeated computation
+        if not hasattr(self, '_computed_permissions'):
+            sorted_roles = sorted(self.roles, key=lambda r: r.weight, reverse=True)
+            permissions = []
+            for role in sorted_roles:
+                permissions.extend(role.permissions)
+            self._computed_permissions = permissions
+        return self._computed_permissions
 
 
 if __name__ == "__main__":

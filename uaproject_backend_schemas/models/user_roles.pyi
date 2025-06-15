@@ -1,30 +1,51 @@
 # AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
 
 from datetime import datetime
-from typing import Any, Optional
+from enum import StrEnum
 
 from pydantic import BaseModel
 
+from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
-from uaproject_backend_schemas.models.role import Role
-from uaproject_backend_schemas.models.user import User
 
 class UserRoles(AwesomeModel):
-    """Base user model."""
+    """Base userroles model."""
 
     updated_at: datetime
-    id: int
     user_id: int
     role_id: int
-    user: Optional[User]
-    role: Optional[Role]
     schemas: UserRolesSchemas
     scopes: UserRolesScopes
     filters: UserRolesFilters
+    sorts: UserRolesSorts
     filter: type[UserRolesFilter]
+    sort: type[UserRolesSort]
 
 class UserRolesSchemas:
     """Schemas for the UserRoles model."""
+
+    create: UserRolesSchemaCreate
+    update: UserRolesSchemaUpdate
+    response: UserRolesSchemaResponse
+
+class UserRolesSchemaCreate(AwesomeBaseModel):
+    """create schema for UserRoles model"""
+
+    user_id: int
+    role_id: int
+
+class UserRolesSchemaUpdate(AwesomeBaseModel):
+    """update schema for UserRoles model"""
+
+    user_id: int
+    role_id: int
+
+class UserRolesSchemaResponse(AwesomeBaseModel):
+    """response schema for UserRoles model"""
+
+    updated_at: datetime
+    user_id: int
+    role_id: int
 
 class UserRolesScopes:
     """Scopes for the UserRoles model."""
@@ -35,15 +56,8 @@ class UserRolesFilters:
 class UserRolesFilter(BaseModel):
     """Pydantic-class for filtering the UserRoles model."""
 
-    updated_at: Optional[datetime] = None
-    min_updated_at: Optional[Any] = None
-    max_updated_at: Optional[Any] = None
-    id: Optional[int] = None
-    min_id: Optional[Any] = None
-    max_id: Optional[Any] = None
-    user_id: Optional[int] = None
-    min_user_id: Optional[Any] = None
-    max_user_id: Optional[Any] = None
-    role_id: Optional[int] = None
-    min_role_id: Optional[Any] = None
-    max_role_id: Optional[Any] = None
+class UserRolesSorts:
+    """Declarative sorts for the UserRoles model."""
+
+class UserRolesSort(StrEnum):
+    """Enum for sorting the UserRoles model."""

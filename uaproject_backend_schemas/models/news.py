@@ -15,6 +15,7 @@ from sqlmodel import (
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
+from uaproject_backend_schemas.awesome.schemas import SchemaDefinition
 from uaproject_backend_schemas.models.schemas.news import ImportanceType, NewsType
 from uaproject_backend_schemas.models.user import User
 
@@ -73,3 +74,20 @@ class News(AwesomeModel, IDMixin, TimestampsMixin, table=True):
 
     author: Optional[User] = Relationship(back_populates="news")
     images: List[NewsImage] = Relationship(back_populates="news")
+
+    class Schemas(AwesomeModel.Schemas):
+        class Create(SchemaDefinition):
+            fields_exclude = ["id", "created_at", "updated_at", "author_id", "is_published"]
+            optional = True
+            permissions = [".write"]
+
+        class Publish(SchemaDefinition):
+            fields = ["is_published"]
+            permissions = [".admin"]
+
+        class UpdateMeta(SchemaDefinition):
+            fields = ["is_pinned", "is_archived", "type", "importance"]
+            permissions = [".admin"]
+
+        class Response(SchemaDefinition):
+            permissions = [".read"]

@@ -16,6 +16,19 @@ class AwesomeFieldInfo(SQLModelFieldInfo):
         super().__init__(*args, **kwargs)
         self.required_permissions = required_permissions or []
 
+    def format_permissions(self, model_cls):
+        """Format permissions with model prefix support."""
+        if not self.required_permissions:
+            return []
+        formatted = []
+        for p in self.required_permissions:
+            if p.startswith("."):
+                prefix = getattr(model_cls, "__scope_prefix__", model_cls.__name__.lower())
+                p = f"{prefix}{p}"
+            formatted_p = p.format(model_cls=model_cls)
+            formatted.append(formatted_p)
+        return formatted
+
     def __repr__(self) -> str:
         parent_repr = super().__repr__()
         attrs = []

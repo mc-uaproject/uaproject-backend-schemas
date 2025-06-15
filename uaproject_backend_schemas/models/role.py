@@ -21,8 +21,5 @@ class Role(AwesomeModel, IDMixin, TimestampsMixin, table=True):
 
     users: List["User"] = Relationship(
         back_populates="roles",
-        sa_relationship_kwargs={
-            "secondary": "user_roles",
-            "lazy": "select"
-        },
+        sa_relationship_kwargs={"secondary": "user_roles", "lazy": "select"},
     )

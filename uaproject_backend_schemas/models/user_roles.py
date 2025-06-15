@@ -1,4 +1,3 @@
-
 from sqlalchemy import BigInteger
 from sqlmodel import Column, ForeignKey
 

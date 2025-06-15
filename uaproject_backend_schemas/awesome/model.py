@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, Callable, ClassVar, Optional, Type, TypeVar
+from typing import Any, Callable, ClassVar, Dict, Optional, Type, TypeVar
 
 from pydantic import BaseModel
 from sqlmodel import SQLModel
@@ -52,22 +52,76 @@ class AwesomeModel(SQLModel):
     filter: ClassVar
     sorts: ClassVar
     sort: ClassVar
+    model_permissions: ClassVar[set[str]]
+    model_schema_permissions: ClassVar[set[str]]
+    model_field_permissions: ClassVar[set[str]]
+
+    _property_cache: ClassVar[Dict[str, Any]] = {}
+
+    @classmethod
+    def _get_cache_key(cls, property_name: str) -> str:
+        """Generate cache key for a property."""
+        return f"{cls.__name__}.{property_name}"
+
+    @classmethod
+    def _clear_cache(cls, property_name: str = None):
+        """Clear cache for specific property or all properties of this class."""
+        if property_name:
+            key = cls._get_cache_key(property_name)
+            cls._property_cache.pop(key, None)
+        else:
+            prefix = f"{cls.__name__}."
+            keys_to_remove = [k for k in cls._property_cache.keys() if k.startswith(prefix)]
+            for key in keys_to_remove:
+                cls._property_cache.pop(key, None)
+
+    @classmethod
+    def _compute_schema_permissions(cls) -> set[str]:
+        """Optimized schema permissions computation."""
+        permissions = set()
+        if not hasattr(cls, "schemas"):
+            return permissions
+
+        schema_names = cls.schemas.list()
+        for schema_name in schema_names:
+            schema_def = cls.schemas._get_schema_definition(schema_name)
+            if schema_def and hasattr(schema_def, "permissions") and schema_def.permissions:
+                formatted_permissions = schema_def.format_permissions(schema_def.permissions, cls)
+                permissions.update(formatted_permissions)
+        return permissions
+
+    @classmethod
+    def _compute_field_permissions(cls) -> set[str]:
+        """Optimized field permissions computation."""
+        permissions = set()
+        field_permissions_gen = (
+            field_info.format_permissions(cls)
+            for field_info in cls.model_fields.values()
+            if hasattr(field_info, "format_permissions")
+        )
+        for field_perms in field_permissions_gen:
+            permissions.update(field_perms)
+        return permissions
 
     @classproperty
     def scopes(cls) -> None | AwesomeScopes | Type[AwesomeScopes]:
         """Get Scopes instance."""
-        if cls.__scopes__ is None:
+        cache_key = cls._get_cache_key("scopes")
+        if cache_key not in cls._property_cache:
             scope_cls = getattr(cls, "Scopes", None)
             if scope_cls:
-                cls.__scopes__ = scope_cls(cls)
-        return cls.__scopes__
+                cls._property_cache[cache_key] = scope_cls(cls)
+            else:
+                cls._property_cache[cache_key] = None
+        return cls._property_cache[cache_key]
 
     @classproperty
     def schemas(cls) -> AwesomeSchemas | Type[AwesomeSchemas]:
         """Get Schemas instance."""
-        if cls.__schemas__ is None:
-            cls.__schemas__ = AwesomeSchemas(cls)
-        return cls.__schemas__
+        cache_key = cls._get_cache_key("schemas")
+        if cache_key not in cls._property_cache:
+            cls._property_cache[cache_key] = AwesomeSchemas(cls)
+        return cls._property_cache[cache_key]
 
     @classproperty
     def filters(cls) -> None | AwesomeFilters | Type[AwesomeFilters]:
@@ -86,8 +140,8 @@ class AwesomeModel(SQLModel):
             if sorts_cls:
                 cls.__sorts__ = sorts_cls(cls)
             else:
-                # Auto-generate Sorts class if none exists
                 from uaproject_backend_schemas.awesome.sorts import AwesomeSorts
+
                 sorts_cls = type(f"{cls.__name__}Sorts", (AwesomeSorts,), {"model_cls": cls})
                 setattr(cls, "Sorts", sorts_cls)
                 cls.__sorts__ = sorts_cls(cls)
@@ -99,17 +153,72 @@ class AwesomeModel(SQLModel):
         filters_cls = getattr(cls, "Filters", None)
         if filters_cls is None:
             from uaproject_backend_schemas.awesome.filters import AwesomeFilters
+
             filters_cls = type(f"{cls.__name__}Filters", (AwesomeFilters,), {"model_cls": cls})
             setattr(cls, "Filters", filters_cls)
         return filters_cls.get_pydantic_filter_class()
+
+    @classproperty
+    def model_permissions(cls) -> set[str]:
+        """Get all permissions required by this model (schemas + fields)."""
+        cache_key = cls._get_cache_key("model_permissions")
+        if cache_key not in cls._property_cache:
+            permissions = set()
+
+            schema_permissions = cls._compute_schema_permissions()
+            permissions.update(schema_permissions)
+
+            field_permissions = cls._compute_field_permissions()
+            permissions.update(field_permissions)
+
+            cls._property_cache[cache_key] = permissions
+        return cls._property_cache[cache_key]
+
+    @classproperty
+    def model_schema_permissions(cls) -> set[str]:
+        """Get permissions required by schemas only (without field permissions)."""
+        cache_key = cls._get_cache_key("model_schema_permissions")
+        if cache_key not in cls._property_cache:
+            cls._property_cache[cache_key] = cls._compute_schema_permissions()
+        return cls._property_cache[cache_key]
+
+    @classproperty
+    def model_field_permissions(cls) -> set[str]:
+        """Get permissions required by fields only (without schema permissions)."""
+        cache_key = cls._get_cache_key("model_field_permissions")
+        if cache_key not in cls._property_cache:
+            cls._property_cache[cache_key] = cls._compute_field_permissions()
+        return cls._property_cache[cache_key]
+
+    @classmethod
+    def get_all_model_permissions(cls, include_fields: bool = True) -> dict[str, set[str]]:
+        """Get permissions for all models."""
+        all_permissions = {}
+
+        def get_all_subclasses(cls):
+            """Recursively get all subclasses."""
+            subclasses = set()
+            for subclass in cls.__subclasses__():
+                subclasses.add(subclass)
+                subclasses.update(get_all_subclasses(subclass))
+            return subclasses
+
+        for subclass in get_all_subclasses(cls):
+            model_name = subclass.__name__
+            if include_fields:
+                all_permissions[model_name] = subclass.model_permissions
+            else:
+                all_permissions[model_name] = subclass.model_schema_permissions
+
+        return all_permissions
 
     @classproperty
     def sort(cls) -> type[Enum] | None:
         """Returns an Enum-class for sorting this model."""
         sorts_cls = getattr(cls, "Sorts", None)
         if sorts_cls is None:
-            # Auto-generate Sorts class if none exists
             from uaproject_backend_schemas.awesome.sorts import AwesomeSorts
+
             sorts_cls = type(f"{cls.__name__}Sorts", (AwesomeSorts,), {"model_cls": cls})
             setattr(cls, "Sorts", sorts_cls)
         return sorts_cls.get_enum_sort_class()

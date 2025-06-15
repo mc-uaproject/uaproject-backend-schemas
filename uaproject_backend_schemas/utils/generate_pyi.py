@@ -3,6 +3,9 @@ import importlib
 import inspect
 import os
 import re
+import subprocess
+import time
+from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 from typing import Any, List, Type, Union, get_args, get_origin
@@ -218,8 +221,21 @@ def collect_imports_from_types(used_types, std_types, py_imports, model_cls) -> 
         elif tp in py_imports and tp not in already_imported:
             imports.add(py_imports[tp])
             already_imported.add(tp)
+
     for name, obj in inspect.getmembers(importlib.import_module(model_cls.__module__)):
         if inspect.isclass(obj) and name in used_types and name not in already_imported:
+            if hasattr(obj, "__bases__") and any("Enum" in str(base) for base in obj.__bases__):
+                model_name = model_cls.__name__.lower()
+                schema_module_path = f"uaproject_backend_schemas.models.schemas.{model_name}"
+                try:
+                    schema_module = importlib.import_module(schema_module_path)
+                    if hasattr(schema_module, name):
+                        imports.add(f"from {schema_module_path} import {name}")
+                        already_imported.add(name)
+                        continue
+                except ImportError:
+                    pass
+
             imports.add(f"from {model_cls.__module__} import {name}")
             already_imported.add(name)
     return imports
@@ -283,9 +299,7 @@ def _get_field_type(field: Any) -> str:
     return field_type
 
 
-def _get_field_str(
-    field_name: str, field: Any, field_type: str
-) -> str:
+def _get_field_str(field_name: str, field: Any, field_type: str) -> str:
     """Get string representation of a field."""
     field_str = f"    {field_name}: {field_type}"
     if isinstance(field, AwesomeFieldInfo):
@@ -328,6 +342,37 @@ def generate_with_permissions_method(class_name: str, all_permissions: set[str])
     return f"    def with_permissions(self, permissions: list[Literal[{permissions_literal}]]) -> {class_name}: ...\n\n"
 
 
+def _get_schema_fields(
+    model_cls: Type[AwesomeModel], schema_name: str, _type: str = "Schema"
+) -> list[str]:
+    """Get fields for a specific schema or scope definition."""
+    if _type.lower() == "schema":
+        home = getattr(model_cls, "Schemas", None)
+    else:
+        home = getattr(model_cls, "Scopes", None)
+
+    if not home:
+        return []
+
+    definition = getattr(home, snake_to_camel(schema_name), None)
+    if not definition:
+        return []
+
+    all_fields = list(model_cls.model_fields.keys())
+
+    computed_fields = _collect_computed_fields(model_cls)
+    all_fields.extend(computed_fields.keys())
+
+    rels = _get_relationship_fields(model_cls)
+    all_fields.extend(rels)
+
+    if hasattr(definition, "fields") and definition.fields:
+        return definition.fields
+
+    excluded = getattr(definition, "fields_exclude", []) or []
+    return [f for f in all_fields if f not in excluded]
+
+
 def generate_class(
     model_cls: Type[AwesomeModel],
     schema_name: str,
@@ -344,12 +389,37 @@ def generate_class(
             for p in sorted(permissions)
         )
 
-    fields = generate_fields(model_cls, permissions)
+    schema_fields = _get_schema_fields(model_cls, schema_name, _type)
+    fields = []
+
+    for field_name in schema_fields:
+        if field_name in model_cls.model_fields:
+            field_type = _get_field_type(model_cls.model_fields[field_name])
+            fields.append(f"    {field_name}: {field_type}")
+        elif field_name in _collect_computed_fields(model_cls):
+            computed_field = _collect_computed_fields(model_cls)[field_name]
+            if hasattr(computed_field.fget, "__annotations__"):
+                return_type = computed_field.fget.__annotations__.get("return", "Any")
+                type_str = (
+                    return_type.__name__ if hasattr(return_type, "__name__") else str(return_type)
+                )
+            else:
+                type_str = "Any"
+            fields.append(f"    {field_name}: {type_str}")
+        elif field_name in model_cls.__annotations__:
+            ann = model_cls.__annotations__[field_name]
+            type_str = _extract_clean_type(ann)
+            fields.append(f"    {field_name}: {type_str}")
+        else:
+            fields.append(f"    {field_name}: Any")
+
     docstring = f'    """{schema_name} schema for {model_cls.__name__} model'
     if permissions:
         docstring += f" with permissions {', '.join(permissions)}"
     docstring += '"""\n'
-    content = f"class {class_name}(AwesomeBaseModel):\n{docstring}" + "\n".join(fields) + "\n\n"
+
+    fields_str = "\n".join(fields) if fields else "    pass"
+    content = f"class {class_name}(AwesomeBaseModel):\n{docstring}\n{fields_str}\n\n"
 
     all_permissions = get_permissions_from_model(model_cls)
     if all_permissions:
@@ -481,11 +551,17 @@ def _extract_clean_type(ann):
         inner = ann_str.split("[", 1)[1].rsplit("]", 1)[0]
         inner = inner.replace("typing.", "")
         inner = re.sub(r'ForwardRef\(["\\\']?([A-Za-z_][A-Za-z0-9_]*)["\\\']?\)', r"\1", inner)
+        inner = re.sub(
+            r"uaproject_backend_schemas\.models\.[\w\.]+\.([A-Z][A-Za-z0-9_]*)", r"\1", inner
+        )
         if not inner.startswith("Optional["):
             inner = f"Optional[{inner}]"
         return inner
     ann_str = ann_str.replace("typing.", "")
     ann_str = re.sub(r'ForwardRef\(["\\\']?([A-Za-z_][A-Za-z0-9_]*)["\\\']?\)', r"\1", ann_str)
+    ann_str = re.sub(
+        r"uaproject_backend_schemas\.models\.[\w\.]+\.([A-Z][A-Za-z0-9_]*)", r"\1", ann_str
+    )
     if not ann_str.startswith("Optional["):
         ann_str = f"Optional[{ann_str}]"
     return ann_str
@@ -496,6 +572,15 @@ def camel_to_snake(name):
 
     s1 = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
     return re.sub("([a-z0-9])([A-Z])", r"\1_\2", s1).lower()
+
+
+def get_all_subclasses(cls):
+    """Recursively get all subclasses of a class."""
+    subclasses = set()
+    for subclass in cls.__subclasses__():
+        subclasses.add(subclass)
+        subclasses.update(get_all_subclasses(subclass))
+    return subclasses
 
 
 MODEL_IMPORT_OVERRIDES = {
@@ -518,9 +603,23 @@ def _generate_model_fields(model_cls: Type[AwesomeModel]) -> tuple[str, set]:
     lines = []
     imports = set()
     model_imports = set()
+
     for field_name, field in model_cls.model_fields.items():
         field_type = _get_field_type(field)
         lines.append(f"    {field_name}: {field_type}")
+
+    computed_fields = _collect_computed_fields(model_cls)
+    for field_name, computed_field in computed_fields.items():
+        if hasattr(computed_field.fget, "__annotations__"):
+            return_type = computed_field.fget.__annotations__.get("return", "Any")
+            if hasattr(return_type, "__name__"):
+                type_str = return_type.__name__
+            else:
+                type_str = str(return_type)
+            lines.append(f"    {field_name}: {type_str}")
+        else:
+            lines.append(f"    {field_name}: Any")
+
     rels = _get_relationship_fields(model_cls)
     for rel in rels:
         ann = model_cls.__annotations__[rel]
@@ -536,6 +635,7 @@ def _generate_model_fields(model_cls: Type[AwesomeModel]) -> tuple[str, set]:
                     f"from uaproject_backend_schemas.models.{filename} import {match}"
                 )
         lines.append(f"    {rel}: {type_str}")
+
     all_imports = imports | model_imports
     return "\n".join(lines) + "\n", all_imports
 
@@ -551,13 +651,15 @@ def _generate_model_sections(model_cls: Type[AwesomeModel], permissions: set[str
         if not _type_instance:
             raise ValueError(f"No {_type[:-1]} found for {model_cls.__name__}")
 
-        print(f"\n\n{model_cls.__name__}\n{_type_instance}\n\n")
         for _type_key in _type_instance.list():
             base_schema = (
                 f"{model_cls.__name__}{_type.capitalize()[:-1]}{snake_to_camel(_type_key)}"
             )
             content += f"    {_type_key}: {base_schema}\n"
 
+        content += "\n"
+
+        for _type_key in _type_instance.list():
             content += generate_class(model_cls, _type_key, _type=_type.capitalize()[:-1])
             for perm in permissions:
                 content += generate_class(
@@ -578,7 +680,7 @@ def build_main_content(model_cls: Type[AwesomeModel], permissions: set[str]) -> 
     if all_imports:
         main_content += "\n".join(sorted(all_imports)) + "\n\n"
     main_content += f"class {model_cls.__name__}(AwesomeModel):\n"
-    main_content += '    """Base user model."""\n'
+    main_content += f'    """Base {model_cls.__name__.lower()} model."""\n'
     main_content += model_fields_str
     main_content += f"    schemas: {model_cls.__name__}Schemas\n"
     main_content += f"    scopes: {model_cls.__name__}Scopes\n"
@@ -593,6 +695,11 @@ def build_main_content(model_cls: Type[AwesomeModel], permissions: set[str]) -> 
     main_content += "\n"
     main_content += _generate_model_sections(model_cls, permissions)
     return main_content
+
+
+def generate_stub_for_model(model_cls: Type[AwesomeModel]) -> str:
+    """Generate stub content for a single model."""
+    return generate_pyi_for_model(model_cls, model_cls.__module__)
 
 
 def generate_pyi_for_model(model_cls: Type[AwesomeModel], module_path: str) -> str:
@@ -633,35 +740,73 @@ def generate_pyi_for_model(model_cls: Type[AwesomeModel], module_path: str) -> s
 
 
 def main():
+    """Optimized stub generation with deduplication and batch processing."""
+
+    print("🚀 Starting optimized stub generation...")
+    start_time = time.perf_counter()
+
     project_root = Path(__file__).parent.parent.parent
+
+    unique_models = {}
+    model_to_modules = defaultdict(list)
 
     for module_path in MODEL_MODULES:
         module = importlib.import_module(module_path)
-        stub_dir = ensure_stub_dir(module_path, project_root)
 
         for name, obj in inspect.getmembers(module):
             if inspect.isclass(obj) and issubclass(obj, AwesomeModel) and obj != AwesomeModel:
-                stub_file = stub_dir / f"{module_path.split('.')[-1]}.pyi"
+                if name not in unique_models:
+                    unique_models[name] = obj
+                model_to_modules[name].append(module_path)
 
-                print(f"Generating .pyi for {obj.__name__} at {stub_file}")
+    print(f"📊 Found {len(unique_models)} unique models across {len(MODEL_MODULES)} modules")
 
-                pyi_content = generate_pyi_for_model(obj, module_path)
+    generated_files = []
+    for name, obj in unique_models.items():
+        module_path = model_to_modules[name][0]
+        stub_dir = ensure_stub_dir(module_path, project_root)
+        stub_file = stub_dir / f"{camel_to_snake(name)}.pyi"
 
-                with open(stub_file, "w") as f:
-                    f.write(pyi_content)
+        file_start_time = time.perf_counter()
+        print(f"📝 Generating .pyi for {obj.__name__} -> {camel_to_snake(name)}.pyi")
 
-                try:
-                    import subprocess
+        pyi_content = generate_pyi_for_model(obj, module_path)
 
-                    subprocess.run(["ruff", "format", str(stub_file)], check=True)
-                    print(f"Formatted {stub_file} with ruff")
+        with open(stub_file, "w") as f:
+            f.write(pyi_content)
 
-                    subprocess.run(["ruff", "check", "--fix", str(stub_file)], check=True)
-                    print(f"Fixed imports in {stub_file} with ruff")
-                except subprocess.CalledProcessError as e:
-                    print(f"Failed to process {stub_file}: {e}")
-                except FileNotFoundError:
-                    print("ruff not found. Please install ruff to enable formatting.")
+        file_end_time = time.perf_counter()
+        file_duration = file_end_time - file_start_time
+        print(f"   ✅ Generated in {file_duration:.3f}s")
+
+        generated_files.append(stub_file)
+
+    print(f"⚡ Batch formatting {len(generated_files)} files with ruff...")
+    try:
+        format_cmd = ["ruff", "format"] + [str(f) for f in generated_files]
+        subprocess.run(format_cmd, check=True)
+        print(f"✅ Formatted {len(generated_files)} files")
+
+        fix_cmd = ["ruff", "check", "--fix"] + [str(f) for f in generated_files]
+        subprocess.run(fix_cmd, check=True)
+        print(f"✅ Fixed imports in {len(generated_files)} files")
+
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Batch ruff processing failed: {e}")
+        print("🔄 Falling back to individual file processing...")
+        for stub_file in generated_files:
+            try:
+                subprocess.run(["ruff", "format", str(stub_file)], check=True)
+                subprocess.run(["ruff", "check", "--fix", str(stub_file)], check=True)
+            except subprocess.CalledProcessError as e:
+                print(f"❌ Failed to process {stub_file}: {e}")
+    except FileNotFoundError:
+        print("❌ ruff not found. Please install ruff to enable formatting.")
+
+    end_time = time.perf_counter()
+    duration = end_time - start_time
+    print(f"🎉 Generated {len(generated_files)} stub files in {duration:.3f} seconds")
+    print(f"📈 Average: {duration / len(generated_files):.3f}s per file")
 
 
 if __name__ == "__main__":

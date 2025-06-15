@@ -91,7 +91,6 @@ class AwesomeFilters:
             typ = getattr(field, "type_", field.annotation)
             typ = cls.ensure_single_optional(typ)
 
-            # Skip complex types that can't be used as query parameters
             base_type = cls._unwrap_optional(typ)
             if cls._is_complex_type(base_type):
                 continue
@@ -132,7 +131,6 @@ class AwesomeFilters:
         if origin in (list, List, dict, tuple, set):
             return True
 
-        # Check for complex generic types
         if hasattr(typ, "__origin__"):
             return True
 
@@ -148,7 +146,6 @@ class AwesomeFilters:
                         if rel_field in ("name", "id"):
                             rel_filter_name = f"{name}_{rel_field}"
                             if rel_filter_name not in exclude:
-                                # Use appropriate simple type instead of Any
                                 if rel_field == "id":
                                     fields[rel_filter_name] = (Optional[int], None)
                                 elif rel_field == "name":
@@ -164,7 +161,6 @@ class AwesomeFilters:
             if filter_cls.field and filter_cls.field not in exclude:
                 typ: Any = getattr(filter_cls, "type", None)
                 if typ is None or cls._is_complex_type(cls._unwrap_optional(typ)):
-                    # Skip custom filters with complex or Any types
                     continue
                 fields[filter_cls.field] = (typ, None)
         return fields

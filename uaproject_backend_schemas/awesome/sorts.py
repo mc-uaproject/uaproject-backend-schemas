@@ -93,11 +93,9 @@ class AwesomeSorts:
         """Get computed fields from the model"""
         computed_fields = []
 
-        # Get computed fields from Pydantic model_computed_fields
         if hasattr(cls.model_cls, "model_computed_fields"):
             computed_fields = list(cls.model_cls.model_computed_fields.keys())
 
-        # Check for properties with ComputedFieldInfo
         computed_fields.extend(cls._find_computed_properties(computed_fields))
         return computed_fields
 

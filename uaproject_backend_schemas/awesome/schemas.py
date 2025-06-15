@@ -30,7 +30,14 @@ class FieldsDefinitionBase:
     def format_permissions(cls, permissions, model_cls):
         if not permissions:
             return permissions
-        return [p.format(model_cls=model_cls) for p in permissions]
+        formatted = []
+        for p in permissions:
+            if p.startswith("."):
+                prefix = getattr(model_cls, "__scope_prefix__", model_cls.__name__.lower())
+                p = f"{prefix}{p}"
+            formatted_p = p.format(model_cls=model_cls)
+            formatted.append(formatted_p)
+        return formatted
 
 
 class SchemaDefinition(FieldsDefinitionBase):
@@ -62,8 +69,6 @@ class AwesomeSchemas:
         else:
             raise AttributeError(f"Model {self.model_cls.__name__} has no attribute {home}")
 
-        # Check if model has custom schema definitions
-        # If it has custom schemas, don't add default ones
         has_custom_schemas = any(
             hasattr(self._home, attr)
             and inspect.isclass(getattr(self._home, attr))
@@ -78,14 +83,13 @@ class AwesomeSchemas:
         if has_custom_schemas:
             return
 
-        # Add default schemas if none exist
         try:
             if not hasattr(self._home, "Create"):
 
                 class Create(SchemaDefinition):
                     fields_exclude = ["id", "created_at", "updated_at"]
                     optional = True
-                    permissions = ["{model_cls.__scope_prefix__}.write"]
+                    permissions = [".write"]
 
                 setattr(self._home, "Create", Create)
 
@@ -94,18 +98,17 @@ class AwesomeSchemas:
                 class Update(SchemaDefinition):
                     fields_exclude = ["id", "created_at", "updated_at"]
                     optional = True
-                    permissions = ["{model_cls.__scope_prefix__}.write"]
+                    permissions = [".write"]
 
                 setattr(self._home, "Update", Update)
 
             if not hasattr(self._home, "Response"):
 
                 class Response(SchemaDefinition):
-                    permissions = ["{model_cls.__scope_prefix__}.read"]
+                    permissions = [".read"]
 
                 setattr(self._home, "Response", Response)
         except Exception:
-            # Fallback to basic schemas without permissions if there's an error
             if not hasattr(self._home, "Create"):
 
                 class Create(SchemaDefinition):
@@ -192,13 +195,18 @@ class AwesomeSchemas:
 
     def _should_include_field(self, field: Any, permissions: Optional[List[str]] = None) -> bool:
         """Check if field should be included based on permissions."""
-        required_permissions = getattr(field, "required_permissions", None)
-        if required_permissions is None:
+        if not hasattr(field, "required_permissions") or not field.required_permissions:
             return True
 
-        if permissions and all(p not in permissions for p in required_permissions):
+        if hasattr(field, "format_permissions"):
+            required_permissions = field.format_permissions(self.model_cls)
+        else:
+            required_permissions = field.required_permissions
+
+        if not permissions:
             return False
-        return True
+
+        return any(p in permissions for p in required_permissions)
 
     def _get_field_type(
         self, field_name: str, field_type: Any, relationships: Dict[str, str]

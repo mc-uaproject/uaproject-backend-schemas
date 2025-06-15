@@ -7,6 +7,7 @@ from sqlmodel import BigInteger, Column, ForeignKey, Relationship
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
+from uaproject_backend_schemas.awesome.schemas import SchemaDefinition
 from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
 
 if TYPE_CHECKING:
@@ -25,6 +26,21 @@ class Balance(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     amount: Decimal = AwesomeField(default=0, nullable=False)
 
     user: "User" = Relationship(back_populates="balance")
+
+    class Schemas(AwesomeModel.Schemas):
+        class Create(SchemaDefinition):
+            fields_exclude = ["id", "created_at", "updated_at", "user_id", "identifier"]
+            permissions = [".admin"]
+
+        class Update(SchemaDefinition):
+            fields = ["amount"]
+            permissions = [".admin"]
+
+        class Response(SchemaDefinition):
+            permissions = [".read.other"]
+
+        class ResponseSelf(SchemaDefinition):
+            permissions = [".read.self"]
 
     class Scopes(AwesomeModel.Scopes):
         class Amount(ScopeDefinition):

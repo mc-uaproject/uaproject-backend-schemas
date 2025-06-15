@@ -1,6 +1,7 @@
 # AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
 
 from datetime import datetime
+from enum import StrEnum
 from typing import Any, List, Optional
 
 from pydantic import BaseModel
@@ -11,7 +12,7 @@ from uaproject_backend_schemas.models.schemas.application import ApplicationStat
 from uaproject_backend_schemas.models.user import User
 
 class Application(AwesomeModel):
-    """Base user model."""
+    """Base application model."""
 
     id: int
     updated_at: datetime
@@ -29,59 +30,110 @@ class Application(AwesomeModel):
     schemas: ApplicationSchemas
     scopes: ApplicationScopes
     filters: ApplicationFilters
+    sorts: ApplicationSorts
     filter: type[ApplicationFilter]
+    sort: type[ApplicationSort]
 
 class ApplicationSchemas:
     """Schemas for the Application model."""
+
+    create: ApplicationSchemaCreate
+    update: ApplicationSchemaUpdate
+    update_status: ApplicationSchemaUpdateStatus
+    response: ApplicationSchemaResponse
+    response_self: ApplicationSchemaResponseSelf
+
+class ApplicationSchemaCreate(AwesomeBaseModel):
+    """create schema for Application model"""
+
+    birth_date: Optional[datetime]
+    launcher: Optional[str]
+    server_source: Optional[str]
+    private_server_experience: Optional[str]
+    useful_skills: Optional[str]
+    conflict_reaction: Optional[str]
+    quiz_answer: Optional[str]
+    editable_fields: List[str]
+    user: Optional[User]
+
+class ApplicationSchemaUpdate(AwesomeBaseModel):
+    """update schema for Application model"""
+
+    birth_date: Optional[datetime]
+    launcher: Optional[str]
+    server_source: Optional[str]
+    private_server_experience: Optional[str]
+    useful_skills: Optional[str]
+    conflict_reaction: Optional[str]
+    quiz_answer: Optional[str]
+    editable_fields: List[str]
+    user: Optional[User]
+
+class ApplicationSchemaUpdateStatus(AwesomeBaseModel):
+    """update_status schema for Application model"""
+
+    status: ApplicationStatus
+
+class ApplicationSchemaResponse(AwesomeBaseModel):
+    """response schema for Application model"""
+
+    id: int
+    updated_at: datetime
+    user_id: int
+    status: ApplicationStatus
+    birth_date: Optional[datetime]
+    launcher: Optional[str]
+    server_source: Optional[str]
+    private_server_experience: Optional[str]
+    useful_skills: Optional[str]
+    conflict_reaction: Optional[str]
+    quiz_answer: Optional[str]
+    editable_fields: List[str]
+    user: Optional[User]
+
+class ApplicationSchemaResponseSelf(AwesomeBaseModel):
+    """response_self schema for Application model"""
+
+    id: int
+    updated_at: datetime
+    user_id: int
+    status: ApplicationStatus
+    birth_date: Optional[datetime]
+    launcher: Optional[str]
+    server_source: Optional[str]
+    private_server_experience: Optional[str]
+    useful_skills: Optional[str]
+    conflict_reaction: Optional[str]
+    quiz_answer: Optional[str]
+    editable_fields: List[str]
+    user: Optional[User]
 
 class ApplicationScopes:
     """Scopes for the Application model."""
 
     status: ApplicationScopeStatus
+    editable_fields: ApplicationScopeEditableFields
+    form: ApplicationScopeForm
 
 class ApplicationScopeStatus(AwesomeBaseModel):
     """status schema for Application model"""
 
     id: int
-    updated_at: datetime
     user_id: int
     status: ApplicationStatus
-    birth_date: Optional[datetime]
-    launcher: Optional[str]
-    server_source: Optional[str]
-    private_server_experience: Optional[str]
-    useful_skills: Optional[str]
-    conflict_reaction: Optional[str]
-    quiz_answer: Optional[str]
-    editable_fields: List[str]
-
-    editable_fields: ApplicationScopeEditableFields
 
 class ApplicationScopeEditableFields(AwesomeBaseModel):
     """editable_fields schema for Application model"""
 
     id: int
-    updated_at: datetime
     user_id: int
-    status: ApplicationStatus
-    birth_date: Optional[datetime]
-    launcher: Optional[str]
-    server_source: Optional[str]
-    private_server_experience: Optional[str]
-    useful_skills: Optional[str]
-    conflict_reaction: Optional[str]
-    quiz_answer: Optional[str]
     editable_fields: List[str]
-
-    form: ApplicationScopeForm
 
 class ApplicationScopeForm(AwesomeBaseModel):
     """form schema for Application model"""
 
     id: int
-    updated_at: datetime
     user_id: int
-    status: ApplicationStatus
     birth_date: Optional[datetime]
     launcher: Optional[str]
     server_source: Optional[str]
@@ -89,7 +141,6 @@ class ApplicationScopeForm(AwesomeBaseModel):
     useful_skills: Optional[str]
     conflict_reaction: Optional[str]
     quiz_answer: Optional[str]
-    editable_fields: List[str]
 
 class ApplicationFilters:
     """Declarative filters for the Application model."""
@@ -116,4 +167,13 @@ class ApplicationFilter(BaseModel):
     useful_skills: Optional[str] = None
     conflict_reaction: Optional[str] = None
     quiz_answer: Optional[str] = None
-    editable_fields: Optional[List] = None
+
+class ApplicationSorts:
+    """Declarative sorts for the Application model."""
+
+class ApplicationSort(StrEnum):
+    """Enum for sorting the Application model."""
+
+    ID = "id"
+    CREATED_AT = "created_at"
+    UPDATED_AT = "updated_at"

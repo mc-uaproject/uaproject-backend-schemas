@@ -18,7 +18,9 @@ class AwesomeActions(Generic[TModel]):
         self._actions: Dict[str, Callable] = {}
         self._actions_meta: Dict[str, Dict[str, Any]] = {}
 
-    def register(self, name: str, func: Callable[[TModel], Any], events: Optional[List[str]] = None):
+    def register(
+        self, name: str, func: Callable[[TModel], Any], events: Optional[List[str]] = None
+    ):
         """Register a new action under the specified name.
         :param name: unique action name
         :param func: function or coroutine implementing the action (takes a model instance)
@@ -86,12 +88,18 @@ class AwesomeActions(Generic[TModel]):
                 else:
                     result = func(instance)
                     if result is False:
-                        raise Exception(f"Action '{name}' failed to execute (returned False) on event {event}")
+                        raise Exception(
+                            f"Action '{name}' failed to execute (returned False) on event {event}"
+                        )
         if tasks:
             results = await asyncio.gather(*tasks)
-            for name, res in zip([n for n, m in self._actions_meta.items() if event in m.get("events", [])], results):
+            for name, res in zip(
+                [n for n, m in self._actions_meta.items() if event in m.get("events", [])], results
+            ):
                 if res is False:
-                    raise Exception(f"Action '{name}' failed to execute (returned False) on event {event}")
+                    raise Exception(
+                        f"Action '{name}' failed to execute (returned False) on event {event}"
+                    )
 
     def __iter__(self):
         """Iterate over all registered actions (for convenience, e.g., list(Model.actions))."""

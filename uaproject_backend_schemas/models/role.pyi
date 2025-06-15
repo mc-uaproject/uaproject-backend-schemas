@@ -1,30 +1,67 @@
 # AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from enum import StrEnum
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel
 
+from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.models.user import User
 
 class Role(AwesomeModel):
-    """Base user model."""
+    """Base role model."""
 
     updated_at: datetime
     id: int
     name: str
-    description: Optional[str]
+    display_name: Optional[str]
     permissions: List[Dict]
     weight: int
     users: Optional[List[User]]
     schemas: RoleSchemas
     scopes: RoleScopes
     filters: RoleFilters
+    sorts: RoleSorts
     filter: type[RoleFilter]
+    sort: type[RoleSort]
 
 class RoleSchemas:
     """Schemas for the Role model."""
+
+    create: RoleSchemaCreate
+    update: RoleSchemaUpdate
+    response: RoleSchemaResponse
+
+class RoleSchemaCreate(AwesomeBaseModel):
+    """create schema for Role model"""
+
+    name: str
+    display_name: Optional[str]
+    permissions: List[Dict]
+    weight: int
+    users: Optional[List[User]]
+
+class RoleSchemaUpdate(AwesomeBaseModel):
+    """update schema for Role model"""
+
+    name: str
+    display_name: Optional[str]
+    permissions: List[Dict]
+    weight: int
+    users: Optional[List[User]]
+
+class RoleSchemaResponse(AwesomeBaseModel):
+    """response schema for Role model"""
+
+    updated_at: datetime
+    id: int
+    name: str
+    display_name: Optional[str]
+    permissions: List[Dict]
+    weight: int
+    users: Optional[List[User]]
 
 class RoleScopes:
     """Scopes for the Role model."""
@@ -35,15 +72,8 @@ class RoleFilters:
 class RoleFilter(BaseModel):
     """Pydantic-class for filtering the Role model."""
 
-    updated_at: Optional[datetime] = None
-    min_updated_at: Optional[Any] = None
-    max_updated_at: Optional[Any] = None
-    id: Optional[int] = None
-    min_id: Optional[Any] = None
-    max_id: Optional[Any] = None
-    name: Optional[str] = None
-    description: Optional[str] = None
-    permissions: Optional[List] = None
-    weight: Optional[int] = None
-    min_weight: Optional[Any] = None
-    max_weight: Optional[Any] = None
+class RoleSorts:
+    """Declarative sorts for the Role model."""
+
+class RoleSort(StrEnum):
+    """Enum for sorting the Role model."""
