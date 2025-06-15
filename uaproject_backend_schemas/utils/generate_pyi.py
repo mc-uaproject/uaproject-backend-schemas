@@ -43,7 +43,9 @@ MODEL_MODULES = []
 for module in [
     "uaproject_backend_schemas.models.*",
 ]:
-    MODEL_MODULES.extend(expand_wildcard_modules(module))
+    modules = expand_wildcard_modules(module)
+    modules = [m for m in modules if not m.endswith("application_old")]
+    MODEL_MODULES.extend(modules)
 
 PYI_HEADER = """# AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
 

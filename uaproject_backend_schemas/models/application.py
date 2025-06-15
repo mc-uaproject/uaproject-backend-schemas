@@ -158,9 +158,9 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
         sa_column=Column(
             ARRAY(String),
             nullable=False,
-            default=DEFAULT_EDITABLE_FIELDS,
             server_default="{}",
-        )
+        ),
+        default_factory=lambda: LEGACY_EDITABLE_FIELDS.copy()
     )
 
     # Relationships
@@ -260,18 +260,8 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
             fields = ["id", "user_id", *DEFAULT_EDITABLE_FIELDS]
             permissions = ["read"]
 
-    @model_validator(mode="before")
-    def validate_fields(cls, values: dict[str, Any]) -> dict[str, Any]:
-        # Legacy fields validation
-        for field in [
-            "private_server_experience",
-            "useful_skills",
-            "conflict_reaction",
-            "quiz_answer",
-        ]:
-            cls._validate_text_length(field, values.get(field))
-
-        # New application fields validation (minimum 20 words)
+    @model_validator(mode="after")
+    def validate_fields(self):
         min_length_fields = [
             "russian_word_reaction",
             "griefing_rule_attitude",
@@ -290,7 +280,7 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
         ]
 
         for field in min_length_fields:
-            value = values.get(field)
+            value = getattr(self, field, None)
             if value and isinstance(value, str):
                 word_count = len(value.split())
                 if word_count < 20:
@@ -298,13 +288,7 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
                         f"{field} must contain at least 20 words (current: {word_count})"
                     )
 
-        if editable_fields := values.get("editable_fields"):
-            if not isinstance(editable_fields, list):
-                raise ValueError("Editable fields must be a list")
-            if not all(field in cls.DEFAULT_EDITABLE_FIELDS for field in editable_fields):
-                raise ValueError("Invalid editable fields")
-
-        return values
+        return self
 
     # Helper methods for server access management
     def get_section(self, server_type: ServerType) -> Optional["ApplicationSection"]:
