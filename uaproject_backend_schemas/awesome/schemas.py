@@ -313,10 +313,14 @@ class AwesomeSchemas:
             # Check if user has permissions for this field
             has_field_permission = True
             if permissions and field_info.required_permissions:
-                formatted_permissions = field_info.format_permissions(self.model_cls) if hasattr(field_info, 'format_permissions') else field_info.required_permissions
+                formatted_permissions = (
+                    field_info.format_permissions(self.model_cls)
+                    if hasattr(field_info, "format_permissions")
+                    else field_info.required_permissions
+                )
                 has_field_permission = any(p in permissions for p in formatted_permissions)
-            
-            # Note: We include all fields in schema, but field permission filtering 
+
+            # Note: We include all fields in schema, but field permission filtering
             # happens at runtime in PermissionChecker.apply_field_permissions_to_data
 
             new_field_info = AwesomeFieldInfo(

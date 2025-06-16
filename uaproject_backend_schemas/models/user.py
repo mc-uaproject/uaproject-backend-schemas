@@ -89,6 +89,10 @@ class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
         back_populates="assigned_to",
         sa_relationship_kwargs={"foreign_keys": "[Ticket.assigned_to_id]", "lazy": "selectin"},
     )
+    ticket_messages: List["TicketMessage"] = Relationship(
+        back_populates="author",
+        sa_relationship_kwargs={"foreign_keys": "[TicketMessage.author_id]", "lazy": "selectin"},
+    )
 
     class Schemas(AwesomeModel.Schemas):
         class Create(SchemaDefinition):

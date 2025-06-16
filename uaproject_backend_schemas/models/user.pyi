@@ -15,6 +15,7 @@ from uaproject_backend_schemas.models.news import News
 from uaproject_backend_schemas.models.punishment import Punishment
 from uaproject_backend_schemas.models.role import Role
 from uaproject_backend_schemas.models.ticket import Ticket
+from uaproject_backend_schemas.models.ticket_message import TicketMessage
 from uaproject_backend_schemas.models.transaction import Transaction
 from uaproject_backend_schemas.models.user_token import Token
 from uaproject_backend_schemas.models.webhook import Webhook
@@ -42,6 +43,7 @@ class User(AwesomeModel):
     news: Optional[List[News]]
     authored_tickets: Optional[List[Ticket]]
     assigned_tickets: Optional[List[Ticket]]
+    ticket_messages: Optional[List[TicketMessage]]
     schemas: UserSchemas
     scopes: UserScopes
     filters: UserFilters
@@ -77,6 +79,7 @@ class UserSchemaCreate(AwesomeBaseModel):
     news: Optional[List[News]]
     authored_tickets: Optional[List[Ticket]]
     assigned_tickets: Optional[List[Ticket]]
+    ticket_messages: Optional[List[TicketMessage]]
 
     def with_permissions(self, permissions: list[Literal[".admin"]]) -> UserSchemaCreate: ...
 
@@ -99,6 +102,7 @@ class UserSchemaCreateWithPermissionsAdmin(AwesomeBaseModel):
     news: Optional[List[News]]
     authored_tickets: Optional[List[Ticket]]
     assigned_tickets: Optional[List[Ticket]]
+    ticket_messages: Optional[List[TicketMessage]]
 
     def with_permissions(
         self, permissions: list[Literal[".admin"]]
@@ -123,6 +127,7 @@ class UserSchemaUpdate(AwesomeBaseModel):
     news: Optional[List[News]]
     authored_tickets: Optional[List[Ticket]]
     assigned_tickets: Optional[List[Ticket]]
+    ticket_messages: Optional[List[TicketMessage]]
 
     def with_permissions(self, permissions: list[Literal[".admin"]]) -> UserSchemaUpdate: ...
 
@@ -145,6 +150,7 @@ class UserSchemaUpdateWithPermissionsAdmin(AwesomeBaseModel):
     news: Optional[List[News]]
     authored_tickets: Optional[List[Ticket]]
     assigned_tickets: Optional[List[Ticket]]
+    ticket_messages: Optional[List[TicketMessage]]
 
     def with_permissions(
         self, permissions: list[Literal[".admin"]]
@@ -171,6 +177,7 @@ class UserSchemaUpdateAdmin(AwesomeBaseModel):
     news: Optional[List[News]]
     authored_tickets: Optional[List[Ticket]]
     assigned_tickets: Optional[List[Ticket]]
+    ticket_messages: Optional[List[TicketMessage]]
 
     def with_permissions(self, permissions: list[Literal[".admin"]]) -> UserSchemaUpdateAdmin: ...
 
@@ -195,6 +202,7 @@ class UserSchemaUpdateAdminWithPermissionsAdmin(AwesomeBaseModel):
     news: Optional[List[News]]
     authored_tickets: Optional[List[Ticket]]
     assigned_tickets: Optional[List[Ticket]]
+    ticket_messages: Optional[List[TicketMessage]]
 
     def with_permissions(
         self, permissions: list[Literal[".admin"]]
@@ -223,6 +231,7 @@ class UserSchemaResponse(AwesomeBaseModel):
     news: Optional[List[News]]
     authored_tickets: Optional[List[Ticket]]
     assigned_tickets: Optional[List[Ticket]]
+    ticket_messages: Optional[List[TicketMessage]]
 
     def with_permissions(self, permissions: list[Literal[".admin"]]) -> UserSchemaResponse: ...
 
@@ -249,6 +258,7 @@ class UserSchemaResponseWithPermissionsAdmin(AwesomeBaseModel):
     news: Optional[List[News]]
     authored_tickets: Optional[List[Ticket]]
     assigned_tickets: Optional[List[Ticket]]
+    ticket_messages: Optional[List[TicketMessage]]
 
     def with_permissions(
         self, permissions: list[Literal[".admin"]]
@@ -277,6 +287,7 @@ class UserSchemaResponseSelf(AwesomeBaseModel):
     news: Optional[List[News]]
     authored_tickets: Optional[List[Ticket]]
     assigned_tickets: Optional[List[Ticket]]
+    ticket_messages: Optional[List[TicketMessage]]
 
     def with_permissions(self, permissions: list[Literal[".admin"]]) -> UserSchemaResponseSelf: ...
 
@@ -303,6 +314,7 @@ class UserSchemaResponseSelfWithPermissionsAdmin(AwesomeBaseModel):
     news: Optional[List[News]]
     authored_tickets: Optional[List[Ticket]]
     assigned_tickets: Optional[List[Ticket]]
+    ticket_messages: Optional[List[TicketMessage]]
 
     def with_permissions(
         self, permissions: list[Literal[".admin"]]

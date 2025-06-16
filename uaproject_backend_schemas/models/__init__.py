@@ -9,6 +9,7 @@ from .punishment_config import PunishmentConfig
 from .role import Role
 from .service import Service
 from .ticket import Ticket
+from .ticket_message import TicketMessage
 from .transaction import Transaction
 from .user import User
 from .user_roles import UserRoles
@@ -26,6 +27,7 @@ PunishmentConfig.model_rebuild()
 Role.model_rebuild()
 Service.model_rebuild()
 Ticket.model_rebuild()
+TicketMessage.model_rebuild()
 Transaction.model_rebuild()
 UserRoles.model_rebuild()
 Token.model_rebuild()
@@ -44,6 +46,7 @@ __all__ = [
     "Role",
     "Service",
     "Ticket",
+    "TicketMessage",
     "Transaction",
     "UserRoles",
     "Token",

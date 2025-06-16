@@ -394,6 +394,7 @@ class ApplicationFilter(BaseModel):
     creeper_explosion_reaction: Optional[str] = None
     incomplete_tree_reaction: Optional[str] = None
     neighbor_proximity_reaction: Optional[str] = None
+    sections_id: Optional[Any] = None
 
 class ApplicationSorts:
     """Declarative sorts for the Application model."""
