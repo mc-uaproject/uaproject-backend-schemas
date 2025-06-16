@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.models.schemas.ticket import TicketPriority, TicketStatus
+from uaproject_backend_schemas.models.ticket_message import TicketMessage
 from uaproject_backend_schemas.models.user import User
 
 class Ticket(AwesomeModel):
@@ -25,6 +26,7 @@ class Ticket(AwesomeModel):
     priority: TicketPriority
     author: Optional[User]
     assigned_to: Optional[User]
+    messages: Optional[List[TicketMessage]]
     schemas: TicketSchemas
     scopes: TicketScopes
     filters: TicketFilters
@@ -51,6 +53,7 @@ class TicketSchemaCreate(AwesomeBaseModel):
     priority: TicketPriority
     author: Optional[User]
     assigned_to: Optional[User]
+    messages: Optional[List[TicketMessage]]
 
 class TicketSchemaUpdate(AwesomeBaseModel):
     """update schema for Ticket model"""
@@ -80,6 +83,7 @@ class TicketSchemaResponse(AwesomeBaseModel):
     priority: TicketPriority
     author: Optional[User]
     assigned_to: Optional[User]
+    messages: Optional[List[TicketMessage]]
 
 class TicketSchemaResponseSelf(AwesomeBaseModel):
     """response_self schema for Ticket model"""
@@ -95,6 +99,7 @@ class TicketSchemaResponseSelf(AwesomeBaseModel):
     priority: TicketPriority
     author: Optional[User]
     assigned_to: Optional[User]
+    messages: Optional[List[TicketMessage]]
 
 class TicketScopes:
     """Scopes for the Ticket model."""
