@@ -160,7 +160,7 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
             nullable=False,
             server_default="{}",
         ),
-        default_factory=lambda: LEGACY_EDITABLE_FIELDS.copy()
+        default_factory=lambda: LEGACY_EDITABLE_FIELDS.copy(),
     )
 
     # Relationships
@@ -176,32 +176,7 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
 
     class Schemas(AwesomeModel.Schemas):
         class Create(SchemaDefinition):
-            fields_exclude = ["id", "created_at", "updated_at", "user_id", "status", "version"]
-            optional = True
-            permissions = [".write.self"]
-
-        class Update(SchemaDefinition):
-            fields_exclude = ["id", "created_at", "updated_at", "user_id", "status", "version"]
-            optional = True
-            permissions = [".write.self"]
-
-        class UpdateStatus(SchemaDefinition):
-            fields = ["status"]
-            permissions = [".admin"]
-
-        class Response(SchemaDefinition):
-            permissions = [".read.other"]
-
-        class ResponseSelf(SchemaDefinition):
-            permissions = [".read.self"]
-
-        class ResponseWithSections(SchemaDefinition):
-            """Response with server sections included."""
-
-            permissions = [".read.self"]
-
-        class CreateV2(SchemaDefinition):
-            """Schema for v2 applications with new fields."""
+            """Default create schema - requires only essential fields, makes legacy fields optional."""
 
             fields_exclude = [
                 "id",
@@ -210,39 +185,68 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
                 "user_id",
                 "status",
                 "version",
-                "private_server_experience",
-                "useful_skills",
-            ]  # exclude legacy fields
+                "private_server_experience",  # Legacy v1 field - optional
+                "useful_skills",  # Legacy v1 field - optional
+                "conflict_reaction",  # Legacy v1 field - optional
+                "quiz_answer",  # Legacy v1 field - optional
+            ]
             optional = True
             permissions = [".write.self"]
 
-        class CreateSurvival(SchemaDefinition):
-            """Schema for survival level application (first level)."""
+        class Update(SchemaDefinition):
+            """Default update schema - same exclusions as Create."""
 
-            fields_include = SURVIVAL_LEVEL_FIELDS
+            fields_exclude = [
+                "id",
+                "created_at",
+                "updated_at",
+                "user_id",
+                "status",
+                "version",
+                "private_server_experience",  # Legacy v1 field - optional
+                "useful_skills",  # Legacy v1 field - optional
+                "conflict_reaction",  # Legacy v1 field - optional
+                "quiz_answer",  # Legacy v1 field - optional
+            ]
             optional = True
             permissions = [".write.self"]
 
-        class CreateEvervault(SchemaDefinition):
-            """Schema for evervault level application (second level)."""
+        class CreateLegacy(SchemaDefinition):
+            """Schema for creating legacy v1 applications with all fields available."""
 
-            fields_include = EVERVAULT_LEVEL_FIELDS
+            fields_exclude = ["id", "created_at", "updated_at", "user_id", "status", "version"]
             optional = True
             permissions = [".write.self"]
 
-        class UpdateSurvival(SchemaDefinition):
-            """Schema for updating survival level fields."""
+        class CreateOther(SchemaDefinition):
+            """Admin schema - can set user_id for other users."""
 
-            fields_include = SURVIVAL_LEVEL_FIELDS
+            fields_exclude = ["id", "created_at", "updated_at", "status", "version"]
             optional = True
-            permissions = [".write.self"]
+            permissions = [".write.other"]
 
-        class UpdateEvervault(SchemaDefinition):
-            """Schema for updating evervault level fields."""
+        class UpdateOther(SchemaDefinition):
+            """Admin update schema - can modify other users' applications."""
 
-            fields_include = EVERVAULT_LEVEL_FIELDS
+            fields_exclude = ["id", "created_at", "updated_at", "status", "version"]
             optional = True
-            permissions = [".write.self"]
+            permissions = [".write.other"]
+
+        class UpdateStatus(SchemaDefinition):
+            """Admin-only status updates."""
+
+            fields = ["status"]
+            permissions = [".admin"]
+
+        class Response(SchemaDefinition):
+            """Standard response schema."""
+
+            permissions = [".read.other"]
+
+        class ResponseSelf(SchemaDefinition):
+            """Self-response schema."""
+
+            permissions = [".read.self"]
 
     class Scopes(AwesomeModel.Scopes):
         class Status(ScopeDefinition):
