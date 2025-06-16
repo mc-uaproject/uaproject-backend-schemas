@@ -1,5 +1,4 @@
 from datetime import UTC, datetime, timedelta
-from typing import Optional
 
 from pydantic import BaseModel, computed_field
 from sqlalchemy import BigInteger
@@ -28,16 +27,18 @@ class IDMixin(BaseModel):
 
 
 class TimestampsMixin(BaseModel):
+    model_config = {"serialize_computed_fields": True}
+
     updated_at: datetime = AwesomeField(
         default_factory=utcnow, sa_column_kwargs={"onupdate": utcnow}, nullable=False
     )
 
-    @computed_field
+    @computed_field(return_type=datetime)
     @property
-    def created_at(self) -> Optional[datetime]:
+    def created_at(self) -> datetime:
         try:
             seconds = self.id // 1_000_000
             result = EPOCH + timedelta(milliseconds=seconds)
-            return result if 1970 <= result.year <= 9999 else None
+            return result if 1970 <= result.year <= 9999 else EPOCH
         except (OverflowError, ValueError):
-            return None
+            return EPOCH

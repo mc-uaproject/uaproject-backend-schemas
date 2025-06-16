@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, List, Literal, Optional
+from typing import List, Literal, Optional
 
 from pydantic import BaseModel
 
@@ -30,6 +30,8 @@ class User(AwesomeModel):
     is_superuser: Optional[bool]
     biography: Optional[str]
     access: Optional[bool]
+    created_at: datetime
+    permissions: List
     roles: Optional[List[Role]]
     token: Optional[Token]
     punishments: Optional[List[Punishment]]
@@ -213,7 +215,7 @@ class UserSchemaResponse(AwesomeBaseModel):
 
     id: int
     updated_at: datetime
-    created_at: Any
+    created_at: datetime
     discord_id: Optional[int]
     minecraft_nickname: Optional[str]
     is_superuser: Optional[bool]
@@ -227,7 +229,7 @@ class UserSchemaResponseWithPermissionsAdmin(AwesomeBaseModel):
 
     id: int
     updated_at: datetime
-    created_at: Any
+    created_at: datetime
     discord_id: Optional[int]
     minecraft_nickname: Optional[str]
     is_superuser: Optional[bool]
@@ -243,7 +245,7 @@ class UserSchemaResponseSelf(AwesomeBaseModel):
 
     id: int
     updated_at: datetime
-    created_at: Any
+    created_at: datetime
     discord_id: Optional[int]
     minecraft_nickname: Optional[str]
     is_superuser: Optional[bool]
@@ -257,7 +259,7 @@ class UserSchemaResponseSelfWithPermissionsAdmin(AwesomeBaseModel):
 
     id: int
     updated_at: datetime
-    created_at: Any
+    created_at: datetime
     discord_id: Optional[int]
     minecraft_nickname: Optional[str]
     is_superuser: Optional[bool]
@@ -322,6 +324,7 @@ class UserScopeSuperuser(AwesomeBaseModel):
     minecraft_nickname: Optional[str]
     is_superuser: Optional[bool]
     updated_at: datetime
+    created_at: datetime
 
     def with_permissions(self, permissions: list[Literal[".admin"]]) -> UserScopeSuperuser: ...
 
@@ -333,6 +336,7 @@ class UserScopeSuperuserWithPermissionsAdmin(AwesomeBaseModel):
     minecraft_nickname: Optional[str]
     is_superuser: Optional[bool]
     updated_at: datetime
+    created_at: datetime
 
     def with_permissions(
         self, permissions: list[Literal[".admin"]]

@@ -30,6 +30,7 @@ class News(AwesomeModel):
     is_archived: bool
     type: NewsType
     importance: ImportanceType
+    created_at: datetime
     author: Optional[User]
     images: Optional[List[NewsImage]]
     schemas: NewsSchemas

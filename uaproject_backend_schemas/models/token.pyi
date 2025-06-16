@@ -18,6 +18,7 @@ class Token(AwesomeModel):
     updated_at: datetime
     token: UUID
     user_id: int
+    created_at: datetime
     user: Optional[User]
     schemas: TokenSchemas
     scopes: TokenScopes

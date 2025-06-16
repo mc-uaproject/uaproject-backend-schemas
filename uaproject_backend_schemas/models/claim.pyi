@@ -21,6 +21,7 @@ class Claim(AwesomeModel):
     description: str
     status: ClaimStatus
     judging_id: Optional[int]
+    created_at: datetime
     claimants: Optional[List[User]]
     defendants: Optional[List[User]]
     judging: Optional[Judging]

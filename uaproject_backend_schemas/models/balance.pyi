@@ -20,6 +20,7 @@ class Balance(AwesomeModel):
     user_id: int
     identifier: UUID
     amount: Decimal
+    created_at: datetime
     user: Optional[User]
     schemas: BalanceSchemas
     scopes: BalanceScopes

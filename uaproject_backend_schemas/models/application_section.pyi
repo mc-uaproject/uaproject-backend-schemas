@@ -23,6 +23,7 @@ class ApplicationSection(AwesomeModel):
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
     is_required: bool
+    created_at: datetime
     schemas: ApplicationSectionSchemas
     scopes: ApplicationSectionScopes
     filters: ApplicationSectionFilters

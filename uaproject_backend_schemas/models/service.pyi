@@ -33,6 +33,7 @@ class Service(AwesomeModel):
     upgrade_to: Optional[str]
     service_metadata: Optional[Dict]
     discounts: Optional[List]
+    created_at: datetime
     schemas: ServiceSchemas
     scopes: ServiceScopes
     filters: ServiceFilters

@@ -19,6 +19,7 @@ class Role(AwesomeModel):
     display_name: Optional[str]
     permissions: List[Dict]
     weight: int
+    created_at: datetime
     users: Optional[List[User]]
     schemas: RoleSchemas
     scopes: RoleScopes

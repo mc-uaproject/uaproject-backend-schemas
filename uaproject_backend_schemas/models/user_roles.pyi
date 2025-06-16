@@ -14,6 +14,7 @@ class UserRoles(AwesomeModel):
     updated_at: datetime
     user_id: int
     role_id: int
+    created_at: datetime
     schemas: UserRolesSchemas
     scopes: UserRolesScopes
     filters: UserRolesFilters

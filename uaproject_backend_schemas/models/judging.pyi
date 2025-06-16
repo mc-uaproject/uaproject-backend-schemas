@@ -20,6 +20,7 @@ class Judging(AwesomeModel):
     judge_id: int
     decision: str
     verdict: JudgingVerdict
+    created_at: datetime
     judge: Optional[User]
     claims: Optional[List[Claim]]
     schemas: JudgingSchemas

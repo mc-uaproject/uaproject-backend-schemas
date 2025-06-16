@@ -398,6 +398,13 @@ def generate_class(
         if field_name in model_cls.model_fields:
             field_type = _get_field_type(model_cls.model_fields[field_name])
             fields.append(f"    {field_name}: {field_type}")
+        elif hasattr(model_cls, "model_computed_fields") and field_name in model_cls.model_computed_fields:
+            computed_field = model_cls.model_computed_fields[field_name]
+            if hasattr(computed_field, "return_type") and computed_field.return_type:
+                type_str = computed_field.return_type.__name__ if hasattr(computed_field.return_type, "__name__") else str(computed_field.return_type)
+            else:
+                type_str = "Any"
+            fields.append(f"    {field_name}: {type_str}")
         elif field_name in _collect_computed_fields(model_cls):
             computed_field = _collect_computed_fields(model_cls)[field_name]
             if hasattr(computed_field.fget, "__annotations__"):
@@ -610,17 +617,25 @@ def _generate_model_fields(model_cls: Type[AwesomeModel]) -> tuple[str, set]:
         field_type = _get_field_type(field)
         lines.append(f"    {field_name}: {field_type}")
 
-    computed_fields = _collect_computed_fields(model_cls)
-    for field_name, computed_field in computed_fields.items():
-        if hasattr(computed_field.fget, "__annotations__"):
-            return_type = computed_field.fget.__annotations__.get("return", "Any")
-            if hasattr(return_type, "__name__"):
-                type_str = return_type.__name__
+    if hasattr(model_cls, "model_computed_fields"):
+        for field_name, computed_field in model_cls.model_computed_fields.items():
+            if hasattr(computed_field, "return_type") and computed_field.return_type:
+                type_str = computed_field.return_type.__name__ if hasattr(computed_field.return_type, "__name__") else str(computed_field.return_type)
             else:
-                type_str = str(return_type)
+                type_str = "Any"
             lines.append(f"    {field_name}: {type_str}")
-        else:
-            lines.append(f"    {field_name}: Any")
+    else:
+        computed_fields = _collect_computed_fields(model_cls)
+        for field_name, computed_field in computed_fields.items():
+            if hasattr(computed_field.fget, "__annotations__"):
+                return_type = computed_field.fget.__annotations__.get("return", "Any")
+                if hasattr(return_type, "__name__"):
+                    type_str = return_type.__name__
+                else:
+                    type_str = str(return_type)
+                lines.append(f"    {field_name}: {type_str}")
+            else:
+                lines.append(f"    {field_name}: Any")
 
     rels = _get_relationship_fields(model_cls)
     for rel in rels:

@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, Dict, Optional
+from typing import Dict, Optional
 
 from pydantic import BaseModel
 
@@ -25,6 +25,7 @@ class Punishment(AwesomeModel):
     expires_at: Optional[datetime]
     config_id: Optional[int]
     punishment_metadata: Optional[Dict]
+    created_at: datetime
     user: Optional[User]
     admin: Optional[User]
     config: Optional[PunishmentConfig]
@@ -100,7 +101,7 @@ class PunishmentScopeCreated(AwesomeBaseModel):
 
     id: int
     user_id: int
-    created_at: Any
+    created_at: datetime
 
 class PunishmentScopeStatusChanged(AwesomeBaseModel):
     """status_changed schema for Punishment model"""

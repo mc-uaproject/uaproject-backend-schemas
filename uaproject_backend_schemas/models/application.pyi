@@ -46,6 +46,7 @@ class Application(AwesomeModel):
     incomplete_tree_reaction: Optional[str]
     neighbor_proximity_reaction: Optional[str]
     editable_fields: List[str]
+    created_at: datetime
     user: Optional[User]
     sections: Optional[List[ApplicationSection]]
     schemas: ApplicationSchemas

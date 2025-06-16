@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, List, Optional
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -22,6 +22,7 @@ class TicketMessage(AwesomeModel):
     attachments: Optional[List]
     is_system_message: bool
     edited_at: Optional[str]
+    created_at: datetime
     ticket: Optional[Ticket]
     author: Optional[User]
     schemas: TicketMessageSchemas
@@ -77,7 +78,7 @@ class TicketMessageSchemaResponseWithAuthor(AwesomeBaseModel):
     attachments: Optional[List]
     is_system_message: bool
     edited_at: Optional[str]
-    created_at: Any
+    created_at: datetime
     updated_at: datetime
 
 class TicketMessageScopes:
@@ -92,7 +93,7 @@ class TicketMessageScopeTicketMessages(AwesomeBaseModel):
     ticket_id: int
     author_id: int
     content: str
-    created_at: Any
+    created_at: datetime
 
 class TicketMessageFilters:
     """Declarative filters for the TicketMessage model."""

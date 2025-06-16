@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     __tablename__ = "users"
     __scope_prefix__ = "user"
-    model_config = {"arbitrary_types_allowed": True, "computed_fields_include": True}
+    model_config = {"arbitrary_types_allowed": True}
 
     discord_id: Optional[int] = AwesomeField(
         default=None, sa_column=Column(BigInteger(), index=True, unique=True)
@@ -129,7 +129,7 @@ class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
 
         class Superuser(ScopeDefinition):
             trigger_fields = ["is_superuser"]
-            fields = ["id", "discord_id", "minecraft_nickname", "is_superuser", "updated_at"]
+            fields = ["id", "discord_id", "minecraft_nickname", "is_superuser", "updated_at", "created_at"]
 
         class Access(ScopeDefinition):
             trigger_fields = ["access"]

@@ -21,6 +21,7 @@ class PunishmentConfig(AwesomeModel):
     warn_threshold: int
     warn_decay_days: int
     config_data: Dict
+    created_at: datetime
     punishments: Optional[List[Punishment]]
     schemas: PunishmentConfigSchemas
     scopes: PunishmentConfigScopes

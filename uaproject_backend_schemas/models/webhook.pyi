@@ -22,6 +22,7 @@ class Webhook(AwesomeModel):
     status: WebhookStatus
     webhook_scopes: Dict
     authorization: Optional[str]
+    created_at: datetime
     user: Optional[User]
     schemas: WebhookSchemas
     scopes: WebhookScopes

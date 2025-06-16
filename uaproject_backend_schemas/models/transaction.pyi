@@ -25,6 +25,7 @@ class Transaction(AwesomeModel):
     recipient_id: int
     service_id: Optional[int]
     transaction_metadata: Optional[Dict]
+    created_at: datetime
     service: Optional[Service]
     user: Optional[User]
     recipient: Optional[User]

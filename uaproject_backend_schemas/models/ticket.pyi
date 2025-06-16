@@ -24,6 +24,7 @@ class Ticket(AwesomeModel):
     added_user_ids: List[int]
     status: TicketStatus
     priority: TicketPriority
+    created_at: datetime
     author: Optional[User]
     assigned_to: Optional[User]
     messages: Optional[List[TicketMessage]]
