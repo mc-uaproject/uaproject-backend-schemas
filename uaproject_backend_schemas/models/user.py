@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from uaproject_backend_schemas.models.punishment import Punishment
     from uaproject_backend_schemas.models.role import Role
     from uaproject_backend_schemas.models.ticket import Ticket
+    from uaproject_backend_schemas.models.ticket_message import TicketMessage
     from uaproject_backend_schemas.models.transaction import Transaction
     from uaproject_backend_schemas.models.webhook import Webhook
 
@@ -87,6 +88,10 @@ class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     assigned_tickets: List["Ticket"] = Relationship(
         back_populates="assigned_to",
         sa_relationship_kwargs={"foreign_keys": "[Ticket.assigned_to_id]", "lazy": "selectin"},
+    )
+    ticket_messages: List["TicketMessage"] = Relationship(
+        back_populates="author",
+        sa_relationship_kwargs={"foreign_keys": "[TicketMessage.author_id]", "lazy": "selectin"}
     )
 
     class Schemas(AwesomeModel.Schemas):

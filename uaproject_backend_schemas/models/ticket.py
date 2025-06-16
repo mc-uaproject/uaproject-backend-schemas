@@ -11,6 +11,7 @@ from uaproject_backend_schemas.models.schemas.ticket import TicketPriority, Tick
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.models.user import User
+    from uaproject_backend_schemas.models.ticket_message import TicketMessage
 
 
 class Ticket(AwesomeModel, TimestampsMixin, IDMixin, table=True):
@@ -53,6 +54,10 @@ class Ticket(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     assigned_to: Optional["User"] = Relationship(
         back_populates="assigned_tickets",
         sa_relationship_kwargs={"foreign_keys": "[Ticket.assigned_to_id]", "uselist": False},
+    )
+    messages: List["TicketMessage"] = Relationship(
+        back_populates="ticket",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
 
     def get_added_users(self, session) -> List["User"]:
