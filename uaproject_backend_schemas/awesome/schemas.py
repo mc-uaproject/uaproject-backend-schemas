@@ -269,7 +269,16 @@ class AwesomeSchemas:
         )
 
         for f in fields:
-            if hasattr(self.model_cls, f):
+            # Check if it's a computed field first (Pydantic v2)
+            if hasattr(self.model_cls, "model_computed_fields") and f in self.model_cls.model_computed_fields:
+                computed_field = self.model_cls.model_computed_fields[f]
+                if hasattr(computed_field, "return_type") and computed_field.return_type:
+                    field_type = computed_field.return_type
+                else:
+                    field_type = Any
+                field_definitions[f] = (field_type, None)
+                continue
+            elif hasattr(self.model_cls, f):
                 field = getattr(self.model_cls, f)
                 if isinstance(field, property) and getattr(field, "__computed_field__", False):
                     field_type = field.fget.__annotations__.get("return", Any)
@@ -292,7 +301,11 @@ class AwesomeSchemas:
     ) -> Dict[str, Any]:
         filtered_fields = {}
         for f, (t, _) in field_definitions.items():
-            if hasattr(self.model_cls, f):
+            # Handle computed fields (Pydantic v2)
+            if hasattr(self.model_cls, "model_computed_fields") and f in self.model_cls.model_computed_fields:
+                filtered_fields[f] = (t, None)
+                continue
+            elif hasattr(self.model_cls, f):
                 field = getattr(self.model_cls, f)
                 if isinstance(field, property) and getattr(field, "__computed_field__", False):
                     filtered_fields[f] = (t, None)
