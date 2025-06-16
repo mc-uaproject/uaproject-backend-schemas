@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Optional
 
 from sqlmodel import JSON, Column
+from sqlalchemy import BigInteger, ForeignKey
 
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
@@ -18,7 +19,9 @@ class ApplicationSection(AwesomeModel, TimestampsMixin, IDMixin, table=True):
 
     __tablename__ = "application_sections"
 
-    application_id: int = AwesomeField(foreign_key="applications.id", index=True)
+    application_id: int = AwesomeField(
+        sa_column=Column(BigInteger(), ForeignKey("applications.id"), nullable=False, index=True)
+    )
     server_type: ServerType = AwesomeField(index=True)
     section_data: dict = AwesomeField(
         sa_column=Column(JSON, nullable=False, default={}),
@@ -28,7 +31,9 @@ class ApplicationSection(AwesomeModel, TimestampsMixin, IDMixin, table=True):
 
     # Review status for this server
     status: ServerAccessStatus = AwesomeField(default=ServerAccessStatus.PENDING, index=True)
-    reviewed_by: Optional[int] = AwesomeField(default=None, foreign_key="users.id")
+    reviewed_by: Optional[int] = AwesomeField(
+        sa_column=Column(BigInteger(), ForeignKey("users.id"), nullable=True), default=None
+    )
     reviewed_at: Optional[datetime] = AwesomeField(default=None)
     rejection_reason: Optional[str] = AwesomeField(default=None, max_length=1000)
     is_required: bool = AwesomeField(
