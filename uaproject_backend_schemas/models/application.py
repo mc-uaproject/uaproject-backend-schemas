@@ -266,6 +266,12 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
 
     @model_validator(mode="after")
     def validate_fields(self):
+        # Auto-set version based on editable_fields
+        if set(self.editable_fields) == set(LEGACY_EDITABLE_FIELDS):
+            self.version = "v1"
+        elif set(self.editable_fields) >= set(DEFAULT_EDITABLE_FIELDS):
+            self.version = "v2"
+        
         min_length_fields = [
             "russian_word_reaction",
             "griefing_rule_attitude",
