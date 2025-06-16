@@ -204,7 +204,9 @@ class AwesomeSchemas:
             required_permissions = field.required_permissions
 
         if not permissions:
-            return False
+            # For fields with required permissions but user has no permissions,
+            # still include the field but it will get default value during filtering
+            return True
 
         return any(p in permissions for p in required_permissions)
 
