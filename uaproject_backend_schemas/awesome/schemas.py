@@ -145,9 +145,12 @@ class AwesomeSchemas:
         else:
             fields.extend(model_cls.__annotations__.keys())
 
-        for name, value in inspect.getmembers(model_cls):
-            if isinstance(value, property) and getattr(value, "__computed_field__", False):
-                fields.append(name)
+        if hasattr(model_cls, "model_computed_fields"):
+            fields.extend(model_cls.model_computed_fields.keys())
+        else:
+            for name, value in inspect.getmembers(model_cls):
+                if isinstance(value, property) and getattr(value, "__computed_field__", False):
+                    fields.append(name)
 
         return fields
 
@@ -311,14 +314,13 @@ class AwesomeSchemas:
                 continue
 
             # Check if user has permissions for this field
-            has_field_permission = True
             if permissions and field_info.required_permissions:
                 formatted_permissions = (
                     field_info.format_permissions(self.model_cls)
                     if hasattr(field_info, "format_permissions")
                     else field_info.required_permissions
                 )
-                has_field_permission = any(p in permissions for p in formatted_permissions)
+                any(p in permissions for p in formatted_permissions)
 
             # Note: We include all fields in schema, but field permission filtering
             # happens at runtime in PermissionChecker.apply_field_permissions_to_data

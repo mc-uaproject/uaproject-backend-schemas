@@ -149,8 +149,8 @@ class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
 
         return values
 
-    @property
     @computed_field
+    @property
     def permissions(self) -> List[Dict[str, bool]]:
         """Computed permissions with caching for performance."""
         # Cache computed permissions to avoid repeated computation

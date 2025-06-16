@@ -32,8 +32,8 @@ class TimestampsMixin(BaseModel):
         default_factory=utcnow, sa_column_kwargs={"onupdate": utcnow}, nullable=False
     )
 
-    @property
     @computed_field
+    @property
     def created_at(self) -> Optional[datetime]:
         try:
             seconds = self.id // 1_000_000
