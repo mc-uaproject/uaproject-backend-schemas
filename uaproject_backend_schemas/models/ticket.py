@@ -10,8 +10,8 @@ from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
 from uaproject_backend_schemas.models.schemas.ticket import TicketPriority, TicketStatus
 
 if TYPE_CHECKING:
-    from uaproject_backend_schemas.models.user import User
     from uaproject_backend_schemas.models.ticket_message import TicketMessage
+    from uaproject_backend_schemas.models.user import User
 
 
 class Ticket(AwesomeModel, TimestampsMixin, IDMixin, table=True):
@@ -56,8 +56,7 @@ class Ticket(AwesomeModel, TimestampsMixin, IDMixin, table=True):
         sa_relationship_kwargs={"foreign_keys": "[Ticket.assigned_to_id]", "uselist": False},
     )
     messages: List["TicketMessage"] = Relationship(
-        back_populates="ticket",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+        back_populates="ticket", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
 
     def get_added_users(self, session) -> List["User"]:

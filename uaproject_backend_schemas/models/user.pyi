@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import List, Literal, Optional
+from typing import Any, List, Literal, Optional
 
 from pydantic import BaseModel
 
@@ -213,25 +213,12 @@ class UserSchemaResponse(AwesomeBaseModel):
 
     id: int
     updated_at: datetime
+    created_at: Any
     discord_id: Optional[int]
     minecraft_nickname: Optional[str]
     is_superuser: Optional[bool]
     biography: Optional[str]
     access: Optional[bool]
-    roles: Optional[List[Role]]
-    token: Optional[Token]
-    punishments: Optional[List[Punishment]]
-    balance: Optional[Balance]
-    application: Optional[Application]
-    transactions: Optional[List[Transaction]]
-    received_transactions: Optional[List[Transaction]]
-    webhooks: Optional[List[Webhook]]
-    claims_as_claimant: Optional[List[Claim]]
-    claims_as_defendant: Optional[List[Claim]]
-    news: Optional[List[News]]
-    authored_tickets: Optional[List[Ticket]]
-    assigned_tickets: Optional[List[Ticket]]
-    ticket_messages: Optional[List[TicketMessage]]
 
     def with_permissions(self, permissions: list[Literal[".admin"]]) -> UserSchemaResponse: ...
 
@@ -240,25 +227,12 @@ class UserSchemaResponseWithPermissionsAdmin(AwesomeBaseModel):
 
     id: int
     updated_at: datetime
+    created_at: Any
     discord_id: Optional[int]
     minecraft_nickname: Optional[str]
     is_superuser: Optional[bool]
     biography: Optional[str]
     access: Optional[bool]
-    roles: Optional[List[Role]]
-    token: Optional[Token]
-    punishments: Optional[List[Punishment]]
-    balance: Optional[Balance]
-    application: Optional[Application]
-    transactions: Optional[List[Transaction]]
-    received_transactions: Optional[List[Transaction]]
-    webhooks: Optional[List[Webhook]]
-    claims_as_claimant: Optional[List[Claim]]
-    claims_as_defendant: Optional[List[Claim]]
-    news: Optional[List[News]]
-    authored_tickets: Optional[List[Ticket]]
-    assigned_tickets: Optional[List[Ticket]]
-    ticket_messages: Optional[List[TicketMessage]]
 
     def with_permissions(
         self, permissions: list[Literal[".admin"]]
@@ -269,25 +243,12 @@ class UserSchemaResponseSelf(AwesomeBaseModel):
 
     id: int
     updated_at: datetime
+    created_at: Any
     discord_id: Optional[int]
     minecraft_nickname: Optional[str]
     is_superuser: Optional[bool]
     biography: Optional[str]
     access: Optional[bool]
-    roles: Optional[List[Role]]
-    token: Optional[Token]
-    punishments: Optional[List[Punishment]]
-    balance: Optional[Balance]
-    application: Optional[Application]
-    transactions: Optional[List[Transaction]]
-    received_transactions: Optional[List[Transaction]]
-    webhooks: Optional[List[Webhook]]
-    claims_as_claimant: Optional[List[Claim]]
-    claims_as_defendant: Optional[List[Claim]]
-    news: Optional[List[News]]
-    authored_tickets: Optional[List[Ticket]]
-    assigned_tickets: Optional[List[Ticket]]
-    ticket_messages: Optional[List[TicketMessage]]
 
     def with_permissions(self, permissions: list[Literal[".admin"]]) -> UserSchemaResponseSelf: ...
 
@@ -296,25 +257,12 @@ class UserSchemaResponseSelfWithPermissionsAdmin(AwesomeBaseModel):
 
     id: int
     updated_at: datetime
+    created_at: Any
     discord_id: Optional[int]
     minecraft_nickname: Optional[str]
     is_superuser: Optional[bool]
     biography: Optional[str]
     access: Optional[bool]
-    roles: Optional[List[Role]]
-    token: Optional[Token]
-    punishments: Optional[List[Punishment]]
-    balance: Optional[Balance]
-    application: Optional[Application]
-    transactions: Optional[List[Transaction]]
-    received_transactions: Optional[List[Transaction]]
-    webhooks: Optional[List[Webhook]]
-    claims_as_claimant: Optional[List[Claim]]
-    claims_as_defendant: Optional[List[Claim]]
-    news: Optional[List[News]]
-    authored_tickets: Optional[List[Ticket]]
-    assigned_tickets: Optional[List[Ticket]]
-    ticket_messages: Optional[List[TicketMessage]]
 
     def with_permissions(
         self, permissions: list[Literal[".admin"]]
