@@ -37,8 +37,8 @@ class TimestampsMixin(BaseModel):
     @property
     def created_at(self) -> datetime:
         try:
-            seconds = self.id // 1_000_000
-            result = EPOCH + timedelta(milliseconds=seconds)
+            timestamp_ms = (self.id >> 17) & 0x1FFFFFFFFFF
+            result = EPOCH + timedelta(milliseconds=timestamp_ms)
             return result if 1970 <= result.year <= 9999 else EPOCH
         except (OverflowError, ValueError):
             return EPOCH

@@ -31,7 +31,7 @@ class User(AwesomeModel):
     biography: Optional[str]
     access: Optional[bool]
     created_at: datetime
-    permissions: List
+    user_permissions: List
     roles: Optional[List[Role]]
     token: Optional[Token]
     punishments: Optional[List[Punishment]]
