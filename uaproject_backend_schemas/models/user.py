@@ -33,7 +33,7 @@ class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
         default=None, sa_column=Column(BigInteger(), index=True, unique=True)
     )
     minecraft_nickname: Optional[str] = AwesomeField(
-        default=None, index=True, nullable=True, max_length=16
+        default=None, index=True, nullable=True, max_length=16, unique=True
     )
     is_superuser: Optional[bool] = AwesomeField(
         default=False, nullable=True, required_permissions=[".admin"]
@@ -153,16 +153,19 @@ class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
 
     @computed_field
     @property
-    def permissions(self) -> List[Dict[str, bool]]:
+    def permissions(self) -> Dict[str, bool]:
         """Computed permissions with caching for performance."""
         # Cache computed permissions to avoid repeated computation
+        user_permissions = {}
+
         if not hasattr(self, '_computed_permissions'):
             sorted_roles = sorted(self.roles, key=lambda r: r.weight, reverse=True)
-            permissions = []
             for role in sorted_roles:
-                permissions.extend(role.permissions)
-            self._computed_permissions = permissions
-        return self._computed_permissions
+                for user_permission in role.permissions:
+                    for user_permission_key, user_permission_value in user_permission.items():
+                            user_permissions[user_permission_key] = user_permission_value
+
+        return user_permissions
 
 
 if __name__ == "__main__":
