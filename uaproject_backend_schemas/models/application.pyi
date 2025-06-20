@@ -9,7 +9,6 @@ from pydantic import BaseModel
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.models.application_section import ApplicationSection
-from uaproject_backend_schemas.models.schemas.application import ApplicationStatus
 from uaproject_backend_schemas.models.user import User
 
 class Application(AwesomeModel):
@@ -19,7 +18,6 @@ class Application(AwesomeModel):
     updated_at: datetime
     user_id: int
     version: str
-    status: ApplicationStatus
     birth_date: Optional[datetime]
     launcher: Optional[str]
     server_source: Optional[str]
@@ -27,15 +25,11 @@ class Application(AwesomeModel):
     useful_skills: Optional[str]
     conflict_reaction: Optional[str]
     quiz_answer: Optional[str]
-    griefing_rule_attitude: Optional[str]
-    chat_conflict_handling: Optional[str]
-    portfolio_links: Optional[str]
-    server_experience_positive: Optional[str]
-    permanent_world_attitude: Optional[str]
-    vanilla_experience_preference: Optional[str]
-    creeper_explosion_reaction: Optional[str]
-    incomplete_tree_reaction: Optional[str]
-    neighbor_proximity_reaction: Optional[str]
+    russian_word_reaction: Optional[str]
+    admin_decision_attitude: Optional[str]
+    new_rule_reaction: Optional[str]
+    useful_skills_detailed: Optional[str]
+    server_experience_negative: Optional[str]
     editable_fields: List[str]
     created_at: datetime
     user: Optional[User]
@@ -52,7 +46,6 @@ class ApplicationSchemas:
     update: ApplicationSchemaUpdate
     create_legacy: ApplicationSchemaCreateLegacy
     create_v2: ApplicationSchemaCreateV2
-    create_evervault: ApplicationSchemaCreateEvervault
     response: ApplicationSchemaResponse
 
 class ApplicationSchemaCreate(AwesomeBaseModel):
@@ -63,7 +56,6 @@ class ApplicationSchemaCreate(AwesomeBaseModel):
 class ApplicationSchemaUpdate(AwesomeBaseModel):
     """update schema for Application model"""
 
-    status: ApplicationStatus
     birth_date: Optional[datetime]
     launcher: Optional[str]
     server_source: Optional[str]
@@ -71,15 +63,11 @@ class ApplicationSchemaUpdate(AwesomeBaseModel):
     useful_skills: Optional[str]
     conflict_reaction: Optional[str]
     quiz_answer: Optional[str]
-    griefing_rule_attitude: Optional[str]
-    chat_conflict_handling: Optional[str]
-    portfolio_links: Optional[str]
-    server_experience_positive: Optional[str]
-    permanent_world_attitude: Optional[str]
-    vanilla_experience_preference: Optional[str]
-    creeper_explosion_reaction: Optional[str]
-    incomplete_tree_reaction: Optional[str]
-    neighbor_proximity_reaction: Optional[str]
+    russian_word_reaction: Optional[str]
+    admin_decision_attitude: Optional[str]
+    new_rule_reaction: Optional[str]
+    useful_skills_detailed: Optional[str]
+    server_experience_negative: Optional[str]
     editable_fields: List[str]
     user: Optional[User]
     sections: Optional[List[ApplicationSection]]
@@ -101,33 +89,11 @@ class ApplicationSchemaCreateV2(AwesomeBaseModel):
     birth_date: Optional[datetime]
     launcher: Optional[str]
     server_source: Optional[str]
-    minecraft_experience_years: Any
-    preferred_gamemode: Any
-    griefing_rule_attitude: Optional[str]
-    chat_conflict_handling: Optional[str]
-    portfolio_links: Optional[str]
-    server_experience_positive: Optional[str]
-    creeper_explosion_reaction: Optional[str]
-    incomplete_tree_reaction: Optional[str]
-    neighbor_proximity_reaction: Optional[str]
-
-class ApplicationSchemaCreateEvervault(AwesomeBaseModel):
-    """create_evervault schema for Application model"""
-
-    birth_date: Optional[datetime]
-    launcher: Optional[str]
-    server_source: Optional[str]
-    minecraft_experience_years: Any
-    preferred_gamemode: Any
-    griefing_rule_attitude: Optional[str]
-    chat_conflict_handling: Optional[str]
-    portfolio_links: Optional[str]
-    server_experience_positive: Optional[str]
-    creeper_explosion_reaction: Optional[str]
-    incomplete_tree_reaction: Optional[str]
-    neighbor_proximity_reaction: Optional[str]
-    permanent_world_attitude: Optional[str]
-    vanilla_experience_preference: Optional[str]
+    russian_word_reaction: Optional[str]
+    admin_decision_attitude: Optional[str]
+    new_rule_reaction: Optional[str]
+    useful_skills_detailed: Optional[str]
+    server_experience_negative: Optional[str]
 
 class ApplicationSchemaResponse(AwesomeBaseModel):
     """response schema for Application model"""
@@ -136,7 +102,6 @@ class ApplicationSchemaResponse(AwesomeBaseModel):
     updated_at: datetime
     user_id: int
     version: str
-    status: ApplicationStatus
     birth_date: Optional[datetime]
     launcher: Optional[str]
     server_source: Optional[str]
@@ -144,15 +109,11 @@ class ApplicationSchemaResponse(AwesomeBaseModel):
     useful_skills: Optional[str]
     conflict_reaction: Optional[str]
     quiz_answer: Optional[str]
-    griefing_rule_attitude: Optional[str]
-    chat_conflict_handling: Optional[str]
-    portfolio_links: Optional[str]
-    server_experience_positive: Optional[str]
-    permanent_world_attitude: Optional[str]
-    vanilla_experience_preference: Optional[str]
-    creeper_explosion_reaction: Optional[str]
-    incomplete_tree_reaction: Optional[str]
-    neighbor_proximity_reaction: Optional[str]
+    russian_word_reaction: Optional[str]
+    admin_decision_attitude: Optional[str]
+    new_rule_reaction: Optional[str]
+    useful_skills_detailed: Optional[str]
+    server_experience_negative: Optional[str]
     editable_fields: List[str]
     user: Optional[User]
     sections: Optional[List[ApplicationSection]]
@@ -160,16 +121,8 @@ class ApplicationSchemaResponse(AwesomeBaseModel):
 class ApplicationScopes:
     """Scopes for the Application model."""
 
-    status: ApplicationScopeStatus
     editable_fields: ApplicationScopeEditableFields
     form: ApplicationScopeForm
-
-class ApplicationScopeStatus(AwesomeBaseModel):
-    """status schema for Application model"""
-
-    id: int
-    user_id: int
-    status: ApplicationStatus
 
 class ApplicationScopeEditableFields(AwesomeBaseModel):
     """editable_fields schema for Application model"""
@@ -186,17 +139,11 @@ class ApplicationScopeForm(AwesomeBaseModel):
     birth_date: Optional[datetime]
     launcher: Optional[str]
     server_source: Optional[str]
-    minecraft_experience_years: Any
-    preferred_gamemode: Any
-    griefing_rule_attitude: Optional[str]
-    chat_conflict_handling: Optional[str]
-    portfolio_links: Optional[str]
-    server_experience_positive: Optional[str]
-    creeper_explosion_reaction: Optional[str]
-    incomplete_tree_reaction: Optional[str]
-    neighbor_proximity_reaction: Optional[str]
-    permanent_world_attitude: Optional[str]
-    vanilla_experience_preference: Optional[str]
+    russian_word_reaction: Optional[str]
+    admin_decision_attitude: Optional[str]
+    new_rule_reaction: Optional[str]
+    useful_skills_detailed: Optional[str]
+    server_experience_negative: Optional[str]
 
 class ApplicationFilter(BaseModel):
     """Pydantic-class for filtering the Application model."""
@@ -211,7 +158,6 @@ class ApplicationFilter(BaseModel):
     min_user_id: Optional[Any] = None
     max_user_id: Optional[Any] = None
     version: Optional[str] = None
-    status: Optional[ApplicationStatus] = None
     birth_date: Optional[datetime] = None
     min_birth_date: Optional[Any] = None
     max_birth_date: Optional[Any] = None
@@ -221,15 +167,11 @@ class ApplicationFilter(BaseModel):
     useful_skills: Optional[str] = None
     conflict_reaction: Optional[str] = None
     quiz_answer: Optional[str] = None
-    griefing_rule_attitude: Optional[str] = None
-    chat_conflict_handling: Optional[str] = None
-    portfolio_links: Optional[str] = None
-    server_experience_positive: Optional[str] = None
-    permanent_world_attitude: Optional[str] = None
-    vanilla_experience_preference: Optional[str] = None
-    creeper_explosion_reaction: Optional[str] = None
-    incomplete_tree_reaction: Optional[str] = None
-    neighbor_proximity_reaction: Optional[str] = None
+    russian_word_reaction: Optional[str] = None
+    admin_decision_attitude: Optional[str] = None
+    new_rule_reaction: Optional[str] = None
+    useful_skills_detailed: Optional[str] = None
+    server_experience_negative: Optional[str] = None
     sections_id: Optional[Any] = None
 
 class ApplicationSort(StrEnum):

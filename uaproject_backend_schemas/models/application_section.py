@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
+from pydantic import model_validator
 from sqlalchemy import BigInteger, ForeignKey
 from sqlmodel import JSON, Column
 
@@ -12,6 +13,14 @@ from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.schemas import SchemaDefinition
 from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
 from uaproject_backend_schemas.models.schemas.server import ServerAccessStatus, ServerType
+
+# Evervault section fields
+EVERVAULT_REQUIRED_FIELDS = [
+    "long_project_experience",
+    "community_projects_readiness",
+    "healthy_community_definition",
+    "ideal_server_description",
+]
 
 
 class ApplicationSection(AwesomeModel, TimestampsMixin, IDMixin, table=True):
@@ -78,3 +87,19 @@ class ApplicationSection(AwesomeModel, TimestampsMixin, IDMixin, table=True):
         class AdminReview(ScopeDefinition):
             description = "Review and manage application sections"
             permissions = [".update.admin", ".read.admin"]
+
+    @model_validator(mode="after")
+    def validate_section_data(self):
+        """Validate section data based on server type."""
+        if self.server_type == ServerType.EVERVAULT and self.section_data:
+            # Validate Evervault fields have minimum character count
+            for field_name in EVERVAULT_REQUIRED_FIELDS:
+                field_value = self.section_data.get(field_name)
+                if field_value and isinstance(field_value, str):
+                    char_count = len(field_value.strip())
+                    if char_count < 30:
+                        raise ValueError(
+                            f"Evervault field '{field_name}' must contain at least 30 characters (current: {char_count})"
+                        )
+
+        return self

@@ -2,21 +2,20 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from pydantic import model_validator
-from sqlmodel import ARRAY, BigInteger, Column, Enum, ForeignKey, Relationship, String
+from sqlmodel import ARRAY, BigInteger, Column, ForeignKey, Relationship, String
 
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.schemas import SchemaDefinition
 from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
-from uaproject_backend_schemas.models.schemas.application import ApplicationStatus
 from uaproject_backend_schemas.models.schemas.server import ServerAccessStatus, ServerType
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.models.application_section import ApplicationSection
     from uaproject_backend_schemas.models.user import User
 
-# Legacy fields (v1)
+# Legacy fields (v1) - keeping for backward compatibility
 LEGACY_EDITABLE_FIELDS: List[str] = [
     "birth_date",
     "launcher",
@@ -27,27 +26,20 @@ LEGACY_EDITABLE_FIELDS: List[str] = [
     "quiz_answer",
 ]
 
-SURVIVAL_LEVEL_FIELDS: List[str] = [
+# V2 fields - simplified set
+V2_EDITABLE_FIELDS: List[str] = [
     "birth_date",
     "launcher",
     "server_source",
-    "minecraft_experience_years",
-    "preferred_gamemode",
-    "griefing_rule_attitude",
-    "chat_conflict_handling",
-    "portfolio_links",
-    "server_experience_positive",
-    "creeper_explosion_reaction",
-    "incomplete_tree_reaction",
-    "neighbor_proximity_reaction",
+    "russian_word_reaction",
+    "admin_decision_attitude",
+    "new_rule_reaction",
+    "useful_skills_detailed",
+    "server_experience_negative",
 ]
 
-EVERVAULT_LEVEL_FIELDS: List[str] = [
-    "permanent_world_attitude",
-    "vanilla_experience_preference",
-]
-
-DEFAULT_EDITABLE_FIELDS: List[str] = SURVIVAL_LEVEL_FIELDS + EVERVAULT_LEVEL_FIELDS
+# All editable fields combined
+DEFAULT_EDITABLE_FIELDS: List[str] = V2_EDITABLE_FIELDS
 
 
 class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
@@ -60,13 +52,7 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
         sa_column=Column(BigInteger(), ForeignKey("users.id"), nullable=False, unique=True)
     )
     version: str = AwesomeField(default="v2", max_length=10, description="Application version")
-    status: ApplicationStatus = AwesomeField(
-        sa_column=Column(
-            Enum(ApplicationStatus, native_enum=False),
-            default=ApplicationStatus.NOT_SENT.value,
-            server_default=ApplicationStatus.NOT_SENT.value,
-        )
-    )
+    # REMOVED: status field - moved to ApplicationSection
 
     # Base fields (always present)
     birth_date: Optional[datetime] = AwesomeField(nullable=True)
@@ -83,37 +69,25 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     conflict_reaction: Optional[str] = AwesomeField(max_length=1024, nullable=True)
     quiz_answer: Optional[str] = AwesomeField(max_length=1024, nullable=True)
 
-    # Survival level questions (first level)
-    griefing_rule_attitude: Optional[str] = AwesomeField(
-        max_length=2048, nullable=True, description="Attitude towards griefing rule 2.3"
+    # V2 fields
+    russian_word_reaction: Optional[str] = AwesomeField(
+        max_length=2048, nullable=True, description="Reaction to hearing 'привет' on server"
     )
-    chat_conflict_handling: Optional[str] = AwesomeField(
-        max_length=2048, nullable=True, description="How to handle conflicts in chat"
+    admin_decision_attitude: Optional[str] = AwesomeField(
+        max_length=2048,
+        nullable=True,
+        description="Attitude towards admin decisions and punishments",
     )
-    portfolio_links: Optional[str] = AwesomeField(
-        max_length=1024, nullable=True, description="Links to portfolio work (optional)"
+    new_rule_reaction: Optional[str] = AwesomeField(
+        max_length=2048, nullable=True, description="Reaction to new rules or mechanics"
     )
-    server_experience_positive: Optional[str] = AwesomeField(
-        max_length=2048, nullable=True, description="Positive experience on other servers"
+    useful_skills_detailed: Optional[str] = AwesomeField(
+        max_length=2048,
+        nullable=True,
+        description="Detailed description of useful skills outside Minecraft",
     )
-
-    # Evervault level questions (second level)
-    permanent_world_attitude: Optional[str] = AwesomeField(
-        max_length=2048, nullable=True, description="Attitude towards permanent world without wipes"
-    )
-    vanilla_experience_preference: Optional[str] = AwesomeField(
-        max_length=2048, nullable=True, description="Preference for vanilla survival experience"
-    )
-
-    # Additional questions
-    creeper_explosion_reaction: Optional[str] = AwesomeField(
-        max_length=1024, nullable=True, description="Actions when creeper explodes near you"
-    )
-    incomplete_tree_reaction: Optional[str] = AwesomeField(
-        max_length=1024, nullable=True, description="Reaction to new player leaving incomplete tree"
-    )
-    neighbor_proximity_reaction: Optional[str] = AwesomeField(
-        max_length=1024, nullable=True, description="Actions when finding neighbor living nearby"
+    server_experience_negative: Optional[str] = AwesomeField(
+        max_length=2048, nullable=True, description="Negative experience on other servers"
     )
 
     editable_fields: List[str] = AwesomeField(
@@ -165,16 +139,9 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
             permissions = [".write.self"]
 
         class CreateV2(SchemaDefinition):
-            """Schema for creating v2 applications with survival level questions."""
+            """Schema for creating v2 applications."""
 
-            fields = SURVIVAL_LEVEL_FIELDS
-            optional = True
-            permissions = [".write.self"]
-
-        class CreateEvervault(SchemaDefinition):
-            """Schema for creating evervault applications with all questions."""
-
-            fields = DEFAULT_EDITABLE_FIELDS
+            fields = V2_EDITABLE_FIELDS
             optional = True
             permissions = [".write.self"]
 
@@ -182,10 +149,7 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
             permissions = [".read"]
 
     class Scopes(AwesomeModel.Scopes):
-        class Status(ScopeDefinition):
-            trigger_fields = ["status"]
-            fields = ["id", "user_id", "status"]
-            permissions = ["read"]
+        # REMOVED: Status scope - status moved to ApplicationSection
 
         class EditableFields(ScopeDefinition):
             trigger_fields = ["editable_fields"]
@@ -206,20 +170,20 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
             self.version = "v2"
 
         min_length_fields = [
-            "griefing_rule_attitude",
-            "chat_conflict_handling",
-            "server_experience_positive",
-            "permanent_world_attitude",
-            "vanilla_experience_preference",
+            "russian_word_reaction",
+            "admin_decision_attitude",
+            "new_rule_reaction",
+            "useful_skills_detailed",
+            "server_experience_negative",
         ]
 
         for field in min_length_fields:
             value = getattr(self, field, None)
             if value and isinstance(value, str):
-                word_count = len(value.split())
-                if word_count < 20:
+                char_count = len(value.strip())
+                if char_count < 30:
                     raise ValueError(
-                        f"{field} must contain at least 20 words (current: {word_count})"
+                        f"{field} must contain at least 30 characters (current: {char_count})"
                     )
 
         return self
