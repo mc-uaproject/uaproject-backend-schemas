@@ -33,15 +33,10 @@ SURVIVAL_LEVEL_FIELDS: List[str] = [
     "server_source",
     "minecraft_experience_years",
     "preferred_gamemode",
-    "russian_word_reaction",
     "griefing_rule_attitude",
     "chat_conflict_handling",
-    "admin_decision_attitude",
-    "new_rule_reaction",
-    "useful_skills_detailed",
     "portfolio_links",
     "server_experience_positive",
-    "server_experience_negative",
     "creeper_explosion_reaction",
     "incomplete_tree_reaction",
     "neighbor_proximity_reaction",
@@ -49,11 +44,7 @@ SURVIVAL_LEVEL_FIELDS: List[str] = [
 
 EVERVAULT_LEVEL_FIELDS: List[str] = [
     "permanent_world_attitude",
-    "long_project_experience",
-    "community_projects_readiness",
     "vanilla_experience_preference",
-    "ideal_server_description",
-    "healthy_community_definition",
 ]
 
 DEFAULT_EDITABLE_FIELDS: List[str] = SURVIVAL_LEVEL_FIELDS + EVERVAULT_LEVEL_FIELDS
@@ -93,25 +84,11 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     quiz_answer: Optional[str] = AwesomeField(max_length=1024, nullable=True)
 
     # Survival level questions (first level)
-    russian_word_reaction: Optional[str] = AwesomeField(
-        max_length=2048, nullable=True, description="Reaction to using Russian words in chat"
-    )
     griefing_rule_attitude: Optional[str] = AwesomeField(
         max_length=2048, nullable=True, description="Attitude towards griefing rule 2.3"
     )
     chat_conflict_handling: Optional[str] = AwesomeField(
         max_length=2048, nullable=True, description="How to handle conflicts in chat"
-    )
-    admin_decision_attitude: Optional[str] = AwesomeField(
-        max_length=2048,
-        nullable=True,
-        description="Attitude towards admin discretion in punishments",
-    )
-    new_rule_reaction: Optional[str] = AwesomeField(
-        max_length=2048, nullable=True, description="Reaction to new rules you don't like"
-    )
-    useful_skills_detailed: Optional[str] = AwesomeField(
-        max_length=2048, nullable=True, description="Detailed description of useful skills"
     )
     portfolio_links: Optional[str] = AwesomeField(
         max_length=1024, nullable=True, description="Links to portfolio work (optional)"
@@ -119,28 +96,13 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     server_experience_positive: Optional[str] = AwesomeField(
         max_length=2048, nullable=True, description="Positive experience on other servers"
     )
-    server_experience_negative: Optional[str] = AwesomeField(
-        max_length=2048, nullable=True, description="Negative experience on other servers"
-    )
 
     # Evervault level questions (second level)
     permanent_world_attitude: Optional[str] = AwesomeField(
         max_length=2048, nullable=True, description="Attitude towards permanent world without wipes"
     )
-    long_project_experience: Optional[str] = AwesomeField(
-        max_length=2048, nullable=True, description="Experience with long-term Minecraft projects"
-    )
-    community_projects_readiness: Optional[str] = AwesomeField(
-        max_length=2048, nullable=True, description="Readiness to participate in community projects"
-    )
     vanilla_experience_preference: Optional[str] = AwesomeField(
         max_length=2048, nullable=True, description="Preference for vanilla survival experience"
-    )
-    ideal_server_description: Optional[str] = AwesomeField(
-        max_length=2048, nullable=True, description="Description of ideal Minecraft server"
-    )
-    healthy_community_definition: Optional[str] = AwesomeField(
-        max_length=2048, nullable=True, description="Definition of healthy gaming community"
     )
 
     # Additional questions
@@ -178,75 +140,43 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
         class Create(SchemaDefinition):
             """Default create schema - requires only essential fields, makes legacy fields optional."""
 
-            fields_exclude = [
-                "id",
-                "created_at",
-                "updated_at",
-                "user_id",
-                "status",
-                "version",
-                "private_server_experience",  # Legacy v1 field - optional
-                "useful_skills",  # Legacy v1 field - optional
-                "conflict_reaction",  # Legacy v1 field - optional
-                "quiz_answer",  # Legacy v1 field - optional
-            ]
+            fields = ["id"]
             optional = True
             permissions = [".write.self"]
 
         class Update(SchemaDefinition):
-            """Default update schema - same exclusions as Create."""
+            """Default update schema - excludes system fields."""
 
             fields_exclude = [
                 "id",
                 "created_at",
                 "updated_at",
                 "user_id",
-                "status",
                 "version",
-                "private_server_experience",  # Legacy v1 field - optional
-                "useful_skills",  # Legacy v1 field - optional
-                "conflict_reaction",  # Legacy v1 field - optional
-                "quiz_answer",  # Legacy v1 field - optional
             ]
             optional = True
-            permissions = [".write.self"]
-
-        class CreateLegacy(SchemaDefinition):
-            """Schema for creating legacy v1 applications with all fields available."""
-
-            fields_exclude = ["id", "created_at", "updated_at", "user_id", "status", "version"]
-            optional = True
-            permissions = [".write.self"]
-
-        class CreateOther(SchemaDefinition):
-            """Admin schema - can set user_id for other users."""
-
-            fields_exclude = ["id", "created_at", "updated_at", "status", "version"]
-            optional = True
-            permissions = [".write.other"]
-
-        class UpdateOther(SchemaDefinition):
-            """Admin update schema - can modify other users' applications."""
-
-            fields_exclude = ["id", "created_at", "updated_at", "status", "version"]
-            optional = True
-            permissions = [".write.other"]
-
-        class UpdateStatus(SchemaDefinition):
-            """Admin-only status updates."""
-
-            fields = ["status"]
             permissions = [".admin"]
 
-        class Response(SchemaDefinition):
-            """Standard response schema."""
+        class CreateLegacy(SchemaDefinition):
+            """Schema for creating legacy v1 applications."""
 
-            permissions = [".read.other"]
+            fields = LEGACY_EDITABLE_FIELDS
+            optional = True
+            permissions = [".write.self"]
 
-        class ResponseSelf(SchemaDefinition):
-            """Self-response schema."""
+        class CreateV2(SchemaDefinition):
+            """Schema for creating v2 applications with survival level questions."""
 
-            permissions = [".read.self"]
+            fields = SURVIVAL_LEVEL_FIELDS
+            optional = True
+            permissions = [".write.self"]
+
+        class CreateEvervault(SchemaDefinition):
+            """Schema for creating evervault applications with all questions."""
+
+            fields = DEFAULT_EDITABLE_FIELDS
+            optional = True
+            permissions = [".write.self"]
 
     class Scopes(AwesomeModel.Scopes):
         class Status(ScopeDefinition):
@@ -273,20 +203,11 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
             self.version = "v2"
 
         min_length_fields = [
-            "russian_word_reaction",
             "griefing_rule_attitude",
             "chat_conflict_handling",
-            "admin_decision_attitude",
-            "new_rule_reaction",
-            "useful_skills_detailed",
             "server_experience_positive",
-            "server_experience_negative",
             "permanent_world_attitude",
-            "long_project_experience",
-            "community_projects_readiness",
             "vanilla_experience_preference",
-            "ideal_server_description",
-            "healthy_community_definition",
         ]
 
         for field in min_length_fields:

@@ -27,21 +27,12 @@ class Application(AwesomeModel):
     useful_skills: Optional[str]
     conflict_reaction: Optional[str]
     quiz_answer: Optional[str]
-    russian_word_reaction: Optional[str]
     griefing_rule_attitude: Optional[str]
     chat_conflict_handling: Optional[str]
-    admin_decision_attitude: Optional[str]
-    new_rule_reaction: Optional[str]
-    useful_skills_detailed: Optional[str]
     portfolio_links: Optional[str]
     server_experience_positive: Optional[str]
-    server_experience_negative: Optional[str]
     permanent_world_attitude: Optional[str]
-    long_project_experience: Optional[str]
-    community_projects_readiness: Optional[str]
     vanilla_experience_preference: Optional[str]
-    ideal_server_description: Optional[str]
-    healthy_community_definition: Optional[str]
     creeper_explosion_reaction: Optional[str]
     incomplete_tree_reaction: Optional[str]
     neighbor_proximity_reaction: Optional[str]
@@ -60,61 +51,31 @@ class ApplicationSchemas:
     create: ApplicationSchemaCreate
     update: ApplicationSchemaUpdate
     create_legacy: ApplicationSchemaCreateLegacy
-    create_other: ApplicationSchemaCreateOther
-    update_other: ApplicationSchemaUpdateOther
-    update_status: ApplicationSchemaUpdateStatus
-    response: ApplicationSchemaResponse
-    response_self: ApplicationSchemaResponseSelf
+    create_v2: ApplicationSchemaCreateV2
+    create_evervault: ApplicationSchemaCreateEvervault
 
 class ApplicationSchemaCreate(AwesomeBaseModel):
     """create schema for Application model"""
 
-    birth_date: Optional[datetime]
-    launcher: Optional[str]
-    server_source: Optional[str]
-    russian_word_reaction: Optional[str]
-    griefing_rule_attitude: Optional[str]
-    chat_conflict_handling: Optional[str]
-    admin_decision_attitude: Optional[str]
-    new_rule_reaction: Optional[str]
-    useful_skills_detailed: Optional[str]
-    portfolio_links: Optional[str]
-    server_experience_positive: Optional[str]
-    server_experience_negative: Optional[str]
-    permanent_world_attitude: Optional[str]
-    long_project_experience: Optional[str]
-    community_projects_readiness: Optional[str]
-    vanilla_experience_preference: Optional[str]
-    ideal_server_description: Optional[str]
-    healthy_community_definition: Optional[str]
-    creeper_explosion_reaction: Optional[str]
-    incomplete_tree_reaction: Optional[str]
-    neighbor_proximity_reaction: Optional[str]
-    editable_fields: List[str]
-    user: Optional[User]
-    sections: Optional[List[ApplicationSection]]
+    id: int
 
 class ApplicationSchemaUpdate(AwesomeBaseModel):
     """update schema for Application model"""
 
+    status: ApplicationStatus
     birth_date: Optional[datetime]
     launcher: Optional[str]
     server_source: Optional[str]
-    russian_word_reaction: Optional[str]
+    private_server_experience: Optional[str]
+    useful_skills: Optional[str]
+    conflict_reaction: Optional[str]
+    quiz_answer: Optional[str]
     griefing_rule_attitude: Optional[str]
     chat_conflict_handling: Optional[str]
-    admin_decision_attitude: Optional[str]
-    new_rule_reaction: Optional[str]
-    useful_skills_detailed: Optional[str]
     portfolio_links: Optional[str]
     server_experience_positive: Optional[str]
-    server_experience_negative: Optional[str]
     permanent_world_attitude: Optional[str]
-    long_project_experience: Optional[str]
-    community_projects_readiness: Optional[str]
     vanilla_experience_preference: Optional[str]
-    ideal_server_description: Optional[str]
-    healthy_community_definition: Optional[str]
     creeper_explosion_reaction: Optional[str]
     incomplete_tree_reaction: Optional[str]
     neighbor_proximity_reaction: Optional[str]
@@ -132,172 +93,40 @@ class ApplicationSchemaCreateLegacy(AwesomeBaseModel):
     useful_skills: Optional[str]
     conflict_reaction: Optional[str]
     quiz_answer: Optional[str]
-    russian_word_reaction: Optional[str]
-    griefing_rule_attitude: Optional[str]
-    chat_conflict_handling: Optional[str]
-    admin_decision_attitude: Optional[str]
-    new_rule_reaction: Optional[str]
-    useful_skills_detailed: Optional[str]
-    portfolio_links: Optional[str]
-    server_experience_positive: Optional[str]
-    server_experience_negative: Optional[str]
-    permanent_world_attitude: Optional[str]
-    long_project_experience: Optional[str]
-    community_projects_readiness: Optional[str]
-    vanilla_experience_preference: Optional[str]
-    ideal_server_description: Optional[str]
-    healthy_community_definition: Optional[str]
-    creeper_explosion_reaction: Optional[str]
-    incomplete_tree_reaction: Optional[str]
-    neighbor_proximity_reaction: Optional[str]
-    editable_fields: List[str]
-    user: Optional[User]
-    sections: Optional[List[ApplicationSection]]
 
-class ApplicationSchemaCreateOther(AwesomeBaseModel):
-    """create_other schema for Application model"""
+class ApplicationSchemaCreateV2(AwesomeBaseModel):
+    """create_v2 schema for Application model"""
 
-    user_id: int
     birth_date: Optional[datetime]
     launcher: Optional[str]
     server_source: Optional[str]
-    private_server_experience: Optional[str]
-    useful_skills: Optional[str]
-    conflict_reaction: Optional[str]
-    quiz_answer: Optional[str]
-    russian_word_reaction: Optional[str]
+    minecraft_experience_years: Any
+    preferred_gamemode: Any
     griefing_rule_attitude: Optional[str]
     chat_conflict_handling: Optional[str]
-    admin_decision_attitude: Optional[str]
-    new_rule_reaction: Optional[str]
-    useful_skills_detailed: Optional[str]
     portfolio_links: Optional[str]
     server_experience_positive: Optional[str]
-    server_experience_negative: Optional[str]
-    permanent_world_attitude: Optional[str]
-    long_project_experience: Optional[str]
-    community_projects_readiness: Optional[str]
-    vanilla_experience_preference: Optional[str]
-    ideal_server_description: Optional[str]
-    healthy_community_definition: Optional[str]
     creeper_explosion_reaction: Optional[str]
     incomplete_tree_reaction: Optional[str]
     neighbor_proximity_reaction: Optional[str]
-    editable_fields: List[str]
-    user: Optional[User]
-    sections: Optional[List[ApplicationSection]]
 
-class ApplicationSchemaUpdateOther(AwesomeBaseModel):
-    """update_other schema for Application model"""
+class ApplicationSchemaCreateEvervault(AwesomeBaseModel):
+    """create_evervault schema for Application model"""
 
-    user_id: int
     birth_date: Optional[datetime]
     launcher: Optional[str]
     server_source: Optional[str]
-    private_server_experience: Optional[str]
-    useful_skills: Optional[str]
-    conflict_reaction: Optional[str]
-    quiz_answer: Optional[str]
-    russian_word_reaction: Optional[str]
+    minecraft_experience_years: Any
+    preferred_gamemode: Any
     griefing_rule_attitude: Optional[str]
     chat_conflict_handling: Optional[str]
-    admin_decision_attitude: Optional[str]
-    new_rule_reaction: Optional[str]
-    useful_skills_detailed: Optional[str]
     portfolio_links: Optional[str]
     server_experience_positive: Optional[str]
-    server_experience_negative: Optional[str]
-    permanent_world_attitude: Optional[str]
-    long_project_experience: Optional[str]
-    community_projects_readiness: Optional[str]
-    vanilla_experience_preference: Optional[str]
-    ideal_server_description: Optional[str]
-    healthy_community_definition: Optional[str]
     creeper_explosion_reaction: Optional[str]
     incomplete_tree_reaction: Optional[str]
     neighbor_proximity_reaction: Optional[str]
-    editable_fields: List[str]
-    user: Optional[User]
-    sections: Optional[List[ApplicationSection]]
-
-class ApplicationSchemaUpdateStatus(AwesomeBaseModel):
-    """update_status schema for Application model"""
-
-    status: ApplicationStatus
-
-class ApplicationSchemaResponse(AwesomeBaseModel):
-    """response schema for Application model"""
-
-    id: int
-    updated_at: datetime
-    user_id: int
-    version: str
-    status: ApplicationStatus
-    birth_date: Optional[datetime]
-    launcher: Optional[str]
-    server_source: Optional[str]
-    private_server_experience: Optional[str]
-    useful_skills: Optional[str]
-    conflict_reaction: Optional[str]
-    quiz_answer: Optional[str]
-    russian_word_reaction: Optional[str]
-    griefing_rule_attitude: Optional[str]
-    chat_conflict_handling: Optional[str]
-    admin_decision_attitude: Optional[str]
-    new_rule_reaction: Optional[str]
-    useful_skills_detailed: Optional[str]
-    portfolio_links: Optional[str]
-    server_experience_positive: Optional[str]
-    server_experience_negative: Optional[str]
     permanent_world_attitude: Optional[str]
-    long_project_experience: Optional[str]
-    community_projects_readiness: Optional[str]
     vanilla_experience_preference: Optional[str]
-    ideal_server_description: Optional[str]
-    healthy_community_definition: Optional[str]
-    creeper_explosion_reaction: Optional[str]
-    incomplete_tree_reaction: Optional[str]
-    neighbor_proximity_reaction: Optional[str]
-    editable_fields: List[str]
-    user: Optional[User]
-    sections: Optional[List[ApplicationSection]]
-
-class ApplicationSchemaResponseSelf(AwesomeBaseModel):
-    """response_self schema for Application model"""
-
-    id: int
-    updated_at: datetime
-    user_id: int
-    version: str
-    status: ApplicationStatus
-    birth_date: Optional[datetime]
-    launcher: Optional[str]
-    server_source: Optional[str]
-    private_server_experience: Optional[str]
-    useful_skills: Optional[str]
-    conflict_reaction: Optional[str]
-    quiz_answer: Optional[str]
-    russian_word_reaction: Optional[str]
-    griefing_rule_attitude: Optional[str]
-    chat_conflict_handling: Optional[str]
-    admin_decision_attitude: Optional[str]
-    new_rule_reaction: Optional[str]
-    useful_skills_detailed: Optional[str]
-    portfolio_links: Optional[str]
-    server_experience_positive: Optional[str]
-    server_experience_negative: Optional[str]
-    permanent_world_attitude: Optional[str]
-    long_project_experience: Optional[str]
-    community_projects_readiness: Optional[str]
-    vanilla_experience_preference: Optional[str]
-    ideal_server_description: Optional[str]
-    healthy_community_definition: Optional[str]
-    creeper_explosion_reaction: Optional[str]
-    incomplete_tree_reaction: Optional[str]
-    neighbor_proximity_reaction: Optional[str]
-    editable_fields: List[str]
-    user: Optional[User]
-    sections: Optional[List[ApplicationSection]]
 
 class ApplicationScopes:
     """Scopes for the Application model."""
@@ -330,24 +159,15 @@ class ApplicationScopeForm(AwesomeBaseModel):
     server_source: Optional[str]
     minecraft_experience_years: Any
     preferred_gamemode: Any
-    russian_word_reaction: Optional[str]
     griefing_rule_attitude: Optional[str]
     chat_conflict_handling: Optional[str]
-    admin_decision_attitude: Optional[str]
-    new_rule_reaction: Optional[str]
-    useful_skills_detailed: Optional[str]
     portfolio_links: Optional[str]
     server_experience_positive: Optional[str]
-    server_experience_negative: Optional[str]
     creeper_explosion_reaction: Optional[str]
     incomplete_tree_reaction: Optional[str]
     neighbor_proximity_reaction: Optional[str]
     permanent_world_attitude: Optional[str]
-    long_project_experience: Optional[str]
-    community_projects_readiness: Optional[str]
     vanilla_experience_preference: Optional[str]
-    ideal_server_description: Optional[str]
-    healthy_community_definition: Optional[str]
 
 class ApplicationFilter(BaseModel):
     """Pydantic-class for filtering the Application model."""
@@ -372,21 +192,12 @@ class ApplicationFilter(BaseModel):
     useful_skills: Optional[str] = None
     conflict_reaction: Optional[str] = None
     quiz_answer: Optional[str] = None
-    russian_word_reaction: Optional[str] = None
     griefing_rule_attitude: Optional[str] = None
     chat_conflict_handling: Optional[str] = None
-    admin_decision_attitude: Optional[str] = None
-    new_rule_reaction: Optional[str] = None
-    useful_skills_detailed: Optional[str] = None
     portfolio_links: Optional[str] = None
     server_experience_positive: Optional[str] = None
-    server_experience_negative: Optional[str] = None
     permanent_world_attitude: Optional[str] = None
-    long_project_experience: Optional[str] = None
-    community_projects_readiness: Optional[str] = None
     vanilla_experience_preference: Optional[str] = None
-    ideal_server_description: Optional[str] = None
-    healthy_community_definition: Optional[str] = None
     creeper_explosion_reaction: Optional[str] = None
     incomplete_tree_reaction: Optional[str] = None
     neighbor_proximity_reaction: Optional[str] = None
