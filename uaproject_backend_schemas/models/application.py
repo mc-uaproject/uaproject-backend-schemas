@@ -178,6 +178,9 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
             optional = True
             permissions = [".write.self"]
 
+        class Response(SchemaDefinition):
+            permissions = [".read"]
+
     class Scopes(AwesomeModel.Scopes):
         class Status(ScopeDefinition):
             trigger_fields = ["status"]

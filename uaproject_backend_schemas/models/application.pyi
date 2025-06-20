@@ -53,6 +53,7 @@ class ApplicationSchemas:
     create_legacy: ApplicationSchemaCreateLegacy
     create_v2: ApplicationSchemaCreateV2
     create_evervault: ApplicationSchemaCreateEvervault
+    response: ApplicationSchemaResponse
 
 class ApplicationSchemaCreate(AwesomeBaseModel):
     """create schema for Application model"""
@@ -127,6 +128,34 @@ class ApplicationSchemaCreateEvervault(AwesomeBaseModel):
     neighbor_proximity_reaction: Optional[str]
     permanent_world_attitude: Optional[str]
     vanilla_experience_preference: Optional[str]
+
+class ApplicationSchemaResponse(AwesomeBaseModel):
+    """response schema for Application model"""
+
+    id: int
+    updated_at: datetime
+    user_id: int
+    version: str
+    status: ApplicationStatus
+    birth_date: Optional[datetime]
+    launcher: Optional[str]
+    server_source: Optional[str]
+    private_server_experience: Optional[str]
+    useful_skills: Optional[str]
+    conflict_reaction: Optional[str]
+    quiz_answer: Optional[str]
+    griefing_rule_attitude: Optional[str]
+    chat_conflict_handling: Optional[str]
+    portfolio_links: Optional[str]
+    server_experience_positive: Optional[str]
+    permanent_world_attitude: Optional[str]
+    vanilla_experience_preference: Optional[str]
+    creeper_explosion_reaction: Optional[str]
+    incomplete_tree_reaction: Optional[str]
+    neighbor_proximity_reaction: Optional[str]
+    editable_fields: List[str]
+    user: Optional[User]
+    sections: Optional[List[ApplicationSection]]
 
 class ApplicationScopes:
     """Scopes for the Application model."""
