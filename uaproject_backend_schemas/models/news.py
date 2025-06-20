@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from sqlmodel import (
     JSON,
@@ -18,6 +18,9 @@ from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.schemas import SchemaDefinition
 from uaproject_backend_schemas.models.schemas.news import ImportanceType, NewsType
 from uaproject_backend_schemas.models.user import User
+
+if TYPE_CHECKING:
+    from uaproject_backend_schemas.models.file import File
 
 
 class NewsImage(AwesomeModel, IDMixin, table=True):
@@ -74,6 +77,9 @@ class News(AwesomeModel, IDMixin, TimestampsMixin, table=True):
 
     author: Optional[User] = Relationship(back_populates="news")
     images: List[NewsImage] = Relationship(back_populates="news")
+
+    # MinIO file relationship (one-to-many)
+    cover_files: List["File"] = Relationship(back_populates="news")
 
     class Schemas(AwesomeModel.Schemas):
         class Create(SchemaDefinition):

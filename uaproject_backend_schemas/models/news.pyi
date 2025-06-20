@@ -2,12 +2,13 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel
 
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
+from uaproject_backend_schemas.models.file import File
 from uaproject_backend_schemas.models.news_image import NewsImage
 from uaproject_backend_schemas.models.schemas.news import ImportanceType, NewsType
 from uaproject_backend_schemas.models.user import User
@@ -33,10 +34,9 @@ class News(AwesomeModel):
     created_at: datetime
     author: Optional[User]
     images: Optional[List[NewsImage]]
+    cover_files: Optional[List[File]]
     schemas: NewsSchemas
     scopes: NewsScopes
-    filters: NewsFilters
-    sorts: NewsSorts
     filter: type[NewsFilter]
     sort: type[NewsSort]
 
@@ -64,6 +64,7 @@ class NewsSchemaCreate(AwesomeBaseModel):
     importance: ImportanceType
     author: Optional[User]
     images: Optional[List[NewsImage]]
+    cover_files: Optional[List[File]]
 
 class NewsSchemaPublish(AwesomeBaseModel):
     """publish schema for News model"""
@@ -98,18 +99,43 @@ class NewsSchemaResponse(AwesomeBaseModel):
     importance: ImportanceType
     author: Optional[User]
     images: Optional[List[NewsImage]]
+    cover_files: Optional[List[File]]
 
 class NewsScopes:
     """Scopes for the News model."""
 
-class NewsFilters:
-    """Declarative filters for the News model."""
-
 class NewsFilter(BaseModel):
     """Pydantic-class for filtering the News model."""
 
-class NewsSorts:
-    """Declarative sorts for the News model."""
+    updated_at: Optional[datetime] = None
+    min_updated_at: Optional[Any] = None
+    max_updated_at: Optional[Any] = None
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
+    title: Optional[str] = None
+    summary: Optional[str] = None
+    content: Optional[str] = None
+    is_published: Optional[bool] = None
+    author_id: Optional[int] = None
+    min_author_id: Optional[Any] = None
+    max_author_id: Optional[Any] = None
+    discord_message_id: Optional[str] = None
+    telegram_message_id: Optional[str] = None
+    event_time: Optional[datetime] = None
+    min_event_time: Optional[Any] = None
+    max_event_time: Optional[Any] = None
+    is_pinned: Optional[bool] = None
+    is_archived: Optional[bool] = None
+    type: Optional[NewsType] = None
+    importance: Optional[ImportanceType] = None
+    images_id: Optional[Any] = None
+    cover_files_id: Optional[Any] = None
 
 class NewsSort(StrEnum):
     """Enum for sorting the News model."""
+
+    ID = "id"
+    CREATED_AT = "created_at"
+    UPDATED_AT = "updated_at"
+    TITLE = "title"

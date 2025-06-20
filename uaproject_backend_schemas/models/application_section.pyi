@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
@@ -26,8 +26,6 @@ class ApplicationSection(AwesomeModel):
     created_at: datetime
     schemas: ApplicationSectionSchemas
     scopes: ApplicationSectionScopes
-    filters: ApplicationSectionFilters
-    sorts: ApplicationSectionSorts
     filter: type[ApplicationSectionFilter]
     sort: type[ApplicationSectionSort]
 
@@ -147,14 +145,33 @@ class ApplicationSectionScopeAdminReview(AwesomeBaseModel):
     rejection_reason: Optional[str]
     is_required: bool
 
-class ApplicationSectionFilters:
-    """Declarative filters for the ApplicationSection model."""
-
 class ApplicationSectionFilter(BaseModel):
     """Pydantic-class for filtering the ApplicationSection model."""
 
-class ApplicationSectionSorts:
-    """Declarative sorts for the ApplicationSection model."""
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
+    updated_at: Optional[datetime] = None
+    min_updated_at: Optional[Any] = None
+    max_updated_at: Optional[Any] = None
+    application_id: Optional[int] = None
+    min_application_id: Optional[Any] = None
+    max_application_id: Optional[Any] = None
+    server_type: Optional[ServerType] = None
+    section_data: Optional[dict] = None
+    status: Optional[ServerAccessStatus] = None
+    reviewed_by: Optional[int] = None
+    min_reviewed_by: Optional[Any] = None
+    max_reviewed_by: Optional[Any] = None
+    reviewed_at: Optional[datetime] = None
+    min_reviewed_at: Optional[Any] = None
+    max_reviewed_at: Optional[Any] = None
+    rejection_reason: Optional[str] = None
+    is_required: Optional[bool] = None
 
 class ApplicationSectionSort(StrEnum):
     """Enum for sorting the ApplicationSection model."""
+
+    ID = "id"
+    CREATED_AT = "created_at"
+    UPDATED_AT = "updated_at"

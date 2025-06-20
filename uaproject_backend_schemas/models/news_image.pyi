@@ -1,7 +1,7 @@
 # AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
 
 from enum import StrEnum
-from typing import Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
@@ -21,8 +21,6 @@ class NewsImage(AwesomeModel):
     news: Optional[News]
     schemas: NewsImageSchemas
     scopes: NewsImageScopes
-    filters: NewsImageFilters
-    sorts: NewsImageSorts
     filter: type[NewsImageFilter]
     sort: type[NewsImageSort]
 
@@ -67,14 +65,23 @@ class NewsImageSchemaResponse(AwesomeBaseModel):
 class NewsImageScopes:
     """Scopes for the NewsImage model."""
 
-class NewsImageFilters:
-    """Declarative filters for the NewsImage model."""
-
 class NewsImageFilter(BaseModel):
     """Pydantic-class for filtering the NewsImage model."""
 
-class NewsImageSorts:
-    """Declarative sorts for the NewsImage model."""
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
+    news_id: Optional[int] = None
+    min_news_id: Optional[Any] = None
+    max_news_id: Optional[Any] = None
+    image_data: Optional[bytes] = None
+    image_path: Optional[str] = None
+    image_url: Optional[str] = None
+    order: Optional[int] = None
+    min_order: Optional[Any] = None
+    max_order: Optional[Any] = None
 
 class NewsImageSort(StrEnum):
     """Enum for sorting the NewsImage model."""
+
+    ID = "id"

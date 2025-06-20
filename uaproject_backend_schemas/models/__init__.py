@@ -2,6 +2,7 @@ from .application import Application
 from .application_section import ApplicationSection
 from .balance import Balance
 from .claim import Claim
+from .file import File
 from .judging import Judging
 from .news import News
 from .punishment import Punishment
@@ -20,6 +21,7 @@ Application.model_rebuild()
 ApplicationSection.model_rebuild()
 Balance.model_rebuild()
 Claim.model_rebuild()
+File.model_rebuild()
 Judging.model_rebuild()
 News.model_rebuild()
 Punishment.model_rebuild()
@@ -39,6 +41,7 @@ __all__ = [
     "ApplicationSection",
     "Balance",
     "Claim",
+    "File",
     "Judging",
     "News",
     "Punishment",

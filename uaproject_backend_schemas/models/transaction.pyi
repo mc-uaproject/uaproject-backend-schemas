@@ -3,7 +3,7 @@
 from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from pydantic import BaseModel
 
@@ -31,8 +31,6 @@ class Transaction(AwesomeModel):
     recipient: Optional[User]
     schemas: TransactionSchemas
     scopes: TransactionScopes
-    filters: TransactionFilters
-    sorts: TransactionSorts
     filter: type[TransactionFilter]
     sort: type[TransactionSort]
 
@@ -90,14 +88,32 @@ class TransactionSchemaResponse(AwesomeBaseModel):
 class TransactionScopes:
     """Scopes for the Transaction model."""
 
-class TransactionFilters:
-    """Declarative filters for the Transaction model."""
-
 class TransactionFilter(BaseModel):
     """Pydantic-class for filtering the Transaction model."""
 
-class TransactionSorts:
-    """Declarative sorts for the Transaction model."""
+    updated_at: Optional[datetime] = None
+    min_updated_at: Optional[Any] = None
+    max_updated_at: Optional[Any] = None
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
+    user_id: Optional[int] = None
+    min_user_id: Optional[Any] = None
+    max_user_id: Optional[Any] = None
+    amount: Optional[Decimal] = None
+    type: Optional[TransactionType] = None
+    description: Optional[str] = None
+    recipient_id: Optional[int] = None
+    min_recipient_id: Optional[Any] = None
+    max_recipient_id: Optional[Any] = None
+    service_id: Optional[int] = None
+    min_service_id: Optional[Any] = None
+    max_service_id: Optional[Any] = None
+    service_name: Optional[Any] = None
 
 class TransactionSort(StrEnum):
     """Enum for sorting the Transaction model."""
+
+    ID = "id"
+    CREATED_AT = "created_at"
+    UPDATED_AT = "updated_at"

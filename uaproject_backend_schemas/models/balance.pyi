@@ -3,7 +3,7 @@
 from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
-from typing import Optional
+from typing import Any, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -24,8 +24,6 @@ class Balance(AwesomeModel):
     user: Optional[User]
     schemas: BalanceSchemas
     scopes: BalanceScopes
-    filters: BalanceFilters
-    sorts: BalanceSorts
     filter: type[BalanceFilter]
     sort: type[BalanceSort]
 
@@ -80,14 +78,24 @@ class BalanceScopeAmount(AwesomeBaseModel):
     user_id: int
     amount: Decimal
 
-class BalanceFilters:
-    """Declarative filters for the Balance model."""
-
 class BalanceFilter(BaseModel):
     """Pydantic-class for filtering the Balance model."""
 
-class BalanceSorts:
-    """Declarative sorts for the Balance model."""
+    updated_at: Optional[datetime] = None
+    min_updated_at: Optional[Any] = None
+    max_updated_at: Optional[Any] = None
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
+    user_id: Optional[int] = None
+    min_user_id: Optional[Any] = None
+    max_user_id: Optional[Any] = None
+    identifier: Optional[UUID] = None
+    amount: Optional[Decimal] = None
 
 class BalanceSort(StrEnum):
     """Enum for sorting the Balance model."""
+
+    ID = "id"
+    CREATED_AT = "created_at"
+    UPDATED_AT = "updated_at"

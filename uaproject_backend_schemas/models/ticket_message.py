@@ -9,6 +9,7 @@ from uaproject_backend_schemas.awesome.schemas import SchemaDefinition
 from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
 
 if TYPE_CHECKING:
+    from uaproject_backend_schemas.models.file import File
     from uaproject_backend_schemas.models.ticket import Ticket
     from uaproject_backend_schemas.models.user import User
 
@@ -26,10 +27,11 @@ class TicketMessage(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     )
 
     content: str = AwesomeField(max_length=4096, description="Message content (supports markdown)")
-    attachments: Optional[List[str]] = AwesomeField(
+    # MinIO file attachments (replacing old attachments field)
+    attachment_file_ids: Optional[List[int]] = AwesomeField(
         sa_column=Column(JSON, nullable=True, default=[]),
         default_factory=list,
-        description="List of attachment URLs/paths",
+        description="List of File IDs for attachments",
     )
 
     is_system_message: bool = AwesomeField(
@@ -46,6 +48,7 @@ class TicketMessage(AwesomeModel, TimestampsMixin, IDMixin, table=True):
         back_populates="ticket_messages",
         sa_relationship_kwargs={"foreign_keys": "[TicketMessage.author_id]", "uselist": False},
     )
+    attachment_files: List["File"] = Relationship(back_populates="ticket_message")
 
     class Schemas(AwesomeModel.Schemas):
         class Create(SchemaDefinition):
@@ -74,7 +77,7 @@ class TicketMessage(AwesomeModel, TimestampsMixin, IDMixin, table=True):
                 "ticket_id",
                 "author_id",
                 "content",
-                "attachments",
+                "attachment_file_ids",
                 "is_system_message",
                 "edited_at",
                 "created_at",

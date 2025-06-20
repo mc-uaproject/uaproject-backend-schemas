@@ -398,10 +398,13 @@ def generate_class(
         if field_name in model_cls.model_fields:
             field_type = _get_field_type(model_cls.model_fields[field_name])
             fields.append(f"    {field_name}: {field_type}")
-        elif hasattr(model_cls, "model_computed_fields") and field_name in model_cls.model_computed_fields:
+        elif (
+            hasattr(model_cls, "model_computed_fields")
+            and field_name in model_cls.model_computed_fields
+        ):
             computed_field = model_cls.model_computed_fields[field_name]
             if hasattr(computed_field, "return_type") and computed_field.return_type:
-                type_str = computed_field.return_type.__name__ if hasattr(computed_field.return_type, "__name__") else str(computed_field.return_type)
+                type_str = _extract_clean_type(computed_field.return_type)
             else:
                 type_str = "Any"
             fields.append(f"    {field_name}: {type_str}")
@@ -501,10 +504,12 @@ def unwrap_optional(ann):
     return ann
 
 
-def generate_filter_class(model_cls: Type[AwesomeModel]) -> str:
-    if not hasattr(model_cls, "filter") or not model_cls.filter:
-        return ""
-    filter_cls = model_cls.filter
+def generate_filter_class(model_cls: Type[AwesomeModel], filter_cls=None) -> str:
+    if filter_cls is None:
+        if not hasattr(model_cls, "filter") or not model_cls.filter:
+            return ""
+        filter_cls = model_cls.filter
+
     content = f"class {model_cls.__name__}Filter(BaseModel):\n"
     content += f'    """Pydantic-class for filtering the {model_cls.__name__} model."""\n'
     for name, field in filter_cls.model_fields.items():
@@ -519,10 +524,12 @@ def generate_filter_class(model_cls: Type[AwesomeModel]) -> str:
     return content
 
 
-def generate_sort_enum(model_cls: Type[AwesomeModel]) -> str:
-    if not hasattr(model_cls, "sort") or not model_cls.sort:
-        return ""
-    sort_cls = model_cls.sort
+def generate_sort_enum(model_cls: Type[AwesomeModel], sort_cls=None) -> str:
+    if sort_cls is None:
+        if not hasattr(model_cls, "sort") or not model_cls.sort:
+            return ""
+        sort_cls = model_cls.sort
+
     content = f"class {model_cls.__name__}Sort(StrEnum):\n"
     content += f'    """Enum for sorting the {model_cls.__name__} model."""\n'
     for member in sort_cls:
@@ -543,6 +550,9 @@ def collect_additional_imports(generated_content: str) -> set[str]:
         imports.add("from uaproject_backend_schemas.awesome.sorts import SortDefinition")
     if "Any" in generated_content:
         imports.add("from typing import Any")
+    # Check for Optional usage in filter/sort classes specifically
+    if "Optional[" in generated_content and "from typing import Optional" not in generated_content:
+        imports.add("from typing import Optional")
     return imports
 
 
@@ -556,6 +566,11 @@ def _get_relationship_fields(model_cls: Type[AwesomeModel]) -> list[str]:
 
 def _extract_clean_type(ann):
     ann_str = str(ann)
+
+    # Handle datetime class representation
+    if ann_str == "<class 'datetime.datetime'>":
+        return "datetime"
+
     if ann_str.startswith("sqlalchemy.orm.base.Mapped"):
         inner = ann_str.split("[", 1)[1].rsplit("]", 1)[0]
         inner = inner.replace("typing.", "")
@@ -566,13 +581,16 @@ def _extract_clean_type(ann):
         if not inner.startswith("Optional["):
             inner = f"Optional[{inner}]"
         return inner
+
+    # Handle computed fields return types without wrapping in Optional
     ann_str = ann_str.replace("typing.", "")
     ann_str = re.sub(r'ForwardRef\(["\\\']?([A-Za-z_][A-Za-z0-9_]*)["\\\']?\)', r"\1", ann_str)
     ann_str = re.sub(
         r"uaproject_backend_schemas\.models\.[\w\.]+\.([A-Z][A-Za-z0-9_]*)", r"\1", ann_str
     )
-    if not ann_str.startswith("Optional["):
-        ann_str = f"Optional[{ann_str}]"
+
+    # Don't automatically wrap computed field types in Optional
+    # Only wrap relationship fields in Optional
     return ann_str
 
 
@@ -620,10 +638,18 @@ def _generate_model_fields(model_cls: Type[AwesomeModel]) -> tuple[str, set]:
     if hasattr(model_cls, "model_computed_fields"):
         for field_name, computed_field in model_cls.model_computed_fields.items():
             if hasattr(computed_field, "return_type") and computed_field.return_type:
-                type_str = computed_field.return_type.__name__ if hasattr(computed_field.return_type, "__name__") else str(computed_field.return_type)
+                type_str = _extract_clean_type(computed_field.return_type)
             else:
                 type_str = "Any"
             lines.append(f"    {field_name}: {type_str}")
+
+            # Add imports for computed field types
+            if "Optional" in type_str:
+                imports.add("from typing import Optional")
+            if "List" in type_str:
+                imports.add("from typing import List")
+            if "Dict" in type_str:
+                imports.add("from typing import Dict")
     else:
         computed_fields = _collect_computed_fields(model_cls)
         for field_name, computed_field in computed_fields.items():
@@ -645,6 +671,8 @@ def _generate_model_fields(model_cls: Type[AwesomeModel]) -> tuple[str, set]:
             imports.add("from typing import Optional")
         if "List" in type_str:
             imports.add("from typing import List")
+        if "Dict" in type_str:
+            imports.add("from typing import Dict")
         for match in re.findall(r"\b([A-Z][A-Za-z0-9_]*)\b", type_str):
             if match not in {"Optional", "List", "Dict", "Any", "str", "int", "bool", "float"}:
                 filename = MODEL_IMPORT_OVERRIDES.get(match, camel_to_snake(match))
@@ -683,11 +711,56 @@ def _generate_model_sections(model_cls: Type[AwesomeModel], permissions: set[str
                     model_cls, _type_key, [perm], _type=_type.capitalize()[:-1]
                 )
 
-    if getattr(model_cls, "filter", None):
+    # Generate declarative filters and filter classes only if they exist and have content
+    if (
+        hasattr(model_cls, "filters")
+        and model_cls.filters
+        and hasattr(model_cls.filters, "list")
+        and model_cls.filters.list()
+    ):
         content += generate_filters_class(model_cls)
-        content += generate_filter_class(model_cls)
-    content += generate_sorts_class(model_cls)
-    content += generate_sort_enum(model_cls)
+
+    # Force regeneration of filter/sort to avoid cached classproperty issues
+    # Reset cached filter/sort attributes if they exist
+    try:
+        if hasattr(model_cls, "__filters__"):
+            delattr(model_cls, "__filters__")
+    except (AttributeError, TypeError):
+        pass
+    try:
+        if hasattr(model_cls, "__sorts__"):
+            delattr(model_cls, "__sorts__")
+    except (AttributeError, TypeError):
+        pass
+
+    # Check for Pydantic filter class - force regeneration to avoid cache issues
+    from uaproject_backend_schemas.awesome.filters import AwesomeFilters
+
+    # Create fresh filters instance for this model
+    filters_cls = type(f"{model_cls.__name__}Filters", (AwesomeFilters,), {"model_cls": model_cls})
+    filter_obj = filters_cls.get_pydantic_filter_class()
+
+    if filter_obj and hasattr(filter_obj, "model_fields") and bool(filter_obj.model_fields):
+        content += generate_filter_class(model_cls, filter_obj)
+
+    # Generate sorts classes only if they exist and have content
+    if (
+        hasattr(model_cls, "sorts")
+        and model_cls.sorts
+        and hasattr(model_cls.sorts, "list")
+        and model_cls.sorts.list()
+    ):
+        content += generate_sorts_class(model_cls)
+
+    # Check for sort enum - force regeneration to avoid cache issues
+    from uaproject_backend_schemas.awesome.sorts import AwesomeSorts
+
+    # Create fresh sorts instance for this model
+    sorts_cls = type(f"{model_cls.__name__}Sorts", (AwesomeSorts,), {"model_cls": model_cls})
+    sort_obj = sorts_cls.get_enum_sort_class()
+
+    if sort_obj and hasattr(sort_obj, "__members__") and bool(sort_obj.__members__):
+        content += generate_sort_enum(model_cls, sort_obj)
     return content
 
 
@@ -701,13 +774,39 @@ def build_main_content(model_cls: Type[AwesomeModel], permissions: set[str]) -> 
     main_content += model_fields_str
     main_content += f"    schemas: {model_cls.__name__}Schemas\n"
     main_content += f"    scopes: {model_cls.__name__}Scopes\n"
-    if getattr(model_cls, "filter", None):
+    if (
+        hasattr(model_cls, "filters")
+        and model_cls.filters
+        and hasattr(model_cls.filters, "list")
+        and model_cls.filters.list()
+    ):
         main_content += f"    filters: {model_cls.__name__}Filters\n"
-    if hasattr(model_cls, "sorts") and model_cls.sorts:
+    if (
+        hasattr(model_cls, "sorts")
+        and model_cls.sorts
+        and hasattr(model_cls.sorts, "list")
+        and model_cls.sorts.list()
+    ):
         main_content += f"    sorts: {model_cls.__name__}Sorts\n"
-    if getattr(model_cls, "filter", None):
+
+    # Check for Pydantic filter class - force regeneration to avoid cache issues
+    from uaproject_backend_schemas.awesome.filters import AwesomeFilters
+
+    # Create fresh filters instance for this model
+    filters_cls = type(f"{model_cls.__name__}Filters", (AwesomeFilters,), {"model_cls": model_cls})
+    filter_obj = filters_cls.get_pydantic_filter_class()
+
+    if filter_obj and hasattr(filter_obj, "model_fields") and bool(filter_obj.model_fields):
         main_content += f"    filter: type[{model_cls.__name__}Filter]\n"
-    if hasattr(model_cls, "sort") and model_cls.sort:
+
+    # Check for sort enum - force regeneration to avoid cache issues
+    from uaproject_backend_schemas.awesome.sorts import AwesomeSorts
+
+    # Create fresh sorts instance for this model
+    sorts_cls = type(f"{model_cls.__name__}Sorts", (AwesomeSorts,), {"model_cls": model_cls})
+    sort_obj = sorts_cls.get_enum_sort_class()
+
+    if sort_obj and hasattr(sort_obj, "__members__") and bool(sort_obj.__members__):
         main_content += f"    sort: type[{model_cls.__name__}Sort]\n"
     main_content += "\n"
     main_content += _generate_model_sections(model_cls, permissions)
@@ -748,7 +847,11 @@ def generate_pyi_for_model(model_cls: Type[AwesomeModel], module_path: str) -> s
 
     additional_imports = collect_additional_imports(main_content)
     already_imported = set(std_imports + typing_imports + project_imports + other_imports)
-    additional_imports = [imp for imp in additional_imports if imp not in already_imported]
+    
+    # Parse existing imports to check what's already there
+    existing_imports_text = "\n".join(std_imports + typing_imports + project_imports + other_imports)
+    
+    additional_imports = [imp for imp in additional_imports if imp not in already_imported and imp not in existing_imports_text]
     if additional_imports:
         content += "\n".join(additional_imports) + "\n\n"
 

@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel
 
@@ -11,6 +11,7 @@ from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.models.application import Application
 from uaproject_backend_schemas.models.balance import Balance
 from uaproject_backend_schemas.models.claim import Claim
+from uaproject_backend_schemas.models.file import File
 from uaproject_backend_schemas.models.news import News
 from uaproject_backend_schemas.models.punishment import Punishment
 from uaproject_backend_schemas.models.role import Role
@@ -31,7 +32,7 @@ class User(AwesomeModel):
     biography: Optional[str]
     access: Optional[bool]
     created_at: datetime
-    user_permissions: List
+    permissions: Dict[str, bool]
     roles: Optional[List[Role]]
     token: Optional[Token]
     punishments: Optional[List[Punishment]]
@@ -46,10 +47,9 @@ class User(AwesomeModel):
     authored_tickets: Optional[List[Ticket]]
     assigned_tickets: Optional[List[Ticket]]
     ticket_messages: Optional[List[TicketMessage]]
+    files: Optional[List[File]]
     schemas: UserSchemas
     scopes: UserScopes
-    filters: UserFilters
-    sorts: UserSorts
     filter: type[UserFilter]
     sort: type[UserSort]
 
@@ -82,6 +82,7 @@ class UserSchemaCreate(AwesomeBaseModel):
     authored_tickets: Optional[List[Ticket]]
     assigned_tickets: Optional[List[Ticket]]
     ticket_messages: Optional[List[TicketMessage]]
+    files: Optional[List[File]]
 
     def with_permissions(self, permissions: list[Literal[".admin"]]) -> UserSchemaCreate: ...
 
@@ -105,6 +106,7 @@ class UserSchemaCreateWithPermissionsAdmin(AwesomeBaseModel):
     authored_tickets: Optional[List[Ticket]]
     assigned_tickets: Optional[List[Ticket]]
     ticket_messages: Optional[List[TicketMessage]]
+    files: Optional[List[File]]
 
     def with_permissions(
         self, permissions: list[Literal[".admin"]]
@@ -130,6 +132,7 @@ class UserSchemaUpdate(AwesomeBaseModel):
     authored_tickets: Optional[List[Ticket]]
     assigned_tickets: Optional[List[Ticket]]
     ticket_messages: Optional[List[TicketMessage]]
+    files: Optional[List[File]]
 
     def with_permissions(self, permissions: list[Literal[".admin"]]) -> UserSchemaUpdate: ...
 
@@ -153,6 +156,7 @@ class UserSchemaUpdateWithPermissionsAdmin(AwesomeBaseModel):
     authored_tickets: Optional[List[Ticket]]
     assigned_tickets: Optional[List[Ticket]]
     ticket_messages: Optional[List[TicketMessage]]
+    files: Optional[List[File]]
 
     def with_permissions(
         self, permissions: list[Literal[".admin"]]
@@ -180,6 +184,7 @@ class UserSchemaUpdateAdmin(AwesomeBaseModel):
     authored_tickets: Optional[List[Ticket]]
     assigned_tickets: Optional[List[Ticket]]
     ticket_messages: Optional[List[TicketMessage]]
+    files: Optional[List[File]]
 
     def with_permissions(self, permissions: list[Literal[".admin"]]) -> UserSchemaUpdateAdmin: ...
 
@@ -205,6 +210,7 @@ class UserSchemaUpdateAdminWithPermissionsAdmin(AwesomeBaseModel):
     authored_tickets: Optional[List[Ticket]]
     assigned_tickets: Optional[List[Ticket]]
     ticket_messages: Optional[List[TicketMessage]]
+    files: Optional[List[File]]
 
     def with_permissions(
         self, permissions: list[Literal[".admin"]]
@@ -360,14 +366,42 @@ class UserScopeAccessWithPermissionsAdmin(AwesomeBaseModel):
         self, permissions: list[Literal[".admin"]]
     ) -> UserScopeAccessWithPermissionsAdmin: ...
 
-class UserFilters:
-    """Declarative filters for the User model."""
-
 class UserFilter(BaseModel):
     """Pydantic-class for filtering the User model."""
 
-class UserSorts:
-    """Declarative sorts for the User model."""
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
+    updated_at: Optional[datetime] = None
+    min_updated_at: Optional[Any] = None
+    max_updated_at: Optional[Any] = None
+    discord_id: Optional[int] = None
+    min_discord_id: Optional[Any] = None
+    max_discord_id: Optional[Any] = None
+    minecraft_nickname: Optional[str] = None
+    is_superuser: Optional[bool] = None
+    biography: Optional[str] = None
+    access: Optional[bool] = None
+    roles_id: Optional[Any] = None
+    roles_name: Optional[Any] = None
+    token_id: Optional[Any] = None
+    punishments_id: Optional[Any] = None
+    balance_id: Optional[Any] = None
+    application_id: Optional[Any] = None
+    transactions_id: Optional[Any] = None
+    received_transactions_id: Optional[Any] = None
+    webhooks_id: Optional[Any] = None
+    claims_as_claimant_id: Optional[Any] = None
+    claims_as_defendant_id: Optional[Any] = None
+    news_id: Optional[Any] = None
+    authored_tickets_id: Optional[Any] = None
+    assigned_tickets_id: Optional[Any] = None
+    ticket_messages_id: Optional[Any] = None
+    files_id: Optional[Any] = None
 
 class UserSort(StrEnum):
     """Enum for sorting the User model."""
+
+    ID = "id"
+    CREATED_AT = "created_at"
+    UPDATED_AT = "updated_at"

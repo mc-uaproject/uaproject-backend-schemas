@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from pydantic import BaseModel
 
@@ -31,8 +31,6 @@ class Punishment(AwesomeModel):
     config: Optional[PunishmentConfig]
     schemas: PunishmentSchemas
     scopes: PunishmentScopes
-    filters: PunishmentFilters
-    sorts: PunishmentSorts
     filter: type[PunishmentFilter]
     sort: type[PunishmentSort]
 
@@ -120,14 +118,35 @@ class PunishmentScopeStatusChanged(AwesomeBaseModel):
     admin: Optional[User]
     config: Optional[PunishmentConfig]
 
-class PunishmentFilters:
-    """Declarative filters for the Punishment model."""
-
 class PunishmentFilter(BaseModel):
     """Pydantic-class for filtering the Punishment model."""
 
-class PunishmentSorts:
-    """Declarative sorts for the Punishment model."""
+    updated_at: Optional[datetime] = None
+    min_updated_at: Optional[Any] = None
+    max_updated_at: Optional[Any] = None
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
+    user_id: Optional[int] = None
+    min_user_id: Optional[Any] = None
+    max_user_id: Optional[Any] = None
+    admin_id: Optional[int] = None
+    min_admin_id: Optional[Any] = None
+    max_admin_id: Optional[Any] = None
+    type: Optional[PunishmentType] = None
+    status: Optional[PunishmentStatus] = None
+    reason: Optional[str] = None
+    expires_at: Optional[datetime] = None
+    min_expires_at: Optional[Any] = None
+    max_expires_at: Optional[Any] = None
+    config_id: Optional[int] = None
+    min_config_id: Optional[Any] = None
+    max_config_id: Optional[Any] = None
+    config_name: Optional[Any] = None
 
 class PunishmentSort(StrEnum):
     """Enum for sorting the Punishment model."""
+
+    ID = "id"
+    CREATED_AT = "created_at"
+    UPDATED_AT = "updated_at"

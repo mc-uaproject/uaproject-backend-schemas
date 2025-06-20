@@ -2,12 +2,13 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel
 
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
+from uaproject_backend_schemas.models.file import File
 from uaproject_backend_schemas.models.ticket import Ticket
 from uaproject_backend_schemas.models.user import User
 
@@ -19,16 +20,15 @@ class TicketMessage(AwesomeModel):
     ticket_id: int
     author_id: int
     content: str
-    attachments: Optional[List]
+    attachment_file_ids: Optional[List]
     is_system_message: bool
     edited_at: Optional[str]
     created_at: datetime
     ticket: Optional[Ticket]
     author: Optional[User]
+    attachment_files: Optional[List[File]]
     schemas: TicketMessageSchemas
     scopes: TicketMessageScopes
-    filters: TicketMessageFilters
-    sorts: TicketMessageSorts
     filter: type[TicketMessageFilter]
     sort: type[TicketMessageSort]
 
@@ -45,9 +45,10 @@ class TicketMessageSchemaCreate(AwesomeBaseModel):
 
     ticket_id: int
     content: str
-    attachments: Optional[List]
+    attachment_file_ids: Optional[List]
     ticket: Optional[Ticket]
     author: Optional[User]
+    attachment_files: Optional[List[File]]
 
 class TicketMessageSchemaUpdate(AwesomeBaseModel):
     """update schema for TicketMessage model"""
@@ -62,11 +63,12 @@ class TicketMessageSchemaResponse(AwesomeBaseModel):
     ticket_id: int
     author_id: int
     content: str
-    attachments: Optional[List]
+    attachment_file_ids: Optional[List]
     is_system_message: bool
     edited_at: Optional[str]
     ticket: Optional[Ticket]
     author: Optional[User]
+    attachment_files: Optional[List[File]]
 
 class TicketMessageSchemaResponseWithAuthor(AwesomeBaseModel):
     """response_with_author schema for TicketMessage model"""
@@ -75,7 +77,7 @@ class TicketMessageSchemaResponseWithAuthor(AwesomeBaseModel):
     ticket_id: int
     author_id: int
     content: str
-    attachments: Optional[List]
+    attachment_file_ids: Optional[List]
     is_system_message: bool
     edited_at: Optional[str]
     created_at: datetime
@@ -95,14 +97,29 @@ class TicketMessageScopeTicketMessages(AwesomeBaseModel):
     content: str
     created_at: datetime
 
-class TicketMessageFilters:
-    """Declarative filters for the TicketMessage model."""
-
 class TicketMessageFilter(BaseModel):
     """Pydantic-class for filtering the TicketMessage model."""
 
-class TicketMessageSorts:
-    """Declarative sorts for the TicketMessage model."""
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
+    updated_at: Optional[datetime] = None
+    min_updated_at: Optional[Any] = None
+    max_updated_at: Optional[Any] = None
+    ticket_id: Optional[int] = None
+    min_ticket_id: Optional[Any] = None
+    max_ticket_id: Optional[Any] = None
+    author_id: Optional[int] = None
+    min_author_id: Optional[Any] = None
+    max_author_id: Optional[Any] = None
+    content: Optional[str] = None
+    is_system_message: Optional[bool] = None
+    edited_at: Optional[str] = None
+    attachment_files_id: Optional[Any] = None
 
 class TicketMessageSort(StrEnum):
     """Enum for sorting the TicketMessage model."""
+
+    ID = "id"
+    CREATED_AT = "created_at"
+    UPDATED_AT = "updated_at"

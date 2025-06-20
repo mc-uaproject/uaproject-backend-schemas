@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel
 
@@ -27,8 +27,6 @@ class Claim(AwesomeModel):
     judging: Optional[Judging]
     schemas: ClaimSchemas
     scopes: ClaimScopes
-    filters: ClaimFilters
-    sorts: ClaimSorts
     filter: type[ClaimFilter]
     sort: type[ClaimSort]
 
@@ -70,14 +68,28 @@ class ClaimSchemaUpdate(AwesomeBaseModel):
 class ClaimScopes:
     """Scopes for the Claim model."""
 
-class ClaimFilters:
-    """Declarative filters for the Claim model."""
-
 class ClaimFilter(BaseModel):
     """Pydantic-class for filtering the Claim model."""
 
-class ClaimSorts:
-    """Declarative sorts for the Claim model."""
+    updated_at: Optional[datetime] = None
+    min_updated_at: Optional[Any] = None
+    max_updated_at: Optional[Any] = None
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+    status: Optional[ClaimStatus] = None
+    judging_id: Optional[int] = None
+    min_judging_id: Optional[Any] = None
+    max_judging_id: Optional[Any] = None
+    claimants_id: Optional[Any] = None
+    defendants_id: Optional[Any] = None
 
 class ClaimSort(StrEnum):
     """Enum for sorting the Claim model."""
+
+    ID = "id"
+    CREATED_AT = "created_at"
+    UPDATED_AT = "updated_at"
+    TITLE = "title"

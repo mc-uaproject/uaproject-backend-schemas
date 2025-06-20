@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
 
@@ -25,8 +25,6 @@ class PunishmentConfig(AwesomeModel):
     punishments: Optional[List[Punishment]]
     schemas: PunishmentConfigSchemas
     scopes: PunishmentConfigScopes
-    filters: PunishmentConfigFilters
-    sorts: PunishmentConfigSorts
     filter: type[PunishmentConfigFilter]
     sort: type[PunishmentConfigSort]
 
@@ -90,14 +88,30 @@ class PunishmentConfigScopeChanged(AwesomeBaseModel):
     config_data: Dict
     punishments: Optional[List[Punishment]]
 
-class PunishmentConfigFilters:
-    """Declarative filters for the PunishmentConfig model."""
-
 class PunishmentConfigFilter(BaseModel):
     """Pydantic-class for filtering the PunishmentConfig model."""
 
-class PunishmentConfigSorts:
-    """Declarative sorts for the PunishmentConfig model."""
+    updated_at: Optional[datetime] = None
+    min_updated_at: Optional[Any] = None
+    max_updated_at: Optional[Any] = None
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
+    name: Optional[str] = None
+    description: Optional[str] = None
+    is_active: Optional[bool] = None
+    warn_threshold: Optional[int] = None
+    min_warn_threshold: Optional[Any] = None
+    max_warn_threshold: Optional[Any] = None
+    warn_decay_days: Optional[int] = None
+    min_warn_decay_days: Optional[Any] = None
+    max_warn_decay_days: Optional[Any] = None
+    punishments_id: Optional[Any] = None
 
 class PunishmentConfigSort(StrEnum):
     """Enum for sorting the PunishmentConfig model."""
+
+    ID = "id"
+    CREATED_AT = "created_at"
+    UPDATED_AT = "updated_at"
+    NAME = "name"

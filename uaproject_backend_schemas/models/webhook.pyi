@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from pydantic import BaseModel
 
@@ -26,8 +26,6 @@ class Webhook(AwesomeModel):
     user: Optional[User]
     schemas: WebhookSchemas
     scopes: WebhookScopes
-    filters: WebhookFilters
-    sorts: WebhookSorts
     filter: type[WebhookFilter]
     sort: type[WebhookSort]
 
@@ -73,14 +71,25 @@ class WebhookSchemaResponse(AwesomeBaseModel):
 class WebhookScopes:
     """Scopes for the Webhook model."""
 
-class WebhookFilters:
-    """Declarative filters for the Webhook model."""
-
 class WebhookFilter(BaseModel):
     """Pydantic-class for filtering the Webhook model."""
 
-class WebhookSorts:
-    """Declarative sorts for the Webhook model."""
+    updated_at: Optional[datetime] = None
+    min_updated_at: Optional[Any] = None
+    max_updated_at: Optional[Any] = None
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
+    endpoint: Optional[SerializableHttpUrl] = None
+    user_id: Optional[int] = None
+    min_user_id: Optional[Any] = None
+    max_user_id: Optional[Any] = None
+    status: Optional[WebhookStatus] = None
+    authorization: Optional[str] = None
 
 class WebhookSort(StrEnum):
     """Enum for sorting the Webhook model."""
+
+    ID = "id"
+    CREATED_AT = "created_at"
+    UPDATED_AT = "updated_at"

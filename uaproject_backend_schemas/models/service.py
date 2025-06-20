@@ -1,7 +1,7 @@
 from decimal import Decimal
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from sqlmodel import DECIMAL, JSON, Column, Enum
+from sqlmodel import DECIMAL, JSON, Column, Enum, Relationship
 
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
@@ -11,6 +11,9 @@ from uaproject_backend_schemas.models.schemas.service import (
     ServicePoint,
     ServiceType,
 )
+
+if TYPE_CHECKING:
+    from uaproject_backend_schemas.models.file import File
 
 
 class Service(AwesomeModel, IDMixin, TimestampsMixin, table=True):
@@ -31,3 +34,6 @@ class Service(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     upgrade_to: Optional[str] = AwesomeField(max_length=100, nullable=True)
     service_metadata: Optional[Dict[str, Any]] = AwesomeField(sa_column=Column(JSON), default=None)
     discounts: Optional[List[ServiceDiscount]] = AwesomeField(sa_column=Column(JSON), default=None)
+
+    # MinIO file relationship (one-to-one)
+    icon_file: Optional["File"] = Relationship(back_populates="service")

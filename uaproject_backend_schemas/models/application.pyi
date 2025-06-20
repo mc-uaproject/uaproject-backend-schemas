@@ -51,8 +51,6 @@ class Application(AwesomeModel):
     sections: Optional[List[ApplicationSection]]
     schemas: ApplicationSchemas
     scopes: ApplicationScopes
-    filters: ApplicationFilters
-    sorts: ApplicationSorts
     filter: type[ApplicationFilter]
     sort: type[ApplicationSort]
 
@@ -351,9 +349,6 @@ class ApplicationScopeForm(AwesomeBaseModel):
     ideal_server_description: Optional[str]
     healthy_community_definition: Optional[str]
 
-class ApplicationFilters:
-    """Declarative filters for the Application model."""
-
 class ApplicationFilter(BaseModel):
     """Pydantic-class for filtering the Application model."""
 
@@ -396,9 +391,6 @@ class ApplicationFilter(BaseModel):
     incomplete_tree_reaction: Optional[str] = None
     neighbor_proximity_reaction: Optional[str] = None
     sections_id: Optional[Any] = None
-
-class ApplicationSorts:
-    """Declarative sorts for the Application model."""
 
 class ApplicationSort(StrEnum):
     """Enum for sorting the Application model."""

@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
@@ -17,8 +18,6 @@ class UserRoles(AwesomeModel):
     created_at: datetime
     schemas: UserRolesSchemas
     scopes: UserRolesScopes
-    filters: UserRolesFilters
-    sorts: UserRolesSorts
     filter: type[UserRolesFilter]
     sort: type[UserRolesSort]
 
@@ -51,14 +50,21 @@ class UserRolesSchemaResponse(AwesomeBaseModel):
 class UserRolesScopes:
     """Scopes for the UserRoles model."""
 
-class UserRolesFilters:
-    """Declarative filters for the UserRoles model."""
-
 class UserRolesFilter(BaseModel):
     """Pydantic-class for filtering the UserRoles model."""
 
-class UserRolesSorts:
-    """Declarative sorts for the UserRoles model."""
+    updated_at: Optional[datetime] = None
+    min_updated_at: Optional[Any] = None
+    max_updated_at: Optional[Any] = None
+    user_id: Optional[int] = None
+    min_user_id: Optional[Any] = None
+    max_user_id: Optional[Any] = None
+    role_id: Optional[int] = None
+    min_role_id: Optional[Any] = None
+    max_role_id: Optional[Any] = None
 
 class UserRolesSort(StrEnum):
     """Enum for sorting the UserRoles model."""
+
+    CREATED_AT = "created_at"
+    UPDATED_AT = "updated_at"

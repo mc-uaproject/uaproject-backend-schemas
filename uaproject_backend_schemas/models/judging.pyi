@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel
 
@@ -25,8 +25,6 @@ class Judging(AwesomeModel):
     claims: Optional[List[Claim]]
     schemas: JudgingSchemas
     scopes: JudgingScopes
-    filters: JudgingFilters
-    sorts: JudgingSorts
     filter: type[JudgingFilter]
     sort: type[JudgingSort]
 
@@ -64,14 +62,25 @@ class JudgingSchemaUpdate(AwesomeBaseModel):
 class JudgingScopes:
     """Scopes for the Judging model."""
 
-class JudgingFilters:
-    """Declarative filters for the Judging model."""
-
 class JudgingFilter(BaseModel):
     """Pydantic-class for filtering the Judging model."""
 
-class JudgingSorts:
-    """Declarative sorts for the Judging model."""
+    updated_at: Optional[datetime] = None
+    min_updated_at: Optional[Any] = None
+    max_updated_at: Optional[Any] = None
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
+    judge_id: Optional[int] = None
+    min_judge_id: Optional[Any] = None
+    max_judge_id: Optional[Any] = None
+    decision: Optional[str] = None
+    verdict: Optional[JudgingVerdict] = None
+    claims_id: Optional[Any] = None
 
 class JudgingSort(StrEnum):
     """Enum for sorting the Judging model."""
+
+    ID = "id"
+    CREATED_AT = "created_at"
+    UPDATED_AT = "updated_at"

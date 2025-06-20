@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
 
@@ -23,8 +23,6 @@ class Role(AwesomeModel):
     users: Optional[List[User]]
     schemas: RoleSchemas
     scopes: RoleScopes
-    filters: RoleFilters
-    sorts: RoleSorts
     filter: type[RoleFilter]
     sort: type[RoleSort]
 
@@ -67,14 +65,26 @@ class RoleSchemaResponse(AwesomeBaseModel):
 class RoleScopes:
     """Scopes for the Role model."""
 
-class RoleFilters:
-    """Declarative filters for the Role model."""
-
 class RoleFilter(BaseModel):
     """Pydantic-class for filtering the Role model."""
 
-class RoleSorts:
-    """Declarative sorts for the Role model."""
+    updated_at: Optional[datetime] = None
+    min_updated_at: Optional[Any] = None
+    max_updated_at: Optional[Any] = None
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
+    name: Optional[str] = None
+    display_name: Optional[str] = None
+    weight: Optional[int] = None
+    min_weight: Optional[Any] = None
+    max_weight: Optional[Any] = None
+    users_id: Optional[Any] = None
 
 class RoleSort(StrEnum):
     """Enum for sorting the Role model."""
+
+    ID = "id"
+    CREATED_AT = "created_at"
+    UPDATED_AT = "updated_at"
+    NAME = "name"

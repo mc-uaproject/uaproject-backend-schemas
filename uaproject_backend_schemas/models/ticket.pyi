@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel
 
@@ -30,8 +30,6 @@ class Ticket(AwesomeModel):
     messages: Optional[List[TicketMessage]]
     schemas: TicketSchemas
     scopes: TicketScopes
-    filters: TicketFilters
-    sorts: TicketSorts
     filter: type[TicketFilter]
     sort: type[TicketSort]
 
@@ -130,14 +128,31 @@ class TicketScopeAssignment(AwesomeBaseModel):
     author_id: int
     assigned_to_id: Optional[int]
 
-class TicketFilters:
-    """Declarative filters for the Ticket model."""
-
 class TicketFilter(BaseModel):
     """Pydantic-class for filtering the Ticket model."""
 
-class TicketSorts:
-    """Declarative sorts for the Ticket model."""
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
+    updated_at: Optional[datetime] = None
+    min_updated_at: Optional[Any] = None
+    max_updated_at: Optional[Any] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+    author_id: Optional[int] = None
+    min_author_id: Optional[Any] = None
+    max_author_id: Optional[Any] = None
+    assigned_to_id: Optional[int] = None
+    min_assigned_to_id: Optional[Any] = None
+    max_assigned_to_id: Optional[Any] = None
+    status: Optional[TicketStatus] = None
+    priority: Optional[TicketPriority] = None
+    messages_id: Optional[Any] = None
 
 class TicketSort(StrEnum):
     """Enum for sorting the Ticket model."""
+
+    ID = "id"
+    CREATED_AT = "created_at"
+    UPDATED_AT = "updated_at"
+    TITLE = "title"
