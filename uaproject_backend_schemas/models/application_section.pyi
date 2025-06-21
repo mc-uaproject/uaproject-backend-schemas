@@ -22,7 +22,6 @@ class ApplicationSection(AwesomeModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    is_required: bool
     created_at: datetime
     schemas: ApplicationSectionSchemas
     scopes: ApplicationSectionScopes
@@ -44,8 +43,8 @@ class ApplicationSectionSchemaCreate(AwesomeBaseModel):
     application_id: int
     server_type: ServerType
     section_data: dict
+    status: ServerAccessStatus
     rejection_reason: Optional[str]
-    is_required: bool
 
 class ApplicationSectionSchemaUpdate(AwesomeBaseModel):
     """update schema for ApplicationSection model"""
@@ -55,7 +54,6 @@ class ApplicationSectionSchemaUpdate(AwesomeBaseModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    is_required: bool
 
 class ApplicationSectionSchemaAdminUpdate(AwesomeBaseModel):
     """admin_update schema for ApplicationSection model"""
@@ -66,7 +64,6 @@ class ApplicationSectionSchemaAdminUpdate(AwesomeBaseModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    is_required: bool
 
 class ApplicationSectionSchemaResponse(AwesomeBaseModel):
     """response schema for ApplicationSection model"""
@@ -80,7 +77,6 @@ class ApplicationSectionSchemaResponse(AwesomeBaseModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    is_required: bool
 
 class ApplicationSectionSchemaResponseDetailed(AwesomeBaseModel):
     """response_detailed schema for ApplicationSection model"""
@@ -94,7 +90,6 @@ class ApplicationSectionSchemaResponseDetailed(AwesomeBaseModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    is_required: bool
 
 class ApplicationSectionScopes:
     """Scopes for the ApplicationSection model."""
@@ -115,7 +110,6 @@ class ApplicationSectionScopeCreateOwn(AwesomeBaseModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    is_required: bool
 
 class ApplicationSectionScopeUpdateOwn(AwesomeBaseModel):
     """update_own schema for ApplicationSection model"""
@@ -129,7 +123,6 @@ class ApplicationSectionScopeUpdateOwn(AwesomeBaseModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    is_required: bool
 
 class ApplicationSectionScopeAdminReview(AwesomeBaseModel):
     """admin_review schema for ApplicationSection model"""
@@ -143,7 +136,6 @@ class ApplicationSectionScopeAdminReview(AwesomeBaseModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    is_required: bool
 
 class ApplicationSectionFilter(BaseModel):
     """Pydantic-class for filtering the ApplicationSection model."""
@@ -167,7 +159,6 @@ class ApplicationSectionFilter(BaseModel):
     min_reviewed_at: Optional[Any] = None
     max_reviewed_at: Optional[Any] = None
     rejection_reason: Optional[str] = None
-    is_required: Optional[bool] = None
 
 class ApplicationSectionSort(StrEnum):
     """Enum for sorting the ApplicationSection model."""

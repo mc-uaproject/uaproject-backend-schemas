@@ -36,9 +36,6 @@ class ApplicationSection(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     )
     reviewed_at: Optional[datetime] = AwesomeField(default=None)
     rejection_reason: Optional[str] = AwesomeField(default=None, max_length=1000)
-    is_required: bool = AwesomeField(
-        default=True, description="Whether this section is required for server access"
-    )
 
     class Schemas(AwesomeModel.Schemas):
         class Create(SchemaDefinition):
@@ -48,7 +45,6 @@ class ApplicationSection(AwesomeModel, TimestampsMixin, IDMixin, table=True):
                 "updated_at",
                 "reviewed_by",
                 "reviewed_at",
-                "status",
             ]
             optional = True
 
