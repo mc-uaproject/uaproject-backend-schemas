@@ -74,8 +74,10 @@ def get_permissions_from_model(model_cls: Type[AwesomeModel]) -> set[str]:
     permissions = set()
 
     for field in model_cls.model_fields.values():
-        if hasattr(field, "required_permissions"):
-            permissions.update(field.required_permissions)
+        if hasattr(field, "read_permissions"):
+            permissions.update(field.read_permissions)
+        if hasattr(field, "write_permissions"):
+            permissions.update(field.write_permissions)
 
     permissions.update(_get_schema_permissions(model_cls))
 
@@ -89,7 +91,7 @@ def _check_field_needs(field_info: Any, needs: dict) -> str:
     needs["list"] |= "List" in field_type
     needs["dict"] |= "Dict" in field_type
     needs["datetime"] |= "datetime" in field_type
-    needs["awesome_field"] |= hasattr(field_info, "required_permissions")
+    needs["awesome_field"] |= hasattr(field_info, "read_permissions") or hasattr(field_info, "write_permissions")
     return field_type
 
 
@@ -305,8 +307,13 @@ def _get_field_str(field_name: str, field: Any, field_type: str) -> str:
     """Get string representation of a field."""
     field_str = f"    {field_name}: {field_type}"
     if isinstance(field, AwesomeFieldInfo):
-        if field.required_permissions:
-            field_str += f" = AwesomeField(required_permissions={field.required_permissions})"
+        permissions_parts = []
+        if hasattr(field, 'read_permissions') and field.read_permissions:
+            permissions_parts.append(f"read_permissions={field.read_permissions}")
+        if hasattr(field, 'write_permissions') and field.write_permissions:
+            permissions_parts.append(f"write_permissions={field.write_permissions}")
+        if permissions_parts:
+            field_str += f" = AwesomeField({', '.join(permissions_parts)})"
     return field_str
 
 
@@ -314,9 +321,9 @@ def _should_include_field(field: Any, permissions: list[str] = None) -> bool:
     """Check if a field should be included considering permissions."""
     if not permissions:
         return True
-    if hasattr(field, "required_permissions") and all(
-        p not in permissions for p in field.required_permissions
-    ):
+    if (hasattr(field, "read_permissions") and all(
+        p not in permissions for p in field.read_permissions
+    )):
         return False
     return True
 

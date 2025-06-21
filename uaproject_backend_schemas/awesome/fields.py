@@ -10,18 +10,21 @@ class AwesomeFieldInfo(SQLModelFieldInfo):
     def __init__(
         self,
         *args,
-        required_permissions: List[str] = None,
+        read_permissions: List[str] = None,
+        write_permissions: List[str] = None,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
-        self.required_permissions = required_permissions or []
+        self.read_permissions = read_permissions or []
+        self.write_permissions = write_permissions or []
 
-    def format_permissions(self, model_cls):
+    def format_permissions(self, model_cls, permission_type: str = "read"):
         """Format permissions with model prefix support."""
-        if not self.required_permissions:
+        permissions = self.read_permissions if permission_type == "read" else self.write_permissions
+        if not permissions:
             return []
         formatted = []
-        for p in self.required_permissions:
+        for p in permissions:
             if p.startswith("."):
                 prefix = getattr(model_cls, "__scope_prefix__", model_cls.__name__.lower())
                 p = f"{prefix}{p}"
@@ -32,8 +35,10 @@ class AwesomeFieldInfo(SQLModelFieldInfo):
     def __repr__(self) -> str:
         parent_repr = super().__repr__()
         attrs = []
-        if self.required_permissions:
-            attrs.append(f"required_permissions={self.required_permissions}")
+        if self.read_permissions:
+            attrs.append(f"read_permissions={self.read_permissions}")
+        if self.write_permissions:
+            attrs.append(f"write_permissions={self.write_permissions}")
         return f"{parent_repr[:-1]}, {', '.join(attrs)})" if attrs else parent_repr
 
 
@@ -54,7 +59,8 @@ def AwesomeField(  # noqa: N802
     ge: Optional[float] = None,
     lt: Optional[float] = None,
     le: Optional[float] = None,
-    required_permissions: List[str] = None,
+    read_permissions: List[str] = None,
+    write_permissions: List[str] = None,
     multiple_of: Optional[float] = None,
     max_digits: Optional[int] = None,
     decimal_places: Optional[int] = None,
@@ -88,7 +94,8 @@ def AwesomeField(  # noqa: N802
         description=description,
         exclude=exclude,
         include=include,
-        required_permissions=required_permissions,
+        read_permissions=read_permissions,
+        write_permissions=write_permissions,
         const=const,
         gt=gt,
         ge=ge,

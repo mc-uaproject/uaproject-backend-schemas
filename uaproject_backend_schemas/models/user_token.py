@@ -19,7 +19,8 @@ class Token(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     model_config = {"arbitrary_types_allowed": True}
 
     token: UUID = AwesomeField(
-        required_permissions=["token.read", "token.write"],
+        read_permissions=["token.read"],
+        write_permissions=["token.write"],
         default_factory=uuid4,
         nullable=False,
         unique=True,

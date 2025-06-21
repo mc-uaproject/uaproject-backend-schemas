@@ -37,11 +37,11 @@ class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
         default=None, index=True, nullable=True, max_length=16, unique=True
     )
     is_superuser: Optional[bool] = AwesomeField(
-        default=False, nullable=True, required_permissions=[".admin"]
+        default=False, nullable=True, read_permissions=[".admin"], write_permissions=[".admin"]
     )
     biography: Optional[str] = AwesomeField(default=None, nullable=True, max_length=2048)
     access: Optional[bool] = AwesomeField(
-        default=False, nullable=True, required_permissions=[".admin"]
+        default=False, nullable=True, read_permissions=[".admin"], write_permissions=[".admin"]
     )
 
     roles: List["Role"] = Relationship(
