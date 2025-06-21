@@ -35,8 +35,8 @@ class TokenSchemas:
 class TokenSchemaCreate(AwesomeBaseModel):
     """create schema for Token model"""
 
-    token: UUID
-    user_id: int
+    token: Optional[UUID]
+    user_id: Optional[int]
     user: Optional[User]
 
     def with_permissions(
@@ -46,8 +46,8 @@ class TokenSchemaCreate(AwesomeBaseModel):
 class TokenSchemaCreateWithPermissionsTokenWrite(AwesomeBaseModel):
     """create schema for Token model with permissions token.write"""
 
-    token: UUID
-    user_id: int
+    token: Optional[UUID]
+    user_id: Optional[int]
     user: Optional[User]
 
     def with_permissions(
@@ -57,8 +57,8 @@ class TokenSchemaCreateWithPermissionsTokenWrite(AwesomeBaseModel):
 class TokenSchemaCreateWithPermissionsTokenRead(AwesomeBaseModel):
     """create schema for Token model with permissions token.read"""
 
-    token: UUID
-    user_id: int
+    token: Optional[UUID]
+    user_id: Optional[int]
     user: Optional[User]
 
     def with_permissions(
@@ -68,8 +68,8 @@ class TokenSchemaCreateWithPermissionsTokenRead(AwesomeBaseModel):
 class TokenSchemaUpdate(AwesomeBaseModel):
     """update schema for Token model"""
 
-    token: UUID
-    user_id: int
+    token: Optional[UUID]
+    user_id: Optional[int]
     user: Optional[User]
 
     def with_permissions(
@@ -79,8 +79,8 @@ class TokenSchemaUpdate(AwesomeBaseModel):
 class TokenSchemaUpdateWithPermissionsTokenWrite(AwesomeBaseModel):
     """update schema for Token model with permissions token.write"""
 
-    token: UUID
-    user_id: int
+    token: Optional[UUID]
+    user_id: Optional[int]
     user: Optional[User]
 
     def with_permissions(
@@ -90,8 +90,8 @@ class TokenSchemaUpdateWithPermissionsTokenWrite(AwesomeBaseModel):
 class TokenSchemaUpdateWithPermissionsTokenRead(AwesomeBaseModel):
     """update schema for Token model with permissions token.read"""
 
-    token: UUID
-    user_id: int
+    token: Optional[UUID]
+    user_id: Optional[int]
     user: Optional[User]
 
     def with_permissions(

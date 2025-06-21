@@ -375,6 +375,21 @@ def _get_schema_fields(
     return [f for f in all_fields if f not in excluded]
 
 
+def _get_schema_definition(
+    model_cls: Type[AwesomeModel], schema_name: str, _type: str = "Schema"
+) -> Any:
+    """Get schema definition object with all its properties."""
+    if _type.lower() == "schema":
+        home = getattr(model_cls, "Schemas", None)
+    else:
+        home = getattr(model_cls, "Scopes", None)
+
+    if not home:
+        return None
+
+    return getattr(home, snake_to_camel(schema_name), None)
+
+
 def generate_class(
     model_cls: Type[AwesomeModel],
     schema_name: str,
@@ -392,38 +407,53 @@ def generate_class(
         )
 
     schema_fields = _get_schema_fields(model_cls, schema_name, _type)
+    schema_definition = _get_schema_definition(model_cls, schema_name, _type)
+    
+    # Get optional setting from schema definition
+    optional_setting = getattr(schema_definition, "optional", None) if schema_definition else None
+    
     fields = []
 
     for field_name in schema_fields:
+        field_type_str = None
+        
         if field_name in model_cls.model_fields:
-            field_type = _get_field_type(model_cls.model_fields[field_name])
-            fields.append(f"    {field_name}: {field_type}")
+            field_type_str = _get_field_type(model_cls.model_fields[field_name])
         elif (
             hasattr(model_cls, "model_computed_fields")
             and field_name in model_cls.model_computed_fields
         ):
             computed_field = model_cls.model_computed_fields[field_name]
             if hasattr(computed_field, "return_type") and computed_field.return_type:
-                type_str = _extract_clean_type(computed_field.return_type)
+                field_type_str = _extract_clean_type(computed_field.return_type)
             else:
-                type_str = "Any"
-            fields.append(f"    {field_name}: {type_str}")
+                field_type_str = "Any"
         elif field_name in _collect_computed_fields(model_cls):
             computed_field = _collect_computed_fields(model_cls)[field_name]
             if hasattr(computed_field.fget, "__annotations__"):
                 return_type = computed_field.fget.__annotations__.get("return", "Any")
-                type_str = (
+                field_type_str = (
                     return_type.__name__ if hasattr(return_type, "__name__") else str(return_type)
                 )
             else:
-                type_str = "Any"
-            fields.append(f"    {field_name}: {type_str}")
+                field_type_str = "Any"
         elif field_name in model_cls.__annotations__:
             ann = model_cls.__annotations__[field_name]
-            type_str = _extract_clean_type(ann)
-            fields.append(f"    {field_name}: {type_str}")
+            field_type_str = _extract_clean_type(ann)
         else:
-            fields.append(f"    {field_name}: Any")
+            field_type_str = "Any"
+
+        # Apply optional logic based on schema definition
+        if optional_setting is True:
+            # All fields are optional
+            if not field_type_str.startswith("Optional["):
+                field_type_str = f"Optional[{field_type_str}]"
+        elif isinstance(optional_setting, list) and field_name in optional_setting:
+            # Specific field is optional
+            if not field_type_str.startswith("Optional["):
+                field_type_str = f"Optional[{field_type_str}]"
+        
+        fields.append(f"    {field_name}: {field_type_str}")
 
     docstring = f'    """{schema_name} schema for {model_cls.__name__} model'
     if permissions:

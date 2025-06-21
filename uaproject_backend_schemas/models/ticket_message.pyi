@@ -43,8 +43,8 @@ class TicketMessageSchemas:
 class TicketMessageSchemaCreate(AwesomeBaseModel):
     """create schema for TicketMessage model"""
 
-    ticket_id: int
-    content: str
+    ticket_id: Optional[int]
+    content: Optional[str]
     attachment_file_ids: Optional[List]
     ticket: Optional[Ticket]
     author: Optional[User]
@@ -53,7 +53,7 @@ class TicketMessageSchemaCreate(AwesomeBaseModel):
 class TicketMessageSchemaUpdate(AwesomeBaseModel):
     """update schema for TicketMessage model"""
 
-    content: str
+    content: Optional[str]
 
 class TicketMessageSchemaResponse(AwesomeBaseModel):
     """response schema for TicketMessage model"""

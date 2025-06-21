@@ -56,8 +56,8 @@ class ApplicationSchemas:
 class ApplicationSchemaCreate(AwesomeBaseModel):
     """create schema for Application model"""
 
-    user_id: int
-    version: str
+    user_id: Optional[int]
+    version: Optional[str]
     birth_date: Optional[datetime]
     launcher: Optional[str]
     server_source: Optional[str]
@@ -74,7 +74,7 @@ class ApplicationSchemaCreate(AwesomeBaseModel):
     community_projects_readiness: Optional[str]
     healthy_community_definition: Optional[str]
     ideal_server_description: Optional[str]
-    editable_fields: List[str]
+    editable_fields: Optional[List[str]]
     user: Optional[User]
     sections: Optional[List[ApplicationSection]]
 
@@ -97,7 +97,7 @@ class ApplicationSchemaUpdate(AwesomeBaseModel):
     community_projects_readiness: Optional[str]
     healthy_community_definition: Optional[str]
     ideal_server_description: Optional[str]
-    editable_fields: List[str]
+    editable_fields: Optional[List[str]]
     user: Optional[User]
     sections: Optional[List[ApplicationSection]]
 

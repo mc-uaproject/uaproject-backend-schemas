@@ -235,14 +235,15 @@ class AwesomeSchemas:
         relationships: Dict[str, str],
         name: str,
         permissions: List[str] = None,
+        optional: Optional[bool | List[str]] = None,
     ) -> Type[AwesomeBaseModel]:
         """Create Pydantic model with permission-based field visibility."""
         formatted_permissions = self._format_permissions(permissions)
         field_definitions = self._get_field_definitions(
-            fields, relationships, formatted_permissions
+            fields, relationships, formatted_permissions, optional
         )
         filtered_fields = self._filter_fields_by_permissions(
-            field_definitions, formatted_permissions
+            field_definitions, formatted_permissions, optional
         )
 
         schema_class_name = f"{self.model_cls.__name__}{name.capitalize()}Schema"
@@ -259,7 +260,7 @@ class AwesomeSchemas:
         return base_model
 
     def _get_field_definitions(
-        self, fields: List[str], relationships: Dict[str, str], permissions: List[str] = None
+        self, fields: List[str], relationships: Dict[str, str], permissions: List[str] = None, optional: Optional[bool | List[str]] = None
     ) -> Dict[str, Any]:
         field_definitions = {}
         model_field_info = (
@@ -297,7 +298,7 @@ class AwesomeSchemas:
         return field_definitions
 
     def _filter_fields_by_permissions(
-        self, field_definitions: Dict[str, Any], permissions: List[str] = None
+        self, field_definitions: Dict[str, Any], permissions: List[str] = None, optional: Optional[bool | List[str]] = None
     ) -> Dict[str, Any]:
         filtered_fields = {}
         for f, (t, _) in field_definitions.items():
@@ -338,16 +339,47 @@ class AwesomeSchemas:
             # Note: We include all fields in schema, but field permission filtering
             # happens at runtime in PermissionChecker.apply_field_permissions_to_data
 
-            new_field_info = AwesomeFieldInfo(
-                annotation=t,
-                default=field_info.default,
-                required_permissions=field_info.required_permissions,
-                **{
-                    k: v
-                    for k, v in field_info.__dict__.items()
-                    if k not in ["annotation", "default", "required_permissions"]
-                },
-            )
+            # Handle optional field logic
+            field_default = field_info.default
+            field_default_factory = getattr(field_info, 'default_factory', None)
+            field_required = getattr(field_info, 'is_required', lambda: True)()
+            
+            # Apply optional logic
+            if optional is True:
+                # All fields are optional
+                field_required = False
+                # If no default and no factory, set default to None
+                if field_default is None and field_default_factory is None:
+                    field_default = None
+                elif field_default_factory is not None:
+                    # Keep the factory if it exists
+                    pass
+            elif isinstance(optional, list) and f in optional:
+                # Specific field is optional
+                field_required = False
+                if field_default is None and field_default_factory is None:
+                    field_default = None
+
+            # Prepare field info arguments
+            field_args = {
+                "annotation": t,
+                "default": field_default,
+                "required": field_required,
+                "required_permissions": field_info.required_permissions,
+            }
+            
+            # Add default_factory if it exists
+            if field_default_factory is not None:
+                field_args["default_factory"] = field_default_factory
+            
+            # Add other attributes
+            field_args.update({
+                k: v
+                for k, v in field_info.__dict__.items()
+                if k not in ["annotation", "default", "default_factory", "required", "required_permissions"]
+            })
+
+            new_field_info = AwesomeFieldInfo(**field_args)
             filtered_fields[f] = (t, new_field_info)
         return filtered_fields
 
@@ -404,6 +436,7 @@ class AwesomeSchemas:
 
         fields = self._get_schema_fields(self.model_cls, name)
         relationships = getattr(schema_cls, "relationships", {})
+        optional = getattr(schema_cls, "optional", None)
 
         if relationships is None:
             relationships = {}
@@ -415,7 +448,7 @@ class AwesomeSchemas:
         ):
             raise ValueError("Relationships must be a dictionary, list or tuple")
 
-        schema_model = self._create_schema_model(fields, relationships, name)
+        schema_model = self._create_schema_model(fields, relationships, name, optional=optional)
         self._cache[name_lower] = schema_model
         self._names[name_lower] = schema_model.__name__
         return schema_model

@@ -56,8 +56,8 @@ class JudgingSchemaResponse(AwesomeBaseModel):
 class JudgingSchemaUpdate(AwesomeBaseModel):
     """update schema for Judging model"""
 
-    decision: str
-    verdict: JudgingVerdict
+    decision: Optional[str]
+    verdict: Optional[JudgingVerdict]
 
 class JudgingScopes:
     """Scopes for the Judging model."""

@@ -44,11 +44,11 @@ class TransactionSchemas:
 class TransactionSchemaCreate(AwesomeBaseModel):
     """create schema for Transaction model"""
 
-    user_id: int
-    amount: Decimal
-    type: TransactionType
+    user_id: Optional[int]
+    amount: Optional[Decimal]
+    type: Optional[TransactionType]
     description: Optional[str]
-    recipient_id: int
+    recipient_id: Optional[int]
     service_id: Optional[int]
     transaction_metadata: Optional[Dict]
     service: Optional[Service]
@@ -58,11 +58,11 @@ class TransactionSchemaCreate(AwesomeBaseModel):
 class TransactionSchemaUpdate(AwesomeBaseModel):
     """update schema for Transaction model"""
 
-    user_id: int
-    amount: Decimal
-    type: TransactionType
+    user_id: Optional[int]
+    amount: Optional[Decimal]
+    type: Optional[TransactionType]
     description: Optional[str]
-    recipient_id: int
+    recipient_id: Optional[int]
     service_id: Optional[int]
     transaction_metadata: Optional[Dict]
     service: Optional[Service]

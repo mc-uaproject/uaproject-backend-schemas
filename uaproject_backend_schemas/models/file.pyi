@@ -54,14 +54,14 @@ class FileSchemas:
 class FileSchemaCreate(AwesomeBaseModel):
     """create schema for File model"""
 
-    bucket: str
-    path: str
-    original_name: str
-    content_type: str
-    size: int
+    bucket: Optional[str]
+    path: Optional[str]
+    original_name: Optional[str]
+    content_type: Optional[str]
+    size: Optional[int]
     checksum: Optional[str]
-    checksum_type: str
-    user_id: int
+    checksum_type: Optional[str]
+    user_id: Optional[int]
     model_name: Optional[str]
     model_id: Optional[int]
     ticket_message_id: Optional[int]
@@ -75,7 +75,7 @@ class FileSchemaCreate(AwesomeBaseModel):
 class FileSchemaUpdate(AwesomeBaseModel):
     """update schema for File model"""
 
-    status: str
+    status: Optional[str]
     checksum: Optional[str]
 
 class FileSchemaResponse(AwesomeBaseModel):

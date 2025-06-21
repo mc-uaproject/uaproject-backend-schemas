@@ -40,17 +40,17 @@ class ApplicationSectionSchemas:
 class ApplicationSectionSchemaCreate(AwesomeBaseModel):
     """create schema for ApplicationSection model"""
 
-    application_id: int
-    server_type: ServerType
-    section_data: dict
-    status: ServerAccessStatus
+    application_id: Optional[int]
+    server_type: Optional[ServerType]
+    section_data: Optional[dict]
+    status: Optional[ServerAccessStatus]
     rejection_reason: Optional[str]
 
 class ApplicationSectionSchemaUpdate(AwesomeBaseModel):
     """update schema for ApplicationSection model"""
 
-    section_data: dict
-    status: ServerAccessStatus
+    section_data: Optional[dict]
+    status: Optional[ServerAccessStatus]
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
@@ -58,9 +58,9 @@ class ApplicationSectionSchemaUpdate(AwesomeBaseModel):
 class ApplicationSectionSchemaAdminUpdate(AwesomeBaseModel):
     """admin_update schema for ApplicationSection model"""
 
-    server_type: ServerType
-    section_data: dict
-    status: ServerAccessStatus
+    server_type: Optional[ServerType]
+    section_data: Optional[dict]
+    status: Optional[ServerAccessStatus]
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]

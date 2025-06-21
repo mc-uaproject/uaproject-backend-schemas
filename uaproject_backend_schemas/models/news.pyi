@@ -51,17 +51,17 @@ class NewsSchemas:
 class NewsSchemaCreate(AwesomeBaseModel):
     """create schema for News model"""
 
-    title: str
+    title: Optional[str]
     summary: Optional[str]
-    content: str
+    content: Optional[str]
     discord_message_id: Optional[str]
     telegram_message_id: Optional[str]
-    tags: List[str]
+    tags: Optional[List[str]]
     event_time: Optional[datetime]
-    is_pinned: bool
-    is_archived: bool
-    type: NewsType
-    importance: ImportanceType
+    is_pinned: Optional[bool]
+    is_archived: Optional[bool]
+    type: Optional[NewsType]
+    importance: Optional[ImportanceType]
     author: Optional[User]
     images: Optional[List[NewsImage]]
     cover_files: Optional[List[File]]

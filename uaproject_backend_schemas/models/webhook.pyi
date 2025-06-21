@@ -39,20 +39,20 @@ class WebhookSchemas:
 class WebhookSchemaCreate(AwesomeBaseModel):
     """create schema for Webhook model"""
 
-    endpoint: SerializableHttpUrl
+    endpoint: Optional[SerializableHttpUrl]
     user_id: Optional[int]
-    status: WebhookStatus
-    webhook_scopes: Dict
+    status: Optional[WebhookStatus]
+    webhook_scopes: Optional[Dict]
     authorization: Optional[str]
     user: Optional[User]
 
 class WebhookSchemaUpdate(AwesomeBaseModel):
     """update schema for Webhook model"""
 
-    endpoint: SerializableHttpUrl
+    endpoint: Optional[SerializableHttpUrl]
     user_id: Optional[int]
-    status: WebhookStatus
-    webhook_scopes: Dict
+    status: Optional[WebhookStatus]
+    webhook_scopes: Optional[Dict]
     authorization: Optional[str]
     user: Optional[User]
 

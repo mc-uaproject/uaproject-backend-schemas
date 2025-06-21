@@ -36,19 +36,19 @@ class RoleSchemas:
 class RoleSchemaCreate(AwesomeBaseModel):
     """create schema for Role model"""
 
-    name: str
+    name: Optional[str]
     display_name: Optional[str]
-    permissions: List[Dict]
-    weight: int
+    permissions: Optional[List[Dict]]
+    weight: Optional[int]
     users: Optional[List[User]]
 
 class RoleSchemaUpdate(AwesomeBaseModel):
     """update schema for Role model"""
 
-    name: str
+    name: Optional[str]
     display_name: Optional[str]
-    permissions: List[Dict]
-    weight: int
+    permissions: Optional[List[Dict]]
+    weight: Optional[int]
     users: Optional[List[User]]
 
 class RoleSchemaResponse(AwesomeBaseModel):

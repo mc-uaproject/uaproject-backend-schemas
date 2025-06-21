@@ -38,23 +38,23 @@ class PunishmentConfigSchemas:
 class PunishmentConfigSchemaCreate(AwesomeBaseModel):
     """create schema for PunishmentConfig model"""
 
-    name: str
+    name: Optional[str]
     description: Optional[str]
-    is_active: bool
-    warn_threshold: int
-    warn_decay_days: int
-    config_data: Dict
+    is_active: Optional[bool]
+    warn_threshold: Optional[int]
+    warn_decay_days: Optional[int]
+    config_data: Optional[Dict]
     punishments: Optional[List[Punishment]]
 
 class PunishmentConfigSchemaUpdate(AwesomeBaseModel):
     """update schema for PunishmentConfig model"""
 
-    name: str
+    name: Optional[str]
     description: Optional[str]
-    is_active: bool
-    warn_threshold: int
-    warn_decay_days: int
-    config_data: Dict
+    is_active: Optional[bool]
+    warn_threshold: Optional[int]
+    warn_decay_days: Optional[int]
+    config_data: Optional[Dict]
     punishments: Optional[List[Punishment]]
 
 class PunishmentConfigSchemaResponse(AwesomeBaseModel):

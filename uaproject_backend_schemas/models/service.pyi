@@ -51,17 +51,17 @@ class ServiceSchemas:
 class ServiceSchemaCreate(AwesomeBaseModel):
     """create schema for Service model"""
 
-    name: str
+    name: Optional[str]
     display_name: Optional[str]
     description: Optional[str]
     points: Optional[List]
     image: Optional[str]
-    price: Decimal
-    is_active: bool
+    price: Optional[Decimal]
+    is_active: Optional[bool]
     category: Optional[str]
-    type: ServiceType
+    type: Optional[ServiceType]
     duration_months: Optional[int]
-    is_upgradable: bool
+    is_upgradable: Optional[bool]
     upgrade_from: Optional[str]
     upgrade_to: Optional[str]
     service_metadata: Optional[Dict]
@@ -71,17 +71,17 @@ class ServiceSchemaCreate(AwesomeBaseModel):
 class ServiceSchemaUpdate(AwesomeBaseModel):
     """update schema for Service model"""
 
-    name: str
+    name: Optional[str]
     display_name: Optional[str]
     description: Optional[str]
     points: Optional[List]
     image: Optional[str]
-    price: Decimal
-    is_active: bool
+    price: Optional[Decimal]
+    is_active: Optional[bool]
     category: Optional[str]
-    type: ServiceType
+    type: Optional[ServiceType]
     duration_months: Optional[int]
-    is_upgradable: bool
+    is_upgradable: Optional[bool]
     upgrade_from: Optional[str]
     upgrade_to: Optional[str]
     service_metadata: Optional[Dict]

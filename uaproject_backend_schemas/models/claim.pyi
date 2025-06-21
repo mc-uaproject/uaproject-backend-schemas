@@ -61,9 +61,9 @@ class ClaimSchemaResponse(AwesomeBaseModel):
 class ClaimSchemaUpdate(AwesomeBaseModel):
     """update schema for Claim model"""
 
-    title: str
-    description: str
-    status: ClaimStatus
+    title: Optional[str]
+    description: Optional[str]
+    status: Optional[ClaimStatus]
 
 class ClaimScopes:
     """Scopes for the Claim model."""

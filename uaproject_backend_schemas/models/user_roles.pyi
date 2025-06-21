@@ -31,14 +31,14 @@ class UserRolesSchemas:
 class UserRolesSchemaCreate(AwesomeBaseModel):
     """create schema for UserRoles model"""
 
-    user_id: int
-    role_id: int
+    user_id: Optional[int]
+    role_id: Optional[int]
 
 class UserRolesSchemaUpdate(AwesomeBaseModel):
     """update schema for UserRoles model"""
 
-    user_id: int
-    role_id: int
+    user_id: Optional[int]
+    role_id: Optional[int]
 
 class UserRolesSchemaResponse(AwesomeBaseModel):
     """response schema for UserRoles model"""

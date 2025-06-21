@@ -34,21 +34,21 @@ class NewsImageSchemas:
 class NewsImageSchemaCreate(AwesomeBaseModel):
     """create schema for NewsImage model"""
 
-    news_id: int
+    news_id: Optional[int]
     image_data: Optional[bytes]
     image_path: Optional[str]
     image_url: Optional[str]
-    order: int
+    order: Optional[int]
     news: Optional[News]
 
 class NewsImageSchemaUpdate(AwesomeBaseModel):
     """update schema for NewsImage model"""
 
-    news_id: int
+    news_id: Optional[int]
     image_data: Optional[bytes]
     image_path: Optional[str]
     image_url: Optional[str]
-    order: int
+    order: Optional[int]
     news: Optional[News]
 
 class NewsImageSchemaResponse(AwesomeBaseModel):

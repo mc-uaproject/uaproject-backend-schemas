@@ -45,11 +45,11 @@ class TicketSchemas:
 class TicketSchemaCreate(AwesomeBaseModel):
     """create schema for Ticket model"""
 
-    title: str
-    description: str
-    author_id: int
-    status: TicketStatus
-    priority: TicketPriority
+    title: Optional[str]
+    description: Optional[str]
+    author_id: Optional[int]
+    status: Optional[TicketStatus]
+    priority: Optional[TicketPriority]
     author: Optional[User]
     assigned_to: Optional[User]
     messages: Optional[List[TicketMessage]]
@@ -57,16 +57,16 @@ class TicketSchemaCreate(AwesomeBaseModel):
 class TicketSchemaUpdate(AwesomeBaseModel):
     """update schema for Ticket model"""
 
-    title: str
-    description: str
+    title: Optional[str]
+    description: Optional[str]
 
 class TicketSchemaUpdateAssign(AwesomeBaseModel):
     """update_assign schema for Ticket model"""
 
     assigned_to_id: Optional[int]
-    added_user_ids: List[int]
-    status: TicketStatus
-    priority: TicketPriority
+    added_user_ids: Optional[List[int]]
+    status: Optional[TicketStatus]
+    priority: Optional[TicketPriority]
 
 class TicketSchemaResponse(AwesomeBaseModel):
     """response schema for Ticket model"""

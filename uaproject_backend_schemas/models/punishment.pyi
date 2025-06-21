@@ -44,10 +44,10 @@ class PunishmentSchemas:
 class PunishmentSchemaCreate(AwesomeBaseModel):
     """create schema for Punishment model"""
 
-    user_id: int
+    user_id: Optional[int]
     admin_id: Optional[int]
-    type: PunishmentType
-    status: PunishmentStatus
+    type: Optional[PunishmentType]
+    status: Optional[PunishmentStatus]
     reason: Optional[str]
     expires_at: Optional[datetime]
     config_id: Optional[int]
@@ -59,10 +59,10 @@ class PunishmentSchemaCreate(AwesomeBaseModel):
 class PunishmentSchemaUpdate(AwesomeBaseModel):
     """update schema for Punishment model"""
 
-    user_id: int
+    user_id: Optional[int]
     admin_id: Optional[int]
-    type: PunishmentType
-    status: PunishmentStatus
+    type: Optional[PunishmentType]
+    status: Optional[PunishmentStatus]
     reason: Optional[str]
     expires_at: Optional[datetime]
     config_id: Optional[int]
