@@ -51,7 +51,23 @@ class ApplicationSchemas:
 class ApplicationSchemaCreate(AwesomeBaseModel):
     """create schema for Application model"""
 
-    id: int
+    user_id: int
+    version: str
+    birth_date: Optional[datetime]
+    launcher: Optional[str]
+    server_source: Optional[str]
+    private_server_experience: Optional[str]
+    useful_skills: Optional[str]
+    conflict_reaction: Optional[str]
+    quiz_answer: Optional[str]
+    russian_word_reaction: Optional[str]
+    admin_decision_attitude: Optional[str]
+    new_rule_reaction: Optional[str]
+    useful_skills_detailed: Optional[str]
+    server_experience_negative: Optional[str]
+    editable_fields: List[str]
+    user: Optional[User]
+    sections: Optional[List[ApplicationSection]]
 
 class ApplicationSchemaUpdate(AwesomeBaseModel):
     """update schema for Application model"""

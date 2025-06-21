@@ -114,7 +114,7 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
         class Create(SchemaDefinition):
             """Default create schema - requires only essential fields, makes legacy fields optional."""
 
-            fields = ["id"]
+            fields_exclude = ["id", "created_at", "updated_at"]
             optional = True
             permissions = [".write.self"]
 

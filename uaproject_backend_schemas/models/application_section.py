@@ -39,7 +39,7 @@ class ApplicationSection(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     )
 
     # Review status for this server
-    status: ServerAccessStatus = AwesomeField(default=ServerAccessStatus.PENDING, index=True)
+    status: ServerAccessStatus = AwesomeField(default=ServerAccessStatus.NOT_APPLIED, index=True)
     reviewed_by: Optional[int] = AwesomeField(
         sa_column=Column(BigInteger(), ForeignKey("users.id"), nullable=True), default=None
     )
