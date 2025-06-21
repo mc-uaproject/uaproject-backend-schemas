@@ -34,15 +34,17 @@ class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
         default=None, sa_column=Column(BigInteger(), index=True, unique=True)
     )
     minecraft_nickname: Optional[str] = AwesomeField(
-        default=None, index=True, nullable=True, max_length=16, unique=True
+        default=None,
+        index=True,
+        nullable=True,
+        max_length=16,
+        unique=True,
+        write_permissions=[".write.nickname"],
     )
     is_superuser: Optional[bool] = AwesomeField(
         default=False, nullable=True, read_permissions=[".admin"], write_permissions=[".admin"]
     )
     biography: Optional[str] = AwesomeField(default=None, nullable=True, max_length=2048)
-    access: Optional[bool] = AwesomeField(
-        default=False, nullable=True, read_permissions=[".admin"], write_permissions=[".admin"]
-    )
 
     roles: List["Role"] = Relationship(
         back_populates="users",
