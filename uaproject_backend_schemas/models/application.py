@@ -154,6 +154,7 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
             """Schema for creating legacy v1 applications."""
 
             fields = LEGACY_EDITABLE_FIELDS
+            fields_exclude = ["id", "created_at", "updated_at"]
             optional = True
             permissions = [".write.self"]
 
@@ -161,6 +162,7 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
             """Schema for creating v2 applications."""
 
             fields = V2_EDITABLE_FIELDS
+            fields_exclude = ["id", "created_at", "updated_at"]
             optional = True
             permissions = [".write.self"]
 
@@ -168,6 +170,7 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
             """Schema for creating evervault applications."""
 
             fields = EVERVAULT_EDITABLE_FIELDS
+            fields_exclude = ["id", "created_at", "updated_at"]
             optional = True
             permissions = [".write.self"]
 
