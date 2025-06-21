@@ -18,6 +18,7 @@ class ApplicationSection(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     """Server-specific section of an application."""
 
     __tablename__ = "application_sections"
+    __scope_prefix__ = "application_section"
 
     application_id: int = AwesomeField(
         sa_column=Column(BigInteger(), ForeignKey("applications.id"), nullable=False, index=True)
