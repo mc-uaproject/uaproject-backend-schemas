@@ -30,6 +30,10 @@ class Application(AwesomeModel):
     new_rule_reaction: Optional[str]
     useful_skills_detailed: Optional[str]
     server_experience_negative: Optional[str]
+    long_project_experience: Optional[str]
+    community_projects_readiness: Optional[str]
+    healthy_community_definition: Optional[str]
+    ideal_server_description: Optional[str]
     editable_fields: List[str]
     created_at: datetime
     user: Optional[User]
@@ -46,6 +50,7 @@ class ApplicationSchemas:
     update: ApplicationSchemaUpdate
     create_legacy: ApplicationSchemaCreateLegacy
     create_v2: ApplicationSchemaCreateV2
+    create_evervault: ApplicationSchemaCreateEvervault
     response: ApplicationSchemaResponse
 
 class ApplicationSchemaCreate(AwesomeBaseModel):
@@ -65,6 +70,10 @@ class ApplicationSchemaCreate(AwesomeBaseModel):
     new_rule_reaction: Optional[str]
     useful_skills_detailed: Optional[str]
     server_experience_negative: Optional[str]
+    long_project_experience: Optional[str]
+    community_projects_readiness: Optional[str]
+    healthy_community_definition: Optional[str]
+    ideal_server_description: Optional[str]
     editable_fields: List[str]
     user: Optional[User]
     sections: Optional[List[ApplicationSection]]
@@ -84,6 +93,10 @@ class ApplicationSchemaUpdate(AwesomeBaseModel):
     new_rule_reaction: Optional[str]
     useful_skills_detailed: Optional[str]
     server_experience_negative: Optional[str]
+    long_project_experience: Optional[str]
+    community_projects_readiness: Optional[str]
+    healthy_community_definition: Optional[str]
+    ideal_server_description: Optional[str]
     editable_fields: List[str]
     user: Optional[User]
     sections: Optional[List[ApplicationSection]]
@@ -111,6 +124,14 @@ class ApplicationSchemaCreateV2(AwesomeBaseModel):
     useful_skills_detailed: Optional[str]
     server_experience_negative: Optional[str]
 
+class ApplicationSchemaCreateEvervault(AwesomeBaseModel):
+    """create_evervault schema for Application model"""
+
+    long_project_experience: Optional[str]
+    community_projects_readiness: Optional[str]
+    healthy_community_definition: Optional[str]
+    ideal_server_description: Optional[str]
+
 class ApplicationSchemaResponse(AwesomeBaseModel):
     """response schema for Application model"""
 
@@ -130,6 +151,10 @@ class ApplicationSchemaResponse(AwesomeBaseModel):
     new_rule_reaction: Optional[str]
     useful_skills_detailed: Optional[str]
     server_experience_negative: Optional[str]
+    long_project_experience: Optional[str]
+    community_projects_readiness: Optional[str]
+    healthy_community_definition: Optional[str]
+    ideal_server_description: Optional[str]
     editable_fields: List[str]
     user: Optional[User]
     sections: Optional[List[ApplicationSection]]
@@ -188,6 +213,10 @@ class ApplicationFilter(BaseModel):
     new_rule_reaction: Optional[str] = None
     useful_skills_detailed: Optional[str] = None
     server_experience_negative: Optional[str] = None
+    long_project_experience: Optional[str] = None
+    community_projects_readiness: Optional[str] = None
+    healthy_community_definition: Optional[str] = None
+    ideal_server_description: Optional[str] = None
     sections_id: Optional[Any] = None
 
 class ApplicationSort(StrEnum):

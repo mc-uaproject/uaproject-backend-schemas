@@ -40,7 +40,12 @@ V2_EDITABLE_FIELDS: List[str] = [
 
 # All editable fields combined
 DEFAULT_EDITABLE_FIELDS: List[str] = V2_EDITABLE_FIELDS
-
+EVERVAULT_EDITABLE_FIELDS = [
+    "long_project_experience",
+    "community_projects_readiness",
+    "healthy_community_definition",
+    "ideal_server_description",
+]
 
 class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     __tablename__ = "applications"
@@ -88,6 +93,20 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     )
     server_experience_negative: Optional[str] = AwesomeField(
         max_length=2048, nullable=True, description="Negative experience on other servers"
+    )
+
+    # Evervault fields
+    long_project_experience: Optional[str] = AwesomeField(
+        max_length=2048, nullable=True, description="Experience with long-term projects"
+    )
+    community_projects_readiness: Optional[str] = AwesomeField(
+        max_length=2048, nullable=True, description="Readiness for community projects"
+    )
+    healthy_community_definition: Optional[str] = AwesomeField(
+        max_length=2048, nullable=True, description="Definition of healthy community"
+    )
+    ideal_server_description: Optional[str] = AwesomeField(
+        max_length=2048, nullable=True, description="Description of ideal server"
     )
 
     editable_fields: List[str] = AwesomeField(
@@ -145,6 +164,13 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
             optional = True
             permissions = [".write.self"]
 
+        class CreateEvervault(SchemaDefinition):
+            """Schema for creating evervault applications."""
+
+            fields = EVERVAULT_EDITABLE_FIELDS
+            optional = True
+            permissions = [".write.self"]
+
         class Response(SchemaDefinition):
             permissions = [".read"]
 
@@ -175,6 +201,10 @@ class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
             "new_rule_reaction",
             "useful_skills_detailed",
             "server_experience_negative",
+            "long_project_experience",
+            "community_projects_readiness",
+            "healthy_community_definition",
+            "ideal_server_description",
         ]
 
         for field in min_length_fields:
