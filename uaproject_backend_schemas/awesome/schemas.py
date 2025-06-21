@@ -198,13 +198,19 @@ class AwesomeSchemas:
 
     def _should_include_field(self, field: Any, permissions: Optional[List[str]] = None) -> bool:
         """Check if field should be included based on permissions."""
-        if not hasattr(field, "required_permissions") or not field.required_permissions:
+        # Check for read permissions (or fallback to required_permissions for legacy)
+        read_perms = getattr(field, "read_permissions", [])
+        if not read_perms:
+            # Legacy fallback
+            read_perms = getattr(field, "required_permissions", [])
+
+        if not read_perms:
             return True
 
         if hasattr(field, "format_permissions"):
-            required_permissions = field.format_permissions(self.model_cls)
+            required_permissions = field.format_permissions(self.model_cls, "read")
         else:
-            required_permissions = field.required_permissions
+            required_permissions = read_perms
 
         if not permissions:
             # For fields with required permissions but user has no permissions,
@@ -260,7 +266,11 @@ class AwesomeSchemas:
         return base_model
 
     def _get_field_definitions(
-        self, fields: List[str], relationships: Dict[str, str], permissions: List[str] = None, optional: Optional[bool | List[str]] = None
+        self,
+        fields: List[str],
+        relationships: Dict[str, str],
+        permissions: List[str] = None,
+        optional: Optional[bool | List[str]] = None,
     ) -> Dict[str, Any]:
         field_definitions = {}
         model_field_info = (
@@ -271,7 +281,10 @@ class AwesomeSchemas:
 
         for f in fields:
             # Check if it's a computed field first (Pydantic v2)
-            if hasattr(self.model_cls, "model_computed_fields") and f in self.model_cls.model_computed_fields:
+            if (
+                hasattr(self.model_cls, "model_computed_fields")
+                and f in self.model_cls.model_computed_fields
+            ):
                 computed_field = self.model_cls.model_computed_fields[f]
                 if hasattr(computed_field, "return_type") and computed_field.return_type:
                     field_type = computed_field.return_type
@@ -297,22 +310,77 @@ class AwesomeSchemas:
             field_definitions[f] = (field_type, None)
         return field_definitions
 
+    def _is_computed_field(self, field_name: str) -> bool:
+        """Check if a field is a computed field."""
+        if (
+            hasattr(self.model_cls, "model_computed_fields")
+            and field_name in self.model_cls.model_computed_fields
+        ):
+            return True
+        if hasattr(self.model_cls, field_name):
+            field = getattr(self.model_cls, field_name)
+            if isinstance(field, property) and getattr(field, "__computed_field__", False):
+                return True
+        return False
+
+    def _get_field_info_params(
+        self, f: str, field_info: AwesomeFieldInfo, optional: Optional[bool | List[str]]
+    ) -> dict:
+        """Get parameters for AwesomeFieldInfo."""
+        field_default = field_info.default
+        field_default_factory = getattr(field_info, "default_factory", None)
+        field_required = getattr(field_info, "is_required", lambda: True)()
+
+        is_field_optional = optional is True or (isinstance(optional, list) and f in optional)
+        if is_field_optional:
+            field_required = False
+            if field_default is None and field_default_factory is None:
+                field_default = None
+
+        return {
+            "required": field_required,
+            "default": field_default,
+            "default_factory": field_default_factory,
+        }
+
+    def _build_new_field_info(
+        self, t: Any, field_info: AwesomeFieldInfo, params: dict
+    ) -> AwesomeFieldInfo:
+        """Build a new AwesomeFieldInfo instance."""
+        field_args = {
+            "annotation": t,
+            "read_permissions": getattr(field_info, "read_permissions", []),
+            "write_permissions": getattr(field_info, "write_permissions", []),
+            **params,
+        }
+
+        # Add other attributes from field_info
+        excluded_keys = {
+            "annotation",
+            "default",
+            "default_factory",
+            "required",
+            "read_permissions",
+            "write_permissions",
+        }
+        field_args.update({k: v for k, v in field_info.__dict__.items() if k not in excluded_keys})
+        return AwesomeFieldInfo(**field_args)
+
     def _filter_fields_by_permissions(
-        self, field_definitions: Dict[str, Any], permissions: List[str] = None, optional: Optional[bool | List[str]] = None
+        self,
+        field_definitions: Dict[str, Any],
+        permissions: List[str] = None,
+        optional: Optional[bool | List[str]] = None,
     ) -> Dict[str, Any]:
         filtered_fields = {}
         for f, (t, _) in field_definitions.items():
-            # Handle computed fields (Pydantic v2)
-            if hasattr(self.model_cls, "model_computed_fields") and f in self.model_cls.model_computed_fields:
+            if self._is_computed_field(f):
                 filtered_fields[f] = (t, None)
                 continue
-            elif hasattr(self.model_cls, f):
-                field = getattr(self.model_cls, f)
-                if isinstance(field, property) and getattr(field, "__computed_field__", False):
-                    filtered_fields[f] = (t, None)
-                    continue
 
-            if f not in self.model_cls.model_fields:
+            if f not in self.model_cls.model_fields or not isinstance(
+                self.model_cls.model_fields[f], AwesomeFieldInfo
+            ):
                 filtered_fields[f] = (
                     t,
                     AwesomeFieldInfo(annotation=t, required=False, default=None),
@@ -320,66 +388,11 @@ class AwesomeSchemas:
                 continue
 
             field_info = self.model_cls.model_fields[f]
-            if not isinstance(field_info, AwesomeFieldInfo):
-                filtered_fields[f] = (
-                    t,
-                    AwesomeFieldInfo(annotation=t, required=False, default=None),
-                )
-                continue
-
-            # Check if user has permissions for this field
-            if permissions and field_info.required_permissions:
-                formatted_permissions = (
-                    field_info.format_permissions(self.model_cls)
-                    if hasattr(field_info, "format_permissions")
-                    else field_info.required_permissions
-                )
-                any(p in permissions for p in formatted_permissions)
 
             # Note: We include all fields in schema, but field permission filtering
             # happens at runtime in PermissionChecker.apply_field_permissions_to_data
-
-            # Handle optional field logic
-            field_default = field_info.default
-            field_default_factory = getattr(field_info, 'default_factory', None)
-            field_required = getattr(field_info, 'is_required', lambda: True)()
-            
-            # Apply optional logic
-            if optional is True:
-                # All fields are optional
-                field_required = False
-                # If no default and no factory, set default to None
-                if field_default is None and field_default_factory is None:
-                    field_default = None
-                elif field_default_factory is not None:
-                    # Keep the factory if it exists
-                    pass
-            elif isinstance(optional, list) and f in optional:
-                # Specific field is optional
-                field_required = False
-                if field_default is None and field_default_factory is None:
-                    field_default = None
-
-            # Prepare field info arguments
-            field_args = {
-                "annotation": t,
-                "default": field_default,
-                "required": field_required,
-                "required_permissions": field_info.required_permissions,
-            }
-            
-            # Add default_factory if it exists
-            if field_default_factory is not None:
-                field_args["default_factory"] = field_default_factory
-            
-            # Add other attributes
-            field_args.update({
-                k: v
-                for k, v in field_info.__dict__.items()
-                if k not in ["annotation", "default", "default_factory", "required", "required_permissions"]
-            })
-
-            new_field_info = AwesomeFieldInfo(**field_args)
+            params = self._get_field_info_params(f, field_info, optional)
+            new_field_info = self._build_new_field_info(t, field_info, params)
             filtered_fields[f] = (t, new_field_info)
         return filtered_fields
 
