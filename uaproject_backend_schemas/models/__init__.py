@@ -16,6 +16,7 @@ from .user import User
 from .user_roles import UserRoles
 from .user_token import Token
 from .webhook import Webhook
+from .webhook_log import WebhookLog
 
 Application.model_rebuild()
 ApplicationSection.model_rebuild()
@@ -35,6 +36,7 @@ UserRoles.model_rebuild()
 Token.model_rebuild()
 User.model_rebuild()
 Webhook.model_rebuild()
+WebhookLog.model_rebuild()
 
 __all__ = [
     "Application",
@@ -55,4 +57,5 @@ __all__ = [
     "Token",
     "User",
     "Webhook",
+    "WebhookLog",
 ]

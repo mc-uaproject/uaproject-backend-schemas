@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
+from sqlalchemy.orm import Mapped
 from sqlmodel import JSON, BigInteger, Column, ForeignKey, Relationship
 
 from uaproject_backend_schemas.awesome.fields import AwesomeField
@@ -39,7 +40,7 @@ class ApplicationSection(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     )
     reviewed_at: Optional[datetime] = AwesomeField(default=None)
     rejection_reason: Optional[str] = AwesomeField(default=None, max_length=1000)
-    application: Optional["Application"] = Relationship(
+    application: Mapped["Application"] = Relationship(
         back_populates="sections",
         sa_relationship_kwargs={
             "foreign_keys": "[ApplicationSection.application_id]",
