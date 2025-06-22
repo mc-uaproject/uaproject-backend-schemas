@@ -12,32 +12,34 @@ from uaproject_backend_schemas.models.news import News
 from uaproject_backend_schemas.models.service import Service
 from uaproject_backend_schemas.models.ticket_message import TicketMessage
 from uaproject_backend_schemas.models.user import User
+from uaproject_backend_schemas.models.webhook_log import WebhookLog
 
 class File(AwesomeModel):
     """Base file model."""
 
-    updated_at: datetime
-    id: int
     bucket: str
-    path: str
-    original_name: str
-    content_type: str
-    size: int
     checksum: Optional[str]
     checksum_type: str
-    user_id: int
-    model_name: Optional[str]
+    content_type: str
+    id: int
     model_id: Optional[int]
-    status: str
-    uploaded_at: Optional[datetime]
-    ticket_message_id: Optional[int]
-    news_id: Optional[int]
-    service_id: Optional[int]
-    created_at: datetime
-    user: Optional[User]
-    ticket_message: Optional[TicketMessage]
+    model_name: Optional[str]
     news: Optional[News]
+    news_id: Optional[int]
+    original_name: str
+    path: str
     service: Optional[Service]
+    service_id: Optional[int]
+    size: int
+    status: str
+    ticket_message: Optional[TicketMessage]
+    ticket_message_id: Optional[int]
+    updated_at: datetime
+    uploaded_at: Optional[datetime]
+    user: Optional[User]
+    user_id: int
+    webhook_logs_as_request: list[WebhookLog]
+    webhook_logs_as_response: list[WebhookLog]
     schemas: FileSchemas
     scopes: FileScopes
     filter: type[FileFilter]
@@ -71,6 +73,8 @@ class FileSchemaCreate(AwesomeBaseModel):
     ticket_message: Optional[TicketMessage]
     news: Optional[News]
     service: Optional[Service]
+    webhook_logs_as_request: Optional[list[WebhookLog]]
+    webhook_logs_as_response: Optional[list[WebhookLog]]
 
 class FileSchemaUpdate(AwesomeBaseModel):
     """update schema for File model"""
@@ -102,6 +106,8 @@ class FileSchemaResponse(AwesomeBaseModel):
     ticket_message: Optional[TicketMessage]
     news: Optional[News]
     service: Optional[Service]
+    webhook_logs_as_request: list[WebhookLog]
+    webhook_logs_as_response: list[WebhookLog]
 
 class FileSchemaRequestUpload(AwesomeBaseModel):
     """request_upload schema for File model"""
@@ -180,7 +186,6 @@ class FileFilter(BaseModel):
     service_id: Optional[int] = None
     min_service_id: Optional[Any] = None
     max_service_id: Optional[Any] = None
-    service_name: Optional[Any] = None
 
 class FileSort(StrEnum):
     """Enum for sorting the File model."""

@@ -10,7 +10,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, List, Type, Union, get_args, get_origin
 
-from uaproject_backend_schemas.awesome.fields import AwesomeFieldInfo
+from sqlalchemy.orm import Mapped
+
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.utils import snake_to_camel
 
@@ -91,7 +92,9 @@ def _check_field_needs(field_info: Any, needs: dict) -> str:
     needs["list"] |= "List" in field_type
     needs["dict"] |= "Dict" in field_type
     needs["datetime"] |= "datetime" in field_type
-    needs["awesome_field"] |= hasattr(field_info, "read_permissions") or hasattr(field_info, "write_permissions")
+    needs["awesome_field"] |= hasattr(field_info, "read_permissions") or hasattr(
+        field_info, "write_permissions"
+    )
     return field_type
 
 
@@ -190,6 +193,11 @@ def parse_imports_from_py(py_path: str) -> dict[str, str]:
 
 
 def extract_types_recursively(tp, used_types):
+    # Handle ForwardRef explicitly
+    if hasattr(tp, "__forward_arg__"):
+        used_types.add(tp.__forward_arg__)
+        return
+
     if hasattr(tp, "__origin__") and hasattr(tp, "__args__"):
         used_types.add(getattr(tp, "_name", None) or getattr(tp, "__name__", str(tp)))
         for arg in tp.__args__:
@@ -202,46 +210,60 @@ def extract_types_recursively(tp, used_types):
 
 def extract_types_from_fields(model_cls: Type[AwesomeModel], fields: list[str]) -> set:
     used_types = set()
-    for field in fields:
-        if field not in model_cls.model_fields:
-            continue
-        ann = model_cls.model_fields[field].annotation
+    for field_name in fields:
+        ann = _get_field_annotation(model_cls, field_name)
         extract_types_recursively(ann, used_types)
-    for name, value in inspect.getmembers(model_cls):
-        if isinstance(value, property) and getattr(value, "__computed_field__", False):
-            tp = value.fget.__annotations__.get("return", None)
-            if tp:
-                extract_types_recursively(tp, used_types)
     return used_types
 
 
-def collect_imports_from_types(used_types, std_types, py_imports, model_cls) -> set:
-    imports = set()
-    already_imported = set()
-    for tp in used_types:
-        if tp in std_types:
+def _find_and_add_imports(types_to_check, std_types, py_imports, imports, already_imported):
+    """Finds imports for given types from standard and project sources."""
+    for tp in types_to_check:
+        if tp in std_types and tp not in already_imported:
             imports.add(std_types[tp])
             already_imported.add(tp)
         elif tp in py_imports and tp not in already_imported:
             imports.add(py_imports[tp])
             already_imported.add(tp)
 
-    for name, obj in inspect.getmembers(importlib.import_module(model_cls.__module__)):
-        if inspect.isclass(obj) and name in used_types and name not in already_imported:
-            if hasattr(obj, "__bases__") and any("Enum" in str(base) for base in obj.__bases__):
-                model_name = model_cls.__name__.lower()
-                schema_module_path = f"uaproject_backend_schemas.models.schemas.{model_name}"
-                try:
-                    schema_module = importlib.import_module(schema_module_path)
-                    if hasattr(schema_module, name):
-                        imports.add(f"from {schema_module_path} import {name}")
-                        already_imported.add(name)
-                        continue
-                except ImportError:
-                    pass
 
-            imports.add(f"from {model_cls.__module__} import {name}")
+def _find_enum_imports(name, model_cls, imports, already_imported):
+    """Finds special-cased enum imports from schema files."""
+    model_name = model_cls.__name__.lower()
+    schema_module_path = f"uaproject_backend_schemas.models.schemas.{model_name}"
+    try:
+        schema_module = importlib.import_module(schema_module_path)
+        if hasattr(schema_module, name):
+            imports.add(f"from {schema_module_path} import {name}")
             already_imported.add(name)
+            return True
+    except ImportError:
+        pass
+    return False
+
+
+def collect_imports_from_types(used_types, std_types, py_imports, model_cls) -> set:
+    imports = set()
+    already_imported = set()
+
+    all_types_to_check = set(used_types)
+    for tp in used_types:
+        matches = re.findall(r'"?([A-Z][a-zA-Z0-9_]*)"?', str(tp))
+        for match in matches:
+            all_types_to_check.add(match)
+
+    _find_and_add_imports(all_types_to_check, std_types, py_imports, imports, already_imported)
+
+    for name, obj in inspect.getmembers(importlib.import_module(model_cls.__module__)):
+        if not (inspect.isclass(obj) and name in used_types and name not in already_imported):
+            continue
+
+        if hasattr(obj, "__bases__") and any("Enum" in str(base) for base in obj.__bases__):
+            if _find_enum_imports(name, model_cls, imports, already_imported):
+                continue
+
+        imports.add(f"from {model_cls.__module__} import {name}")
+        already_imported.add(name)
     return imports
 
 
@@ -251,7 +273,7 @@ def collect_imports_from_generated_content(model_cls, std_types) -> set:
     for _type in [("Schema", "schemas"), ("Scope", "scopes")]:
         for schema_key in (
             getattr(model_cls, _type[1], []).list()
-            if hasattr(getattr(model_cls, _type[1], None), "list")
+            if hasattr(model_cls, _type[1]) and hasattr(getattr(model_cls, _type[1]), "list")
             else []
         ):
             all_content.append(generate_class(model_cls, schema_key, _type=_type[0]))
@@ -275,6 +297,7 @@ def get_required_imports(model_cls: Type[AwesomeModel], fields: list[str]) -> se
         "Decimal": "from decimal import Decimal",
         "datetime": "from datetime import datetime",
         "AwesomeField": "from uaproject_backend_schemas.awesome.fields import AwesomeField",
+        "Mapped": "from sqlalchemy.orm import Mapped",
     }
     base_imports = {
         "from uaproject_backend_schemas.awesome.model import AwesomeModel",
@@ -293,57 +316,27 @@ def get_required_imports(model_cls: Type[AwesomeModel], fields: list[str]) -> se
     return imports
 
 
-def _get_field_type(field: Any) -> str:
-    """Get field type."""
-    field_type = field.annotation.__name__ if hasattr(field, "annotation") else str(field.type_)
-    if field_type == "Optional":
-        field_type = f"Optional[{field.annotation.__args__[0].__name__}]"
-    elif field_type == "List":
-        field_type = f"List[{field.annotation.__args__[0].__name__}]"
-    return field_type
+def _get_field_annotation(model_cls: Type[AwesomeModel], field_name: str) -> Any:
+    """Gets the type annotation for a field from the model, searching in all relevant places."""
+    ann: Any = Any  # Default to Any
 
+    if field_name in model_cls.model_fields:
+        ann = model_cls.model_fields[field_name].annotation
+    elif (
+        hasattr(model_cls, "model_computed_fields")
+        and field_name in model_cls.model_computed_fields
+    ):
+        computed_field = model_cls.model_computed_fields[field_name]
+        if hasattr(computed_field, "return_type") and computed_field.return_type:
+            ann = computed_field.return_type
+    elif field_name in _collect_computed_fields(model_cls):
+        computed_field = _collect_computed_fields(model_cls)[field_name]
+        if hasattr(computed_field.fget, "__annotations__"):
+            ann = computed_field.fget.__annotations__.get("return", Any)
+    elif field_name in model_cls.__annotations__:
+        ann = model_cls.__annotations__[field_name]
 
-def _get_field_str(field_name: str, field: Any, field_type: str) -> str:
-    """Get string representation of a field."""
-    field_str = f"    {field_name}: {field_type}"
-    if isinstance(field, AwesomeFieldInfo):
-        permissions_parts = []
-        if hasattr(field, 'read_permissions') and field.read_permissions:
-            permissions_parts.append(f"read_permissions={field.read_permissions}")
-        if hasattr(field, 'write_permissions') and field.write_permissions:
-            permissions_parts.append(f"write_permissions={field.write_permissions}")
-        if permissions_parts:
-            field_str += f" = AwesomeField({', '.join(permissions_parts)})"
-    return field_str
-
-
-def _should_include_field(field: Any, permissions: list[str] = None) -> bool:
-    """Check if a field should be included considering permissions."""
-    if not permissions:
-        return True
-    if (hasattr(field, "read_permissions") and all(
-        p not in permissions for p in field.read_permissions
-    )):
-        return False
-    return True
-
-
-def generate_fields(model_cls: Type[AwesomeModel], permissions: list[str] = None) -> list[str]:
-    fields = []
-    for field_name, field in model_cls.model_fields.items():
-        if not _should_include_field(field, permissions):
-            continue
-        field_type = _get_field_type(field)
-        field_str = _get_field_str(field_name, field, field_type)
-        fields.append(field_str)
-    for name, value in inspect.getmembers(model_cls):
-        if isinstance(value, property) and getattr(value, "__computed_field__", False):
-            field_type = value.fget.__annotations__.get("return", Any)
-            fields.append(f"    {name}: {field_type.__name__}")
-    relationships = getattr(model_cls, "__relationships__", [])
-    for rel in relationships:
-        fields.append(f"    {rel}: Optional[Any] = None")
-    return fields
+    return ann
 
 
 def generate_with_permissions_method(class_name: str, all_permissions: set[str]) -> str:
@@ -415,40 +408,15 @@ def generate_class(
 
     schema_fields = _get_schema_fields(model_cls, schema_name, _type)
     schema_definition = _get_schema_definition(model_cls, schema_name, _type)
-    
+
     # Get optional setting from schema definition
     optional_setting = getattr(schema_definition, "optional", None) if schema_definition else None
-    
+
     fields = []
 
     for field_name in schema_fields:
-        field_type_str = None
-        
-        if field_name in model_cls.model_fields:
-            field_type_str = _get_field_type(model_cls.model_fields[field_name])
-        elif (
-            hasattr(model_cls, "model_computed_fields")
-            and field_name in model_cls.model_computed_fields
-        ):
-            computed_field = model_cls.model_computed_fields[field_name]
-            if hasattr(computed_field, "return_type") and computed_field.return_type:
-                field_type_str = _extract_clean_type(computed_field.return_type)
-            else:
-                field_type_str = "Any"
-        elif field_name in _collect_computed_fields(model_cls):
-            computed_field = _collect_computed_fields(model_cls)[field_name]
-            if hasattr(computed_field.fget, "__annotations__"):
-                return_type = computed_field.fget.__annotations__.get("return", "Any")
-                field_type_str = (
-                    return_type.__name__ if hasattr(return_type, "__name__") else str(return_type)
-                )
-            else:
-                field_type_str = "Any"
-        elif field_name in model_cls.__annotations__:
-            ann = model_cls.__annotations__[field_name]
-            field_type_str = _extract_clean_type(ann)
-        else:
-            field_type_str = "Any"
+        ann = _get_field_annotation(model_cls, field_name)
+        field_type_str = _extract_clean_type(ann)
 
         # Apply optional logic based on schema definition
         if optional_setting is True:
@@ -459,7 +427,7 @@ def generate_class(
             # Specific field is optional
             if not field_type_str.startswith("Optional["):
                 field_type_str = f"Optional[{field_type_str}]"
-        
+
         fields.append(f"    {field_name}: {field_type_str}")
 
     docstring = f'    """{schema_name} schema for {model_cls.__name__} model'
@@ -601,34 +569,43 @@ def _get_relationship_fields(model_cls: Type[AwesomeModel]) -> list[str]:
     return rels
 
 
-def _extract_clean_type(ann):
-    ann_str = str(ann)
+def _extract_clean_type(ann: Any) -> str:
+    """
+    Recursively constructs a type hint string from a type annotation,
+    correctly handling generics, optionals, and forward references.
+    """
+    if isinstance(ann, str):
+        return ann
 
-    # Handle datetime class representation
-    if ann_str == "<class 'datetime.datetime'>":
-        return "datetime"
+    origin = get_origin(ann)
 
-    if ann_str.startswith("sqlalchemy.orm.base.Mapped"):
-        inner = ann_str.split("[", 1)[1].rsplit("]", 1)[0]
-        inner = inner.replace("typing.", "")
-        inner = re.sub(r'ForwardRef\(["\\\']?([A-Za-z_][A-Za-z0-9_]*)["\\\']?\)', r"\1", inner)
-        inner = re.sub(
-            r"uaproject_backend_schemas\.models\.[\w\.]+\.([A-Z][A-Za-z0-9_]*)", r"\1", inner
-        )
-        if not inner.startswith("Optional["):
-            inner = f"Optional[{inner}]"
-        return inner
+    # Handle Mapped from SQLAlchemy by unwrapping it and processing the inner type.
+    if origin is Mapped:
+        args = get_args(ann)
+        return _extract_clean_type(args[0]) if args else "Any"
 
-    # Handle computed fields return types without wrapping in Optional
-    ann_str = ann_str.replace("typing.", "")
-    ann_str = re.sub(r'ForwardRef\(["\\\']?([A-Za-z_][A-Za-z0-9_]*)["\\\']?\)', r"\1", ann_str)
-    ann_str = re.sub(
-        r"uaproject_backend_schemas\.models\.[\w\.]+\.([A-Z][A-Za-z0-9_]*)", r"\1", ann_str
-    )
+    # Handle ForwardRef objects by extracting their argument as a string
+    if hasattr(ann, "__forward_arg__"):
+        return ann.__forward_arg__
 
-    # Don't automatically wrap computed field types in Optional
-    # Only wrap relationship fields in Optional
-    return ann_str
+    args = get_args(ann)
+
+    # Not a generic type (e.g., int, str, a custom class)
+    if origin is None:
+        return getattr(ann, "__name__", str(ann))
+
+    # Special handling for Optional[T] which is represented as Union[T, None]
+    if origin is Union and len(args) == 2 and args[1] is type(None):
+        # We only need to represent the T part
+        return f"Optional[{_extract_clean_type(args[0])}]"
+
+    # For other generics like List[T], Dict[K, V], etc.
+    origin_name = getattr(origin, "_name", None) or getattr(origin, "__name__", "Any")
+    if not args:
+        return origin_name
+
+    inner_types = ", ".join(_extract_clean_type(arg) for arg in args)
+    return f"{origin_name}[{inner_types}]"
 
 
 def camel_to_snake(name):
@@ -663,66 +640,25 @@ def _collect_computed_fields(cls: Type[AwesomeModel]) -> dict[str, Any]:
     return fields
 
 
-def _generate_model_fields(model_cls: Type[AwesomeModel]) -> tuple[str, set]:
+def _generate_model_fields(model_cls: Type[AwesomeModel]) -> str:
     lines = []
-    imports = set()
-    model_imports = set()
+    all_field_names = list(model_cls.model_fields.keys())
+    all_field_names.extend(_collect_computed_fields(model_cls).keys())
+    all_field_names.extend(_get_relationship_fields(model_cls))
 
-    for field_name, field in model_cls.model_fields.items():
-        field_type = _get_field_type(field)
+    # Use a set to avoid duplicate fields from inheritance
+    for field_name in sorted(set(all_field_names)):
+        ann = _get_field_annotation(model_cls, field_name)
+        field_type = _extract_clean_type(ann)
         lines.append(f"    {field_name}: {field_type}")
 
-    if hasattr(model_cls, "model_computed_fields"):
-        for field_name, computed_field in model_cls.model_computed_fields.items():
-            if hasattr(computed_field, "return_type") and computed_field.return_type:
-                type_str = _extract_clean_type(computed_field.return_type)
-            else:
-                type_str = "Any"
-            lines.append(f"    {field_name}: {type_str}")
-
-            # Add imports for computed field types
-            if "Optional" in type_str:
-                imports.add("from typing import Optional")
-            if "List" in type_str:
-                imports.add("from typing import List")
-            if "Dict" in type_str:
-                imports.add("from typing import Dict")
-    else:
-        computed_fields = _collect_computed_fields(model_cls)
-        for field_name, computed_field in computed_fields.items():
-            if hasattr(computed_field.fget, "__annotations__"):
-                return_type = computed_field.fget.__annotations__.get("return", "Any")
-                if hasattr(return_type, "__name__"):
-                    type_str = return_type.__name__
-                else:
-                    type_str = str(return_type)
-                lines.append(f"    {field_name}: {type_str}")
-            else:
-                lines.append(f"    {field_name}: Any")
-
-    rels = _get_relationship_fields(model_cls)
-    for rel in rels:
-        ann = model_cls.__annotations__[rel]
-        type_str = _extract_clean_type(ann)
-        if "Optional" in type_str:
-            imports.add("from typing import Optional")
-        if "List" in type_str:
-            imports.add("from typing import List")
-        if "Dict" in type_str:
-            imports.add("from typing import Dict")
-        for match in re.findall(r"\b([A-Z][A-Za-z0-9_]*)\b", type_str):
-            if match not in {"Optional", "List", "Dict", "Any", "str", "int", "bool", "float"}:
-                filename = MODEL_IMPORT_OVERRIDES.get(match, camel_to_snake(match))
-                model_imports.add(
-                    f"from uaproject_backend_schemas.models.{filename} import {match}"
-                )
-        lines.append(f"    {rel}: {type_str}")
-
-    all_imports = imports | model_imports
-    return "\n".join(lines) + "\n", all_imports
+    return "\n".join(lines) + "\n"
 
 
-def _generate_model_sections(model_cls: Type[AwesomeModel], permissions: set[str]) -> str:
+def _generate_schema_and_scope_sections(
+    model_cls: Type[AwesomeModel], permissions: set[str]
+) -> str:
+    """Generates schema and scope class definitions for the model."""
     content = ""
     for _type in ["schemas", "scopes"]:
         _type_instance = getattr(model_cls, _type, None)
@@ -747,8 +683,22 @@ def _generate_model_sections(model_cls: Type[AwesomeModel], permissions: set[str
                 content += generate_class(
                     model_cls, _type_key, [perm], _type=_type.capitalize()[:-1]
                 )
+    return content
 
-    # Generate declarative filters and filter classes only if they exist and have content
+
+def _reset_cached_properties(model_cls: Type[AwesomeModel]):
+    """Resets cached filter and sort attributes to avoid stale data."""
+    for prop in ["__filters__", "__sorts__"]:
+        try:
+            if hasattr(model_cls, prop):
+                delattr(model_cls, prop)
+        except (AttributeError, TypeError):
+            pass
+
+
+def _generate_filter_section(model_cls: Type[AwesomeModel]) -> str:
+    """Generates declarative filters and Pydantic filter class definitions."""
+    content = ""
     if (
         hasattr(model_cls, "filters")
         and model_cls.filters
@@ -757,30 +707,19 @@ def _generate_model_sections(model_cls: Type[AwesomeModel], permissions: set[str
     ):
         content += generate_filters_class(model_cls)
 
-    # Force regeneration of filter/sort to avoid cached classproperty issues
-    # Reset cached filter/sort attributes if they exist
-    try:
-        if hasattr(model_cls, "__filters__"):
-            delattr(model_cls, "__filters__")
-    except (AttributeError, TypeError):
-        pass
-    try:
-        if hasattr(model_cls, "__sorts__"):
-            delattr(model_cls, "__sorts__")
-    except (AttributeError, TypeError):
-        pass
-
-    # Check for Pydantic filter class - force regeneration to avoid cache issues
     from uaproject_backend_schemas.awesome.filters import AwesomeFilters
 
-    # Create fresh filters instance for this model
     filters_cls = type(f"{model_cls.__name__}Filters", (AwesomeFilters,), {"model_cls": model_cls})
     filter_obj = filters_cls.get_pydantic_filter_class()
 
     if filter_obj and hasattr(filter_obj, "model_fields") and bool(filter_obj.model_fields):
         content += generate_filter_class(model_cls, filter_obj)
+    return content
 
-    # Generate sorts classes only if they exist and have content
+
+def _generate_sort_section(model_cls: Type[AwesomeModel]) -> str:
+    """Generates declarative sorts and Enum sort class definitions."""
+    content = ""
     if (
         hasattr(model_cls, "sorts")
         and model_cls.sorts
@@ -789,10 +728,8 @@ def _generate_model_sections(model_cls: Type[AwesomeModel], permissions: set[str
     ):
         content += generate_sorts_class(model_cls)
 
-    # Check for sort enum - force regeneration to avoid cache issues
     from uaproject_backend_schemas.awesome.sorts import AwesomeSorts
 
-    # Create fresh sorts instance for this model
     sorts_cls = type(f"{model_cls.__name__}Sorts", (AwesomeSorts,), {"model_cls": model_cls})
     sort_obj = sorts_cls.get_enum_sort_class()
 
@@ -801,11 +738,20 @@ def _generate_model_sections(model_cls: Type[AwesomeModel], permissions: set[str
     return content
 
 
+def _generate_model_sections(model_cls: Type[AwesomeModel], permissions: set[str]) -> str:
+    content = _generate_schema_and_scope_sections(model_cls, permissions)
+
+    # Force regeneration of filter/sort to avoid cached classproperty issues
+    _reset_cached_properties(model_cls)
+
+    content += _generate_filter_section(model_cls)
+    content += _generate_sort_section(model_cls)
+    return content
+
+
 def build_main_content(model_cls: Type[AwesomeModel], permissions: set[str]) -> str:
     main_content = ""
-    model_fields_str, all_imports = _generate_model_fields(model_cls)
-    if all_imports:
-        main_content += "\n".join(sorted(all_imports)) + "\n\n"
+    model_fields_str = _generate_model_fields(model_cls)
     main_content += f"class {model_cls.__name__}(AwesomeModel):\n"
     main_content += f'    """Base {model_cls.__name__.lower()} model."""\n'
     main_content += model_fields_str
@@ -857,9 +803,13 @@ def generate_stub_for_model(model_cls: Type[AwesomeModel]) -> str:
 
 def generate_pyi_for_model(model_cls: Type[AwesomeModel], module_path: str) -> str:
     permissions = get_permissions_from_model(model_cls)
-    all_fields = list(model_cls.model_fields.keys())
 
-    imports = get_required_imports(model_cls, all_fields)
+    all_field_names = list(model_cls.model_fields.keys())
+    all_field_names.extend(_collect_computed_fields(model_cls).keys())
+    all_field_names.extend(_get_relationship_fields(model_cls))
+    all_field_names = list(set(all_field_names))
+
+    imports = get_required_imports(model_cls, all_field_names)
     std_imports = sorted(
         [
             imp
@@ -884,11 +834,17 @@ def generate_pyi_for_model(model_cls: Type[AwesomeModel], module_path: str) -> s
 
     additional_imports = collect_additional_imports(main_content)
     already_imported = set(std_imports + typing_imports + project_imports + other_imports)
-    
+
     # Parse existing imports to check what's already there
-    existing_imports_text = "\n".join(std_imports + typing_imports + project_imports + other_imports)
-    
-    additional_imports = [imp for imp in additional_imports if imp not in already_imported and imp not in existing_imports_text]
+    existing_imports_text = "\n".join(
+        std_imports + typing_imports + project_imports + other_imports
+    )
+
+    additional_imports = [
+        imp
+        for imp in additional_imports
+        if imp not in already_imported and imp not in existing_imports_text
+    ]
     if additional_imports:
         content += "\n".join(additional_imports) + "\n\n"
 
@@ -896,19 +852,17 @@ def generate_pyi_for_model(model_cls: Type[AwesomeModel], module_path: str) -> s
     return content
 
 
-def main():
-    """Optimized stub generation with deduplication and batch processing."""
-
-    print("🚀 Starting optimized stub generation...")
-    start_time = time.perf_counter()
-
-    project_root = Path(__file__).parent.parent.parent
-
+def _discover_models() -> tuple[dict[str, Type[AwesomeModel]], defaultdict[str, list]]:
+    """Discover unique models from module paths."""
     unique_models = {}
     model_to_modules = defaultdict(list)
 
     for module_path in MODEL_MODULES:
-        module = importlib.import_module(module_path)
+        try:
+            module = importlib.import_module(module_path)
+        except Exception as e:
+            print(f"Failed to import {module_path}: {e}")
+            continue
 
         for name, obj in inspect.getmembers(module):
             if inspect.isclass(obj) and issubclass(obj, AwesomeModel) and obj != AwesomeModel:
@@ -917,7 +871,13 @@ def main():
                 model_to_modules[name].append(module_path)
 
     print(f"📊 Found {len(unique_models)} unique models across {len(MODEL_MODULES)} modules")
+    return unique_models, model_to_modules
 
+
+def _generate_stubs(
+    unique_models: dict, model_to_modules: defaultdict, project_root: Path
+) -> list[Path]:
+    """Generate .pyi stub files for each unique model."""
     generated_files = []
     for name, obj in unique_models.items():
         module_path = model_to_modules[name][0]
@@ -937,31 +897,63 @@ def main():
         print(f"   ✅ Generated in {file_duration:.3f}s")
 
         generated_files.append(stub_file)
+    return generated_files
+
+
+def _format_stubs_individually(generated_files: list[Path]):
+    """Fallback to format stub files individually."""
+    print("🔄 Falling back to individual file processing...")
+    for stub_file in generated_files:
+        try:
+            subprocess.run(["ruff", "format", str(stub_file)], check=True)
+            subprocess.run(["ruff", "check", "--fix", str(stub_file)], check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"❌ Failed to process {stub_file}: {e}")
+
+
+def _format_stubs(generated_files: list[Path]):
+    """Format generated stub files using ruff."""
+    if not generated_files:
+        return
 
     print(f"⚡ Batch formatting {len(generated_files)} files with ruff...")
     try:
         format_cmd = ["ruff", "format"] + [str(f) for f in generated_files]
-        subprocess.run(format_cmd, check=True)
+        subprocess.run(format_cmd, check=True, capture_output=True, text=True)
         print(f"✅ Formatted {len(generated_files)} files")
 
         fix_cmd = ["ruff", "check", "--fix"] + [str(f) for f in generated_files]
-        subprocess.run(fix_cmd, check=True)
+        subprocess.run(fix_cmd, check=True, capture_output=True, text=True)
         print(f"✅ Fixed imports in {len(generated_files)} files")
 
     except subprocess.CalledProcessError as e:
         print(f"❌ Batch ruff processing failed: {e}")
-        print("🔄 Falling back to individual file processing...")
-        for stub_file in generated_files:
-            try:
-                subprocess.run(["ruff", "format", str(stub_file)], check=True)
-                subprocess.run(["ruff", "check", "--fix", str(stub_file)], check=True)
-            except subprocess.CalledProcessError as e:
-                print(f"❌ Failed to process {stub_file}: {e}")
+        print(f"   stdout: {e.stdout}")
+        print(f"   stderr: {e.stderr}")
+        _format_stubs_individually(generated_files)
     except FileNotFoundError:
         print("❌ ruff not found. Please install ruff to enable formatting.")
 
+
+def main():
+    """Stub generation with deduplication and batch processing."""
+
+    print("🚀 Starting stub generation...")
+    start_time = time.perf_counter()
+
+    project_root = Path(__file__).parent.parent.parent
+
+    unique_models, model_to_modules = _discover_models()
+    generated_files = _generate_stubs(unique_models, model_to_modules, project_root)
+    _format_stubs(generated_files)
+
     end_time = time.perf_counter()
     duration = end_time - start_time
+
+    if not generated_files:
+        print("✅ No models found to generate stubs for.")
+        return
+
     print(f"🎉 Generated {len(generated_files)} stub files in {duration:.3f} seconds")
     print(f"📈 Average: {duration / len(generated_files):.3f}s per file")
 

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from sqlmodel import (
     BigInteger,
@@ -22,6 +22,7 @@ if TYPE_CHECKING:
     from uaproject_backend_schemas.models.service import Service
     from uaproject_backend_schemas.models.ticket_message import TicketMessage
     from uaproject_backend_schemas.models.user import User
+    from uaproject_backend_schemas.models.webhook_log import WebhookLog
 
 
 class File(AwesomeModel, IDMixin, TimestampsMixin, table=True):
@@ -112,8 +113,21 @@ class File(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     # Relationships
     user: Optional["User"] = Relationship(back_populates="files")
     ticket_message: Optional["TicketMessage"] = Relationship(back_populates="attachment_files")
-    news: Optional["News"] = Relationship(back_populates="cover_files")
+    news: Optional["News"] = Relationship(back_populates="images")
     service: Optional["Service"] = Relationship(back_populates="icon_file")
+
+    webhook_logs_as_request: List["WebhookLog"] = Relationship(
+        back_populates="request_payload_file",
+        sa_relationship_kwargs={
+            "foreign_keys": "[WebhookLog.request_payload_file_id]",
+        },
+    )
+    webhook_logs_as_response: List["WebhookLog"] = Relationship(
+        back_populates="response_body_file",
+        sa_relationship_kwargs={
+            "foreign_keys": "[WebhookLog.response_body_file_id]",
+        },
+    )
 
     __table_args__ = (
         Index("idx_model_lookup", "model_name", "model_id"),

@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
@@ -15,19 +15,18 @@ from uaproject_backend_schemas.models.user import User
 class Ticket(AwesomeModel):
     """Base ticket model."""
 
-    id: int
-    updated_at: datetime
-    title: str
-    description: str
-    author_id: int
-    assigned_to_id: Optional[int]
-    added_user_ids: List[int]
-    status: TicketStatus
-    priority: TicketPriority
-    created_at: datetime
-    author: Optional[User]
+    added_user_ids: list[int]
     assigned_to: Optional[User]
-    messages: Optional[List[TicketMessage]]
+    assigned_to_id: Optional[int]
+    author: Optional[User]
+    author_id: int
+    description: str
+    id: int
+    messages: list[TicketMessage]
+    priority: TicketPriority
+    status: TicketStatus
+    title: str
+    updated_at: datetime
     schemas: TicketSchemas
     scopes: TicketScopes
     filter: type[TicketFilter]
@@ -52,7 +51,7 @@ class TicketSchemaCreate(AwesomeBaseModel):
     priority: Optional[TicketPriority]
     author: Optional[User]
     assigned_to: Optional[User]
-    messages: Optional[List[TicketMessage]]
+    messages: Optional[list[TicketMessage]]
 
 class TicketSchemaUpdate(AwesomeBaseModel):
     """update schema for Ticket model"""
@@ -64,7 +63,7 @@ class TicketSchemaUpdateAssign(AwesomeBaseModel):
     """update_assign schema for Ticket model"""
 
     assigned_to_id: Optional[int]
-    added_user_ids: Optional[List[int]]
+    added_user_ids: Optional[list[int]]
     status: Optional[TicketStatus]
     priority: Optional[TicketPriority]
 
@@ -77,12 +76,12 @@ class TicketSchemaResponse(AwesomeBaseModel):
     description: str
     author_id: int
     assigned_to_id: Optional[int]
-    added_user_ids: List[int]
+    added_user_ids: list[int]
     status: TicketStatus
     priority: TicketPriority
     author: Optional[User]
     assigned_to: Optional[User]
-    messages: Optional[List[TicketMessage]]
+    messages: list[TicketMessage]
 
 class TicketSchemaResponseSelf(AwesomeBaseModel):
     """response_self schema for Ticket model"""
@@ -93,12 +92,12 @@ class TicketSchemaResponseSelf(AwesomeBaseModel):
     description: str
     author_id: int
     assigned_to_id: Optional[int]
-    added_user_ids: List[int]
+    added_user_ids: list[int]
     status: TicketStatus
     priority: TicketPriority
     author: Optional[User]
     assigned_to: Optional[User]
-    messages: Optional[List[TicketMessage]]
+    messages: list[TicketMessage]
 
 class TicketScopes:
     """Scopes for the Ticket model."""
@@ -147,7 +146,6 @@ class TicketFilter(BaseModel):
     max_assigned_to_id: Optional[Any] = None
     status: Optional[TicketStatus] = None
     priority: Optional[TicketPriority] = None
-    messages_id: Optional[Any] = None
 
 class TicketSort(StrEnum):
     """Enum for sorting the Ticket model."""

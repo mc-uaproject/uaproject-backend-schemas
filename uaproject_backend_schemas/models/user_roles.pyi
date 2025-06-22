@@ -12,10 +12,9 @@ from uaproject_backend_schemas.awesome.model import AwesomeModel
 class UserRoles(AwesomeModel):
     """Base userroles model."""
 
+    role_id: int
     updated_at: datetime
     user_id: int
-    role_id: int
-    created_at: datetime
     schemas: UserRolesSchemas
     scopes: UserRolesScopes
     filter: type[UserRolesFilter]

@@ -2,39 +2,36 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.models.file import File
-from uaproject_backend_schemas.models.news_image import NewsImage
 from uaproject_backend_schemas.models.schemas.news import ImportanceType, NewsType
 from uaproject_backend_schemas.models.user import User
 
 class News(AwesomeModel):
     """Base news model."""
 
-    updated_at: datetime
-    id: int
-    title: str
-    summary: Optional[str]
-    content: str
-    is_published: bool
-    author_id: int
-    discord_message_id: Optional[str]
-    telegram_message_id: Optional[str]
-    tags: List[str]
-    event_time: Optional[datetime]
-    is_pinned: bool
-    is_archived: bool
-    type: NewsType
-    importance: ImportanceType
-    created_at: datetime
     author: Optional[User]
-    images: Optional[List[NewsImage]]
-    cover_files: Optional[List[File]]
+    author_id: int
+    content: str
+    discord_message_id: Optional[str]
+    event_time: Optional[datetime]
+    id: int
+    images: list[File]
+    importance: ImportanceType
+    is_archived: bool
+    is_pinned: bool
+    is_published: bool
+    summary: Optional[str]
+    tags: list[str]
+    telegram_message_id: Optional[str]
+    title: str
+    type: NewsType
+    updated_at: datetime
     schemas: NewsSchemas
     scopes: NewsScopes
     filter: type[NewsFilter]
@@ -56,15 +53,14 @@ class NewsSchemaCreate(AwesomeBaseModel):
     content: Optional[str]
     discord_message_id: Optional[str]
     telegram_message_id: Optional[str]
-    tags: Optional[List[str]]
+    tags: Optional[list[str]]
     event_time: Optional[datetime]
     is_pinned: Optional[bool]
     is_archived: Optional[bool]
     type: Optional[NewsType]
     importance: Optional[ImportanceType]
     author: Optional[User]
-    images: Optional[List[NewsImage]]
-    cover_files: Optional[List[File]]
+    images: Optional[list[File]]
 
 class NewsSchemaPublish(AwesomeBaseModel):
     """publish schema for News model"""
@@ -91,15 +87,14 @@ class NewsSchemaResponse(AwesomeBaseModel):
     author_id: int
     discord_message_id: Optional[str]
     telegram_message_id: Optional[str]
-    tags: List[str]
+    tags: list[str]
     event_time: Optional[datetime]
     is_pinned: bool
     is_archived: bool
     type: NewsType
     importance: ImportanceType
     author: Optional[User]
-    images: Optional[List[NewsImage]]
-    cover_files: Optional[List[File]]
+    images: list[File]
 
 class NewsScopes:
     """Scopes for the News model."""
@@ -129,8 +124,6 @@ class NewsFilter(BaseModel):
     is_archived: Optional[bool] = None
     type: Optional[NewsType] = None
     importance: Optional[ImportanceType] = None
-    images_id: Optional[Any] = None
-    cover_files_id: Optional[Any] = None
 
 class NewsSort(StrEnum):
     """Enum for sorting the News model."""

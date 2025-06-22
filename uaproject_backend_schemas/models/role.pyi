@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
@@ -13,14 +13,13 @@ from uaproject_backend_schemas.models.user import User
 class Role(AwesomeModel):
     """Base role model."""
 
-    updated_at: datetime
+    display_name: Optional[str]
     id: int
     name: str
-    display_name: Optional[str]
-    permissions: List[Dict]
+    permissions: list[dict[str, bool]]
+    updated_at: datetime
+    users: list[User]
     weight: int
-    created_at: datetime
-    users: Optional[List[User]]
     schemas: RoleSchemas
     scopes: RoleScopes
     filter: type[RoleFilter]
@@ -38,18 +37,18 @@ class RoleSchemaCreate(AwesomeBaseModel):
 
     name: Optional[str]
     display_name: Optional[str]
-    permissions: Optional[List[Dict]]
+    permissions: Optional[list[dict[str, bool]]]
     weight: Optional[int]
-    users: Optional[List[User]]
+    users: Optional[list[User]]
 
 class RoleSchemaUpdate(AwesomeBaseModel):
     """update schema for Role model"""
 
     name: Optional[str]
     display_name: Optional[str]
-    permissions: Optional[List[Dict]]
+    permissions: Optional[list[dict[str, bool]]]
     weight: Optional[int]
-    users: Optional[List[User]]
+    users: Optional[list[User]]
 
 class RoleSchemaResponse(AwesomeBaseModel):
     """response schema for Role model"""
@@ -58,9 +57,9 @@ class RoleSchemaResponse(AwesomeBaseModel):
     id: int
     name: str
     display_name: Optional[str]
-    permissions: List[Dict]
+    permissions: list[dict[str, bool]]
     weight: int
-    users: Optional[List[User]]
+    users: list[User]
 
 class RoleScopes:
     """Scopes for the Role model."""
@@ -79,7 +78,6 @@ class RoleFilter(BaseModel):
     weight: Optional[int] = None
     min_weight: Optional[Any] = None
     max_weight: Optional[Any] = None
-    users_id: Optional[Any] = None
 
 class RoleSort(StrEnum):
     """Enum for sorting the Role model."""

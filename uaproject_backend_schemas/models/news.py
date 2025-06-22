@@ -8,7 +8,6 @@ from sqlmodel import (
     DateTime,
     Enum,
     ForeignKey,
-    LargeBinary,
     Relationship,
 )
 
@@ -21,20 +20,6 @@ from uaproject_backend_schemas.models.user import User
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.models.file import File
-
-
-class NewsImage(AwesomeModel, IDMixin, table=True):
-    __tablename__ = "news_images"
-    __scope_prefix__ = "news_image"
-    model_config = {"arbitrary_types_allowed": True}
-
-    news_id: int = AwesomeField(sa_column=Column(BigInteger, ForeignKey("news.id"), nullable=False))
-    image_data: Optional[bytes] = AwesomeField(sa_column=Column(LargeBinary, nullable=True))
-    image_path: Optional[str] = AwesomeField(max_length=512, nullable=True)
-    image_url: Optional[str] = AwesomeField(max_length=512, nullable=True)
-    order: int = AwesomeField(default=0, nullable=False)
-
-    news: Optional["News"] = Relationship(back_populates="images")
 
 
 class News(AwesomeModel, IDMixin, TimestampsMixin, table=True):
@@ -76,10 +61,7 @@ class News(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     )
 
     author: Optional[User] = Relationship(back_populates="news")
-    images: List[NewsImage] = Relationship(back_populates="news")
-
-    # MinIO file relationship (one-to-many)
-    cover_files: List["File"] = Relationship(back_populates="news")
+    images: List["File"] = Relationship(back_populates="news")
 
     class Schemas(AwesomeModel.Schemas):
         class Create(SchemaDefinition):

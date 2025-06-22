@@ -3,7 +3,7 @@
 from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
@@ -16,19 +16,18 @@ from uaproject_backend_schemas.models.user import User
 class Transaction(AwesomeModel):
     """Base transaction model."""
 
-    updated_at: datetime
-    id: int
-    user_id: int
     amount: Decimal
-    type: TransactionType
     description: Optional[str]
-    recipient_id: int
-    service_id: Optional[int]
-    transaction_metadata: Optional[Dict]
-    created_at: datetime
-    service: Optional[Service]
-    user: Optional[User]
+    id: int
     recipient: Optional[User]
+    recipient_id: int
+    service: Optional[Service]
+    service_id: Optional[int]
+    transaction_metadata: Optional[dict[str, Any]]
+    type: TransactionType
+    updated_at: datetime
+    user: Optional[User]
+    user_id: int
     schemas: TransactionSchemas
     scopes: TransactionScopes
     filter: type[TransactionFilter]
@@ -50,7 +49,7 @@ class TransactionSchemaCreate(AwesomeBaseModel):
     description: Optional[str]
     recipient_id: Optional[int]
     service_id: Optional[int]
-    transaction_metadata: Optional[Dict]
+    transaction_metadata: Optional[dict[str, Any]]
     service: Optional[Service]
     user: Optional[User]
     recipient: Optional[User]
@@ -64,7 +63,7 @@ class TransactionSchemaUpdate(AwesomeBaseModel):
     description: Optional[str]
     recipient_id: Optional[int]
     service_id: Optional[int]
-    transaction_metadata: Optional[Dict]
+    transaction_metadata: Optional[dict[str, Any]]
     service: Optional[Service]
     user: Optional[User]
     recipient: Optional[User]
@@ -80,7 +79,7 @@ class TransactionSchemaResponse(AwesomeBaseModel):
     description: Optional[str]
     recipient_id: int
     service_id: Optional[int]
-    transaction_metadata: Optional[Dict]
+    transaction_metadata: Optional[dict[str, Any]]
     service: Optional[Service]
     user: Optional[User]
     recipient: Optional[User]
@@ -109,7 +108,6 @@ class TransactionFilter(BaseModel):
     service_id: Optional[int] = None
     min_service_id: Optional[Any] = None
     max_service_id: Optional[Any] = None
-    service_name: Optional[Any] = None
 
 class TransactionSort(StrEnum):
     """Enum for sorting the Transaction model."""

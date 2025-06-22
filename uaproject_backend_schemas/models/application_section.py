@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import BigInteger, ForeignKey
-from sqlmodel import JSON, Column
+from sqlmodel import JSON, BigInteger, Column, ForeignKey, Relationship
 
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
@@ -12,6 +11,9 @@ from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.schemas import SchemaDefinition
 from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
 from uaproject_backend_schemas.models.schemas.server import ServerAccessStatus, ServerType
+
+if TYPE_CHECKING:
+    from uaproject_backend_schemas.models.application import Application
 
 
 class ApplicationSection(AwesomeModel, TimestampsMixin, IDMixin, table=True):
@@ -37,6 +39,13 @@ class ApplicationSection(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     )
     reviewed_at: Optional[datetime] = AwesomeField(default=None)
     rejection_reason: Optional[str] = AwesomeField(default=None, max_length=1000)
+    application: Optional["Application"] = Relationship(
+        back_populates="sections",
+        sa_relationship_kwargs={
+            "foreign_keys": "[ApplicationSection.application_id]",
+            "lazy": "selectin",
+        },
+    )
 
     class Schemas(AwesomeModel.Schemas):
         class Create(SchemaDefinition):

@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
@@ -15,20 +15,19 @@ from uaproject_backend_schemas.models.user import User
 class Punishment(AwesomeModel):
     """Base punishment model."""
 
-    updated_at: datetime
-    id: int
-    user_id: int
-    admin_id: Optional[int]
-    type: PunishmentType
-    status: PunishmentStatus
-    reason: Optional[str]
-    expires_at: Optional[datetime]
-    config_id: Optional[int]
-    punishment_metadata: Optional[Dict]
-    created_at: datetime
-    user: Optional[User]
     admin: Optional[User]
+    admin_id: Optional[int]
     config: Optional[PunishmentConfig]
+    config_id: Optional[int]
+    expires_at: Optional[datetime]
+    id: int
+    punishment_metadata: Optional[dict[str, Any]]
+    reason: Optional[str]
+    status: PunishmentStatus
+    type: PunishmentType
+    updated_at: datetime
+    user: Optional[User]
+    user_id: int
     schemas: PunishmentSchemas
     scopes: PunishmentScopes
     filter: type[PunishmentFilter]
@@ -51,7 +50,7 @@ class PunishmentSchemaCreate(AwesomeBaseModel):
     reason: Optional[str]
     expires_at: Optional[datetime]
     config_id: Optional[int]
-    punishment_metadata: Optional[Dict]
+    punishment_metadata: Optional[dict[str, Any]]
     user: Optional[User]
     admin: Optional[User]
     config: Optional[PunishmentConfig]
@@ -66,7 +65,7 @@ class PunishmentSchemaUpdate(AwesomeBaseModel):
     reason: Optional[str]
     expires_at: Optional[datetime]
     config_id: Optional[int]
-    punishment_metadata: Optional[Dict]
+    punishment_metadata: Optional[dict[str, Any]]
     user: Optional[User]
     admin: Optional[User]
     config: Optional[PunishmentConfig]
@@ -83,7 +82,7 @@ class PunishmentSchemaResponse(AwesomeBaseModel):
     reason: Optional[str]
     expires_at: Optional[datetime]
     config_id: Optional[int]
-    punishment_metadata: Optional[Dict]
+    punishment_metadata: Optional[dict[str, Any]]
     user: Optional[User]
     admin: Optional[User]
     config: Optional[PunishmentConfig]
@@ -113,7 +112,7 @@ class PunishmentScopeStatusChanged(AwesomeBaseModel):
     reason: Optional[str]
     expires_at: Optional[datetime]
     config_id: Optional[int]
-    punishment_metadata: Optional[Dict]
+    punishment_metadata: Optional[dict[str, Any]]
     user: Optional[User]
     admin: Optional[User]
     config: Optional[PunishmentConfig]
@@ -142,7 +141,6 @@ class PunishmentFilter(BaseModel):
     config_id: Optional[int] = None
     min_config_id: Optional[Any] = None
     max_config_id: Optional[Any] = None
-    config_name: Optional[Any] = None
 
 class PunishmentSort(StrEnum):
     """Enum for sorting the Punishment model."""

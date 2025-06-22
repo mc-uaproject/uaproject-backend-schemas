@@ -3,7 +3,7 @@
 from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
@@ -11,31 +11,32 @@ from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.models.file import File
 from uaproject_backend_schemas.models.schemas.service import (
+    ServiceDiscount,
+    ServicePoint,
     ServiceType,
 )
 
 class Service(AwesomeModel):
     """Base service model."""
 
-    updated_at: datetime
-    id: int
-    name: str
-    display_name: Optional[str]
-    description: Optional[str]
-    points: Optional[List]
-    image: Optional[str]
-    price: Decimal
-    is_active: bool
     category: Optional[str]
-    type: ServiceType
+    description: Optional[str]
+    discounts: Optional[list[ServiceDiscount]]
+    display_name: Optional[str]
     duration_months: Optional[int]
+    icon_file: Optional[File]
+    id: int
+    image: Optional[str]
+    is_active: bool
     is_upgradable: bool
+    name: str
+    points: Optional[list[ServicePoint]]
+    price: Decimal
+    service_metadata: Optional[dict[str, Any]]
+    type: ServiceType
+    updated_at: datetime
     upgrade_from: Optional[str]
     upgrade_to: Optional[str]
-    service_metadata: Optional[Dict]
-    discounts: Optional[List]
-    created_at: datetime
-    icon_file: Optional[File]
     schemas: ServiceSchemas
     scopes: ServiceScopes
     filter: type[ServiceFilter]
@@ -54,7 +55,7 @@ class ServiceSchemaCreate(AwesomeBaseModel):
     name: Optional[str]
     display_name: Optional[str]
     description: Optional[str]
-    points: Optional[List]
+    points: Optional[list[ServicePoint]]
     image: Optional[str]
     price: Optional[Decimal]
     is_active: Optional[bool]
@@ -64,8 +65,8 @@ class ServiceSchemaCreate(AwesomeBaseModel):
     is_upgradable: Optional[bool]
     upgrade_from: Optional[str]
     upgrade_to: Optional[str]
-    service_metadata: Optional[Dict]
-    discounts: Optional[List]
+    service_metadata: Optional[dict[str, Any]]
+    discounts: Optional[list[ServiceDiscount]]
     icon_file: Optional[File]
 
 class ServiceSchemaUpdate(AwesomeBaseModel):
@@ -74,7 +75,7 @@ class ServiceSchemaUpdate(AwesomeBaseModel):
     name: Optional[str]
     display_name: Optional[str]
     description: Optional[str]
-    points: Optional[List]
+    points: Optional[list[ServicePoint]]
     image: Optional[str]
     price: Optional[Decimal]
     is_active: Optional[bool]
@@ -84,8 +85,8 @@ class ServiceSchemaUpdate(AwesomeBaseModel):
     is_upgradable: Optional[bool]
     upgrade_from: Optional[str]
     upgrade_to: Optional[str]
-    service_metadata: Optional[Dict]
-    discounts: Optional[List]
+    service_metadata: Optional[dict[str, Any]]
+    discounts: Optional[list[ServiceDiscount]]
     icon_file: Optional[File]
 
 class ServiceSchemaResponse(AwesomeBaseModel):
@@ -96,7 +97,7 @@ class ServiceSchemaResponse(AwesomeBaseModel):
     name: str
     display_name: Optional[str]
     description: Optional[str]
-    points: Optional[List]
+    points: Optional[list[ServicePoint]]
     image: Optional[str]
     price: Decimal
     is_active: bool
@@ -106,8 +107,8 @@ class ServiceSchemaResponse(AwesomeBaseModel):
     is_upgradable: bool
     upgrade_from: Optional[str]
     upgrade_to: Optional[str]
-    service_metadata: Optional[Dict]
-    discounts: Optional[List]
+    service_metadata: Optional[dict[str, Any]]
+    discounts: Optional[list[ServiceDiscount]]
     icon_file: Optional[File]
 
 class ServiceScopes:
@@ -136,7 +137,6 @@ class ServiceFilter(BaseModel):
     is_upgradable: Optional[bool] = None
     upgrade_from: Optional[str] = None
     upgrade_to: Optional[str] = None
-    icon_file_id: Optional[Any] = None
 
 class ServiceSort(StrEnum):
     """Enum for sorting the Service model."""

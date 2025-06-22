@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
@@ -15,16 +15,15 @@ from uaproject_backend_schemas.models.user import User
 class Claim(AwesomeModel):
     """Base claim model."""
 
-    updated_at: datetime
-    id: int
-    title: str
+    claimants: list[User]
+    defendants: list[User]
     description: str
-    status: ClaimStatus
-    judging_id: Optional[int]
-    created_at: datetime
-    claimants: Optional[List[User]]
-    defendants: Optional[List[User]]
+    id: int
     judging: Optional[Judging]
+    judging_id: Optional[int]
+    status: ClaimStatus
+    title: str
+    updated_at: datetime
     schemas: ClaimSchemas
     scopes: ClaimScopes
     filter: type[ClaimFilter]
@@ -42,8 +41,8 @@ class ClaimSchemaCreate(AwesomeBaseModel):
 
     title: str
     description: str
-    claimants: Optional[List[User]]
-    defendants: Optional[List[User]]
+    claimants: list[User]
+    defendants: list[User]
 
 class ClaimSchemaResponse(AwesomeBaseModel):
     """response schema for Claim model"""
@@ -54,8 +53,8 @@ class ClaimSchemaResponse(AwesomeBaseModel):
     description: str
     status: ClaimStatus
     judging_id: Optional[int]
-    claimants: Optional[List[User]]
-    defendants: Optional[List[User]]
+    claimants: list[User]
+    defendants: list[User]
     judging: Optional[Judging]
 
 class ClaimSchemaUpdate(AwesomeBaseModel):
@@ -83,8 +82,6 @@ class ClaimFilter(BaseModel):
     judging_id: Optional[int] = None
     min_judging_id: Optional[Any] = None
     max_judging_id: Optional[Any] = None
-    claimants_id: Optional[Any] = None
-    defendants_id: Optional[Any] = None
 
 class ClaimSort(StrEnum):
     """Enum for sorting the Claim model."""

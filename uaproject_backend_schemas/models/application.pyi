@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
@@ -14,30 +14,29 @@ from uaproject_backend_schemas.models.user import User
 class Application(AwesomeModel):
     """Base application model."""
 
-    id: int
-    updated_at: datetime
-    user_id: int
-    version: str
+    admin_decision_attitude: Optional[str]
     birth_date: Optional[datetime]
-    launcher: Optional[str]
-    server_source: Optional[str]
-    private_server_experience: Optional[str]
-    useful_skills: Optional[str]
+    community_projects_readiness: Optional[str]
     conflict_reaction: Optional[str]
+    editable_fields: list[str]
+    healthy_community_definition: Optional[str]
+    id: int
+    ideal_server_description: Optional[str]
+    launcher: Optional[str]
+    long_project_experience: Optional[str]
+    new_rule_reaction: Optional[str]
+    private_server_experience: Optional[str]
     quiz_answer: Optional[str]
     russian_word_reaction: Optional[str]
-    admin_decision_attitude: Optional[str]
-    new_rule_reaction: Optional[str]
-    useful_skills_detailed: Optional[str]
+    sections: list[ApplicationSection]
     server_experience_negative: Optional[str]
-    long_project_experience: Optional[str]
-    community_projects_readiness: Optional[str]
-    healthy_community_definition: Optional[str]
-    ideal_server_description: Optional[str]
-    editable_fields: List[str]
-    created_at: datetime
+    server_source: Optional[str]
+    updated_at: datetime
+    useful_skills: Optional[str]
+    useful_skills_detailed: Optional[str]
     user: Optional[User]
-    sections: Optional[List[ApplicationSection]]
+    user_id: int
+    version: str
     schemas: ApplicationSchemas
     scopes: ApplicationScopes
     filter: type[ApplicationFilter]
@@ -74,9 +73,9 @@ class ApplicationSchemaCreate(AwesomeBaseModel):
     community_projects_readiness: Optional[str]
     healthy_community_definition: Optional[str]
     ideal_server_description: Optional[str]
-    editable_fields: Optional[List[str]]
+    editable_fields: Optional[list[str]]
     user: Optional[User]
-    sections: Optional[List[ApplicationSection]]
+    sections: Optional[list[ApplicationSection]]
 
 class ApplicationSchemaUpdate(AwesomeBaseModel):
     """update schema for Application model"""
@@ -97,9 +96,9 @@ class ApplicationSchemaUpdate(AwesomeBaseModel):
     community_projects_readiness: Optional[str]
     healthy_community_definition: Optional[str]
     ideal_server_description: Optional[str]
-    editable_fields: Optional[List[str]]
+    editable_fields: Optional[list[str]]
     user: Optional[User]
-    sections: Optional[List[ApplicationSection]]
+    sections: Optional[list[ApplicationSection]]
 
 class ApplicationSchemaCreateLegacy(AwesomeBaseModel):
     """create_legacy schema for Application model"""
@@ -155,9 +154,9 @@ class ApplicationSchemaResponse(AwesomeBaseModel):
     community_projects_readiness: Optional[str]
     healthy_community_definition: Optional[str]
     ideal_server_description: Optional[str]
-    editable_fields: List[str]
+    editable_fields: list[str]
     user: Optional[User]
-    sections: Optional[List[ApplicationSection]]
+    sections: list[ApplicationSection]
 
 class ApplicationScopes:
     """Scopes for the Application model."""
@@ -170,7 +169,7 @@ class ApplicationScopeEditableFields(AwesomeBaseModel):
 
     id: int
     user_id: int
-    editable_fields: List[str]
+    editable_fields: list[str]
 
 class ApplicationScopeForm(AwesomeBaseModel):
     """form schema for Application model"""
@@ -217,7 +216,6 @@ class ApplicationFilter(BaseModel):
     community_projects_readiness: Optional[str] = None
     healthy_community_definition: Optional[str] = None
     ideal_server_description: Optional[str] = None
-    sections_id: Optional[Any] = None
 
 class ApplicationSort(StrEnum):
     """Enum for sorting the Application model."""

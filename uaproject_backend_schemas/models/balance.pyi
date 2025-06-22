@@ -15,13 +15,12 @@ from uaproject_backend_schemas.models.user import User
 class Balance(AwesomeModel):
     """Base balance model."""
 
-    updated_at: datetime
-    id: int
-    user_id: int
-    identifier: UUID
     amount: Decimal
-    created_at: datetime
-    user: Optional[User]
+    id: int
+    identifier: UUID
+    updated_at: datetime
+    user: User
+    user_id: int
     schemas: BalanceSchemas
     scopes: BalanceScopes
     filter: type[BalanceFilter]
@@ -39,7 +38,7 @@ class BalanceSchemaCreate(AwesomeBaseModel):
     """create schema for Balance model"""
 
     amount: Decimal
-    user: Optional[User]
+    user: User
 
 class BalanceSchemaUpdate(AwesomeBaseModel):
     """update schema for Balance model"""
@@ -54,7 +53,7 @@ class BalanceSchemaResponse(AwesomeBaseModel):
     user_id: int
     identifier: UUID
     amount: Decimal
-    user: Optional[User]
+    user: User
 
 class BalanceSchemaResponseSelf(AwesomeBaseModel):
     """response_self schema for Balance model"""
@@ -64,7 +63,7 @@ class BalanceSchemaResponseSelf(AwesomeBaseModel):
     user_id: int
     identifier: UUID
     amount: Decimal
-    user: Optional[User]
+    user: User
 
 class BalanceScopes:
     """Scopes for the Balance model."""

@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
@@ -15,14 +15,13 @@ from uaproject_backend_schemas.models.user import User
 class Judging(AwesomeModel):
     """Base judging model."""
 
-    updated_at: datetime
-    id: int
-    judge_id: int
+    claims: list[Claim]
     decision: str
-    verdict: JudgingVerdict
-    created_at: datetime
+    id: int
     judge: Optional[User]
-    claims: Optional[List[Claim]]
+    judge_id: int
+    updated_at: datetime
+    verdict: JudgingVerdict
     schemas: JudgingSchemas
     scopes: JudgingScopes
     filter: type[JudgingFilter]
@@ -51,7 +50,7 @@ class JudgingSchemaResponse(AwesomeBaseModel):
     decision: str
     verdict: JudgingVerdict
     judge: Optional[User]
-    claims: Optional[List[Claim]]
+    claims: list[Claim]
 
 class JudgingSchemaUpdate(AwesomeBaseModel):
     """update schema for Judging model"""
@@ -76,7 +75,6 @@ class JudgingFilter(BaseModel):
     max_judge_id: Optional[Any] = None
     decision: Optional[str] = None
     verdict: Optional[JudgingVerdict] = None
-    claims_id: Optional[Any] = None
 
 class JudgingSort(StrEnum):
     """Enum for sorting the Judging model."""

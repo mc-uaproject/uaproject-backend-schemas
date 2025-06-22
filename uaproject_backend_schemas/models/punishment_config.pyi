@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
@@ -13,16 +13,15 @@ from uaproject_backend_schemas.models.punishment import Punishment
 class PunishmentConfig(AwesomeModel):
     """Base punishmentconfig model."""
 
-    updated_at: datetime
-    id: int
-    name: str
+    config_data: dict[str, Any]
     description: Optional[str]
+    id: int
     is_active: bool
-    warn_threshold: int
+    name: str
+    punishments: list[Punishment]
+    updated_at: datetime
     warn_decay_days: int
-    config_data: Dict
-    created_at: datetime
-    punishments: Optional[List[Punishment]]
+    warn_threshold: int
     schemas: PunishmentConfigSchemas
     scopes: PunishmentConfigScopes
     filter: type[PunishmentConfigFilter]
@@ -43,8 +42,8 @@ class PunishmentConfigSchemaCreate(AwesomeBaseModel):
     is_active: Optional[bool]
     warn_threshold: Optional[int]
     warn_decay_days: Optional[int]
-    config_data: Optional[Dict]
-    punishments: Optional[List[Punishment]]
+    config_data: Optional[dict[str, Any]]
+    punishments: Optional[list[Punishment]]
 
 class PunishmentConfigSchemaUpdate(AwesomeBaseModel):
     """update schema for PunishmentConfig model"""
@@ -54,8 +53,8 @@ class PunishmentConfigSchemaUpdate(AwesomeBaseModel):
     is_active: Optional[bool]
     warn_threshold: Optional[int]
     warn_decay_days: Optional[int]
-    config_data: Optional[Dict]
-    punishments: Optional[List[Punishment]]
+    config_data: Optional[dict[str, Any]]
+    punishments: Optional[list[Punishment]]
 
 class PunishmentConfigSchemaResponse(AwesomeBaseModel):
     """response schema for PunishmentConfig model"""
@@ -67,8 +66,8 @@ class PunishmentConfigSchemaResponse(AwesomeBaseModel):
     is_active: bool
     warn_threshold: int
     warn_decay_days: int
-    config_data: Dict
-    punishments: Optional[List[Punishment]]
+    config_data: dict[str, Any]
+    punishments: list[Punishment]
 
 class PunishmentConfigScopes:
     """Scopes for the PunishmentConfig model."""
@@ -85,8 +84,8 @@ class PunishmentConfigScopeChanged(AwesomeBaseModel):
     is_active: bool
     warn_threshold: int
     warn_decay_days: int
-    config_data: Dict
-    punishments: Optional[List[Punishment]]
+    config_data: dict[str, Any]
+    punishments: list[Punishment]
 
 class PunishmentConfigFilter(BaseModel):
     """Pydantic-class for filtering the PunishmentConfig model."""
@@ -106,7 +105,6 @@ class PunishmentConfigFilter(BaseModel):
     warn_decay_days: Optional[int] = None
     min_warn_decay_days: Optional[Any] = None
     max_warn_decay_days: Optional[Any] = None
-    punishments_id: Optional[Any] = None
 
 class PunishmentConfigSort(StrEnum):
     """Enum for sorting the PunishmentConfig model."""

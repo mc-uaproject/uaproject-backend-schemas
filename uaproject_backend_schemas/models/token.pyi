@@ -15,11 +15,10 @@ class Token(AwesomeModel):
     """Base token model."""
 
     id: int
-    updated_at: datetime
     token: UUID
+    updated_at: datetime
+    user: User
     user_id: int
-    created_at: datetime
-    user: Optional[User]
     schemas: TokenSchemas
     scopes: TokenScopes
     filter: type[TokenFilter]
@@ -105,7 +104,7 @@ class TokenSchemaResponse(AwesomeBaseModel):
     updated_at: datetime
     token: UUID
     user_id: int
-    user: Optional[User]
+    user: User
 
     def with_permissions(
         self, permissions: list[Literal["token.read", "token.write"]]
@@ -118,7 +117,7 @@ class TokenSchemaResponseWithPermissionsTokenRead(AwesomeBaseModel):
     updated_at: datetime
     token: UUID
     user_id: int
-    user: Optional[User]
+    user: User
 
     def with_permissions(
         self, permissions: list[Literal["token.read", "token.write"]]
@@ -131,7 +130,7 @@ class TokenSchemaResponseWithPermissionsTokenWrite(AwesomeBaseModel):
     updated_at: datetime
     token: UUID
     user_id: int
-    user: Optional[User]
+    user: User
 
     def with_permissions(
         self, permissions: list[Literal["token.read", "token.write"]]
@@ -149,7 +148,7 @@ class TokenScopeFull(AwesomeBaseModel):
     updated_at: datetime
     token: UUID
     user_id: int
-    user: Optional[User]
+    user: User
 
     def with_permissions(
         self, permissions: list[Literal["token.read", "token.write"]]
@@ -162,7 +161,7 @@ class TokenScopeFullWithPermissionsTokenRead(AwesomeBaseModel):
     updated_at: datetime
     token: UUID
     user_id: int
-    user: Optional[User]
+    user: User
 
     def with_permissions(
         self, permissions: list[Literal["token.read", "token.write"]]
@@ -175,7 +174,7 @@ class TokenScopeFullWithPermissionsTokenWrite(AwesomeBaseModel):
     updated_at: datetime
     token: UUID
     user_id: int
-    user: Optional[User]
+    user: User
 
     def with_permissions(
         self, permissions: list[Literal["token.read", "token.write"]]
