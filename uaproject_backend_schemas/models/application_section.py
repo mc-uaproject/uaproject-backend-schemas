@@ -1,9 +1,6 @@
-from __future__ import annotations
-
 from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy.orm import Mapped
 from sqlmodel import JSON, BigInteger, Column, ForeignKey, Relationship
 
 from uaproject_backend_schemas.awesome.fields import AwesomeField
