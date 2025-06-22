@@ -40,7 +40,7 @@ class ApplicationSection(AwesomeModel, TimestampsMixin, IDMixin, table=True):
     )
     reviewed_at: Optional[datetime] = AwesomeField(default=None)
     rejection_reason: Optional[str] = AwesomeField(default=None, max_length=1000)
-    application: Mapped["Application"] = Relationship(
+    application: "Application" = Relationship(
         back_populates="sections",
         sa_relationship_kwargs={
             "foreign_keys": "[ApplicationSection.application_id]",

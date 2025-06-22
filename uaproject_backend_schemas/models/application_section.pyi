@@ -5,7 +5,6 @@ from enum import StrEnum
 from typing import Any, Optional
 
 from pydantic import BaseModel
-from sqlalchemy.orm import Mapped
 
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
@@ -15,7 +14,7 @@ from uaproject_backend_schemas.models.schemas.server import ServerAccessStatus, 
 class ApplicationSection(AwesomeModel):
     """Base applicationsection model."""
 
-    application: Mapped["Application"]
+    application: "Application"
     application_id: int
     id: int
     rejection_reason: Optional[str]
@@ -47,7 +46,7 @@ class ApplicationSectionSchemaCreate(AwesomeBaseModel):
     section_data: Optional[dict]
     status: Optional[ServerAccessStatus]
     rejection_reason: Optional[str]
-    application: Optional[Mapped["Application"]]
+    application: Optional["Application"]
 
 class ApplicationSectionSchemaUpdate(AwesomeBaseModel):
     """update schema for ApplicationSection model"""
@@ -57,7 +56,7 @@ class ApplicationSectionSchemaUpdate(AwesomeBaseModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    application: Optional[Mapped["Application"]]
+    application: Optional["Application"]
 
 class ApplicationSectionSchemaAdminUpdate(AwesomeBaseModel):
     """admin_update schema for ApplicationSection model"""
@@ -68,7 +67,7 @@ class ApplicationSectionSchemaAdminUpdate(AwesomeBaseModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    application: Optional[Mapped["Application"]]
+    application: Optional["Application"]
 
 class ApplicationSectionSchemaResponse(AwesomeBaseModel):
     """response schema for ApplicationSection model"""
@@ -82,7 +81,7 @@ class ApplicationSectionSchemaResponse(AwesomeBaseModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    application: Mapped["Application"]
+    application: "Application"
 
 class ApplicationSectionSchemaResponseDetailed(AwesomeBaseModel):
     """response_detailed schema for ApplicationSection model"""
@@ -96,7 +95,7 @@ class ApplicationSectionSchemaResponseDetailed(AwesomeBaseModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    application: Mapped["Application"]
+    application: "Application"
 
 class ApplicationSectionScopes:
     """Scopes for the ApplicationSection model."""
@@ -117,7 +116,7 @@ class ApplicationSectionScopeCreateOwn(AwesomeBaseModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    application: Mapped["Application"]
+    application: "Application"
 
 class ApplicationSectionScopeUpdateOwn(AwesomeBaseModel):
     """update_own schema for ApplicationSection model"""
@@ -131,7 +130,7 @@ class ApplicationSectionScopeUpdateOwn(AwesomeBaseModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    application: Mapped["Application"]
+    application: "Application"
 
 class ApplicationSectionScopeAdminReview(AwesomeBaseModel):
     """admin_review schema for ApplicationSection model"""
@@ -145,7 +144,7 @@ class ApplicationSectionScopeAdminReview(AwesomeBaseModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    application: Mapped["Application"]
+    application: "Application"
 
 class ApplicationSectionFilter(BaseModel):
     """Pydantic-class for filtering the ApplicationSection model."""
