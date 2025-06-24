@@ -1,3 +1,6 @@
+import datetime
+import uuid
+from decimal import Decimal
 from typing import TYPE_CHECKING, ClassVar, Dict, List, Optional, Type
 
 from pydantic import BaseModel
@@ -8,6 +11,15 @@ if TYPE_CHECKING:
 
 
 class AwesomeBaseModel(BaseModel):
+    model_config = {
+        "ser_json_encoders": {
+            Decimal: float,
+            datetime.datetime: lambda v: v.isoformat(),
+            datetime.date: lambda v: v.isoformat(),
+            datetime.time: lambda v: v.isoformat(),
+            uuid.UUID: str,
+        }
+    }
     _model_father: ClassVar[Type["AwesomeModel"]] = None
     _fields: ClassVar[List[str]] = []
     _relationships: ClassVar[Dict[str, str]] = {}
@@ -35,3 +47,12 @@ class AwesomeBaseModel(BaseModel):
     def __call__(cls, *args, **kwargs) -> Type["AwesomeBaseModel"]:
         """Create a new model instance."""
         return cls._create_model(cls, cls._permissions, **kwargs)
+
+    def to_json(self, **kwargs) -> str:
+        """Serialize model to JSON with support for decimal, datetime, uuid, etc."""
+        return self.model_dump_json(**kwargs)
+
+    @classmethod
+    def from_json(cls, json_str: str, **kwargs) -> "AwesomeBaseModel":
+        """Deserialize JSON into AwesomeBaseModel with support for decimal, datetime, uuid, etc."""
+        return cls.model_validate_json(json_str, **kwargs)
