@@ -134,8 +134,8 @@ class ApplicationSchemaCreateEvervault(AwesomeBaseModel):
 class ApplicationSchemaResponse(AwesomeBaseModel):
     """response schema for Application model"""
 
-    id: int
     updated_at: datetime
+    id: int
     user_id: int
     version: str
     birth_date: Optional[datetime]
@@ -188,12 +188,12 @@ class ApplicationScopeForm(AwesomeBaseModel):
 class ApplicationFilter(BaseModel):
     """Pydantic-class for filtering the Application model."""
 
-    id: Optional[int] = None
-    min_id: Optional[Any] = None
-    max_id: Optional[Any] = None
     updated_at: Optional[datetime] = None
     min_updated_at: Optional[Any] = None
     max_updated_at: Optional[Any] = None
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
     user_id: Optional[int] = None
     min_user_id: Optional[Any] = None
     max_user_id: Optional[Any] = None
@@ -216,6 +216,7 @@ class ApplicationFilter(BaseModel):
     community_projects_readiness: Optional[str] = None
     healthy_community_definition: Optional[str] = None
     ideal_server_description: Optional[str] = None
+    sections_id: Optional[Any] = None
 
 class ApplicationSort(StrEnum):
     """Enum for sorting the Application model."""

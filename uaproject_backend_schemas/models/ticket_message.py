@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from uaproject_backend_schemas.models.user import User
 
 
-class TicketMessage(AwesomeModel, TimestampsMixin, IDMixin, table=True):
+class TicketMessage(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "ticket_messages"
     __scope_prefix__ = "ticket_message"
     model_config = {"arbitrary_types_allowed": True}

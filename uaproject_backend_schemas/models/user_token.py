@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from uaproject_backend_schemas.models.user import User
 
 
-class Token(AwesomeModel, TimestampsMixin, IDMixin, table=True):
+class Token(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "user_tokens"
     __scope_prefix__ = "token"
     model_config = {"arbitrary_types_allowed": True}

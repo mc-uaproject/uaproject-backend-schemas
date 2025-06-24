@@ -882,10 +882,12 @@ def _generate_stubs(
     for name, obj in unique_models.items():
         module_path = model_to_modules[name][0]
         stub_dir = ensure_stub_dir(module_path, project_root)
-        stub_file = stub_dir / f"{camel_to_snake(name)}.pyi"
+        override = MODEL_IMPORT_OVERRIDES.get(name)
+        filename = override if override else camel_to_snake(name)
+        stub_file = stub_dir / f"{filename}.pyi"
 
         file_start_time = time.perf_counter()
-        print(f"📝 Generating .pyi for {obj.__name__} -> {camel_to_snake(name)}.pyi")
+        print(f"📝 Generating .pyi for {obj.__name__} -> {filename}.pyi")
 
         pyi_content = generate_pyi_for_model(obj, module_path)
 

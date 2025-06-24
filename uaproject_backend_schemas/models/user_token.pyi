@@ -100,8 +100,8 @@ class TokenSchemaUpdateWithPermissionsTokenRead(AwesomeBaseModel):
 class TokenSchemaResponse(AwesomeBaseModel):
     """response schema for Token model"""
 
-    id: int
     updated_at: datetime
+    id: int
     token: UUID
     user_id: int
     user: User
@@ -113,8 +113,8 @@ class TokenSchemaResponse(AwesomeBaseModel):
 class TokenSchemaResponseWithPermissionsTokenWrite(AwesomeBaseModel):
     """response schema for Token model with permissions token.write"""
 
-    id: int
     updated_at: datetime
+    id: int
     token: UUID
     user_id: int
     user: User
@@ -126,8 +126,8 @@ class TokenSchemaResponseWithPermissionsTokenWrite(AwesomeBaseModel):
 class TokenSchemaResponseWithPermissionsTokenRead(AwesomeBaseModel):
     """response schema for Token model with permissions token.read"""
 
-    id: int
     updated_at: datetime
+    id: int
     token: UUID
     user_id: int
     user: User
@@ -144,8 +144,8 @@ class TokenScopes:
 class TokenScopeFull(AwesomeBaseModel):
     """full schema for Token model"""
 
-    id: int
     updated_at: datetime
+    id: int
     token: UUID
     user_id: int
     user: User
@@ -157,8 +157,8 @@ class TokenScopeFull(AwesomeBaseModel):
 class TokenScopeFullWithPermissionsTokenWrite(AwesomeBaseModel):
     """full schema for Token model with permissions token.write"""
 
-    id: int
     updated_at: datetime
+    id: int
     token: UUID
     user_id: int
     user: User
@@ -170,8 +170,8 @@ class TokenScopeFullWithPermissionsTokenWrite(AwesomeBaseModel):
 class TokenScopeFullWithPermissionsTokenRead(AwesomeBaseModel):
     """full schema for Token model with permissions token.read"""
 
-    id: int
     updated_at: datetime
+    id: int
     token: UUID
     user_id: int
     user: User
@@ -183,12 +183,12 @@ class TokenScopeFullWithPermissionsTokenRead(AwesomeBaseModel):
 class TokenFilter(BaseModel):
     """Pydantic-class for filtering the Token model."""
 
-    id: Optional[int] = None
-    min_id: Optional[Any] = None
-    max_id: Optional[Any] = None
     updated_at: Optional[datetime] = None
     min_updated_at: Optional[Any] = None
     max_updated_at: Optional[Any] = None
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
     token: Optional[UUID] = None
     user_id: Optional[int] = None
     min_user_id: Optional[Any] = None

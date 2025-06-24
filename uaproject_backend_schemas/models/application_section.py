@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from uaproject_backend_schemas.models.application import Application
 
 
-class ApplicationSection(AwesomeModel, TimestampsMixin, IDMixin, table=True):
+class ApplicationSection(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     """Server-specific section of an application."""
 
     __tablename__ = "application_sections"

@@ -186,6 +186,9 @@ class FileFilter(BaseModel):
     service_id: Optional[int] = None
     min_service_id: Optional[Any] = None
     max_service_id: Optional[Any] = None
+    service_name: Optional[Any] = None
+    webhook_logs_as_request_id: Optional[Any] = None
+    webhook_logs_as_response_id: Optional[Any] = None
 
 class FileSort(StrEnum):
     """Enum for sorting the File model."""

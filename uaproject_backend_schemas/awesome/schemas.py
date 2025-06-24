@@ -331,10 +331,11 @@ class AwesomeSchemas:
         field_default_factory = getattr(field_info, "default_factory", None)
         field_required = getattr(field_info, "is_required", lambda: True)()
 
+        from sqlmodel.main import Undefined
         is_field_optional = optional is True or (isinstance(optional, list) and f in optional)
         if is_field_optional:
             field_required = False
-            if field_default is None and field_default_factory is None:
+            if (field_default is None or field_default is Undefined) and field_default_factory is None:
                 field_default = None
 
         return {

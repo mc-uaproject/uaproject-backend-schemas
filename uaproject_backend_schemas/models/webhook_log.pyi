@@ -142,6 +142,7 @@ class WebhookLogFilter(BaseModel):
     execution_duration_ms: Optional[int] = None
     min_execution_duration_ms: Optional[Any] = None
     max_execution_duration_ms: Optional[Any] = None
+    webhook_name: Optional[Any] = None
 
 class WebhookLogSort(StrEnum):
     """Enum for sorting the WebhookLog model."""

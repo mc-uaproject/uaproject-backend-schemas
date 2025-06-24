@@ -3,9 +3,6 @@ from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
-if TYPE_CHECKING:
-    pass
-
 
 class WebhookStatus(StrEnum):
     ACTIVE = "active"

@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from uaproject_backend_schemas.models.webhook import Webhook
 
 
-class User(AwesomeModel, TimestampsMixin, IDMixin, table=True):
+class User(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "users"
     __scope_prefix__ = "user"
     model_config = {"arbitrary_types_allowed": True}

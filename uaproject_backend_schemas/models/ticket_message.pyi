@@ -57,8 +57,8 @@ class TicketMessageSchemaUpdate(AwesomeBaseModel):
 class TicketMessageSchemaResponse(AwesomeBaseModel):
     """response schema for TicketMessage model"""
 
-    id: int
     updated_at: datetime
+    id: int
     ticket_id: int
     author_id: int
     content: str
@@ -99,12 +99,12 @@ class TicketMessageScopeTicketMessages(AwesomeBaseModel):
 class TicketMessageFilter(BaseModel):
     """Pydantic-class for filtering the TicketMessage model."""
 
-    id: Optional[int] = None
-    min_id: Optional[Any] = None
-    max_id: Optional[Any] = None
     updated_at: Optional[datetime] = None
     min_updated_at: Optional[Any] = None
     max_updated_at: Optional[Any] = None
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
     ticket_id: Optional[int] = None
     min_ticket_id: Optional[Any] = None
     max_ticket_id: Optional[Any] = None
@@ -114,6 +114,7 @@ class TicketMessageFilter(BaseModel):
     content: Optional[str] = None
     is_system_message: Optional[bool] = None
     edited_at: Optional[str] = None
+    attachment_files_id: Optional[Any] = None
 
 class TicketMessageSort(StrEnum):
     """Enum for sorting the TicketMessage model."""

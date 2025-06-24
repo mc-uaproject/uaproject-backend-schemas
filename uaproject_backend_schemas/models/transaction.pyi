@@ -108,6 +108,7 @@ class TransactionFilter(BaseModel):
     service_id: Optional[int] = None
     min_service_id: Optional[Any] = None
     max_service_id: Optional[Any] = None
+    service_name: Optional[Any] = None
 
 class TransactionSort(StrEnum):
     """Enum for sorting the Transaction model."""

@@ -44,3 +44,6 @@ class Transaction(AwesomeModel, IDMixin, TimestampsMixin, table=True):
         back_populates="received_transactions",
         sa_relationship_kwargs={"foreign_keys": "[Transaction.recipient_id]"},
     )
+
+if __name__ == "__main__":
+    Transaction.schemas.create()

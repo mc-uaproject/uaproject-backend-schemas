@@ -14,7 +14,7 @@ from uaproject_backend_schemas.models.schemas.server import ServerAccessStatus, 
 class ApplicationSection(AwesomeModel):
     """Base applicationsection model."""
 
-    application: "Application"
+    application: Application
     application_id: int
     id: int
     rejection_reason: Optional[str]
@@ -46,7 +46,7 @@ class ApplicationSectionSchemaCreate(AwesomeBaseModel):
     section_data: Optional[dict]
     status: Optional[ServerAccessStatus]
     rejection_reason: Optional[str]
-    application: Optional["Application"]
+    application: Optional[Application]
 
 class ApplicationSectionSchemaUpdate(AwesomeBaseModel):
     """update schema for ApplicationSection model"""
@@ -56,7 +56,7 @@ class ApplicationSectionSchemaUpdate(AwesomeBaseModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    application: Optional["Application"]
+    application: Optional[Application]
 
 class ApplicationSectionSchemaAdminUpdate(AwesomeBaseModel):
     """admin_update schema for ApplicationSection model"""
@@ -67,13 +67,13 @@ class ApplicationSectionSchemaAdminUpdate(AwesomeBaseModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    application: Optional["Application"]
+    application: Optional[Application]
 
 class ApplicationSectionSchemaResponse(AwesomeBaseModel):
     """response schema for ApplicationSection model"""
 
-    id: int
     updated_at: datetime
+    id: int
     application_id: int
     server_type: ServerType
     section_data: dict
@@ -81,13 +81,13 @@ class ApplicationSectionSchemaResponse(AwesomeBaseModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    application: "Application"
+    application: Application
 
 class ApplicationSectionSchemaResponseDetailed(AwesomeBaseModel):
     """response_detailed schema for ApplicationSection model"""
 
-    id: int
     updated_at: datetime
+    id: int
     application_id: int
     server_type: ServerType
     section_data: dict
@@ -95,7 +95,7 @@ class ApplicationSectionSchemaResponseDetailed(AwesomeBaseModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    application: "Application"
+    application: Application
 
 class ApplicationSectionScopes:
     """Scopes for the ApplicationSection model."""
@@ -107,8 +107,8 @@ class ApplicationSectionScopes:
 class ApplicationSectionScopeCreateOwn(AwesomeBaseModel):
     """create_own schema for ApplicationSection model"""
 
-    id: int
     updated_at: datetime
+    id: int
     application_id: int
     server_type: ServerType
     section_data: dict
@@ -116,13 +116,13 @@ class ApplicationSectionScopeCreateOwn(AwesomeBaseModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    application: "Application"
+    application: Application
 
 class ApplicationSectionScopeUpdateOwn(AwesomeBaseModel):
     """update_own schema for ApplicationSection model"""
 
-    id: int
     updated_at: datetime
+    id: int
     application_id: int
     server_type: ServerType
     section_data: dict
@@ -130,13 +130,13 @@ class ApplicationSectionScopeUpdateOwn(AwesomeBaseModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    application: "Application"
+    application: Application
 
 class ApplicationSectionScopeAdminReview(AwesomeBaseModel):
     """admin_review schema for ApplicationSection model"""
 
-    id: int
     updated_at: datetime
+    id: int
     application_id: int
     server_type: ServerType
     section_data: dict
@@ -144,17 +144,17 @@ class ApplicationSectionScopeAdminReview(AwesomeBaseModel):
     reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    application: "Application"
+    application: Application
 
 class ApplicationSectionFilter(BaseModel):
     """Pydantic-class for filtering the ApplicationSection model."""
 
-    id: Optional[int] = None
-    min_id: Optional[Any] = None
-    max_id: Optional[Any] = None
     updated_at: Optional[datetime] = None
     min_updated_at: Optional[Any] = None
     max_updated_at: Optional[Any] = None
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
     application_id: Optional[int] = None
     min_application_id: Optional[Any] = None
     max_application_id: Optional[Any] = None

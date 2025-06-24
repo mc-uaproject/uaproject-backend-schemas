@@ -47,7 +47,7 @@ EVERVAULT_EDITABLE_FIELDS = [
     "ideal_server_description",
 ]
 
-class Application(AwesomeModel, TimestampsMixin, IDMixin, table=True):
+class Application(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "applications"
     __scope_prefix__ = "application"
     model_config = {"arbitrary_types_allowed": True}

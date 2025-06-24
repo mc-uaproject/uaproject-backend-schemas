@@ -82,34 +82,8 @@ class UserSchemaCreate(AwesomeBaseModel):
     files: Optional[list[File]]
 
     def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
     ) -> UserSchemaCreate: ...
-
-class UserSchemaCreateWithPermissionsWriteNickname(AwesomeBaseModel):
-    """create schema for User model with permissions .write.nickname"""
-
-    discord_id: Optional[int]
-    minecraft_nickname: Optional[str]
-    biography: Optional[str]
-    roles: Optional[list[Role]]
-    token: Optional[Token]
-    punishments: Optional[list[Punishment]]
-    balance: Optional[Balance]
-    application: Optional[Application]
-    transactions: Optional[list[Transaction]]
-    received_transactions: Optional[list[Transaction]]
-    webhooks: Optional[list[Webhook]]
-    claims_as_claimant: Optional[list[Claim]]
-    claims_as_defendant: Optional[list[Claim]]
-    news: Optional[list[News]]
-    authored_tickets: Optional[list[Ticket]]
-    assigned_tickets: Optional[list[Ticket]]
-    ticket_messages: Optional[list[TicketMessage]]
-    files: Optional[list[File]]
-
-    def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
-    ) -> UserSchemaCreateWithPermissionsWriteNickname: ...
 
 class UserSchemaCreateWithPermissionsAdmin(AwesomeBaseModel):
     """create schema for User model with permissions .admin"""
@@ -134,8 +108,34 @@ class UserSchemaCreateWithPermissionsAdmin(AwesomeBaseModel):
     files: Optional[list[File]]
 
     def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
     ) -> UserSchemaCreateWithPermissionsAdmin: ...
+
+class UserSchemaCreateWithPermissionsWriteNickname(AwesomeBaseModel):
+    """create schema for User model with permissions .write.nickname"""
+
+    discord_id: Optional[int]
+    minecraft_nickname: Optional[str]
+    biography: Optional[str]
+    roles: Optional[list[Role]]
+    token: Optional[Token]
+    punishments: Optional[list[Punishment]]
+    balance: Optional[Balance]
+    application: Optional[Application]
+    transactions: Optional[list[Transaction]]
+    received_transactions: Optional[list[Transaction]]
+    webhooks: Optional[list[Webhook]]
+    claims_as_claimant: Optional[list[Claim]]
+    claims_as_defendant: Optional[list[Claim]]
+    news: Optional[list[News]]
+    authored_tickets: Optional[list[Ticket]]
+    assigned_tickets: Optional[list[Ticket]]
+    ticket_messages: Optional[list[TicketMessage]]
+    files: Optional[list[File]]
+
+    def with_permissions(
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
+    ) -> UserSchemaCreateWithPermissionsWriteNickname: ...
 
 class UserSchemaUpdate(AwesomeBaseModel):
     """update schema for User model"""
@@ -160,34 +160,8 @@ class UserSchemaUpdate(AwesomeBaseModel):
     files: Optional[list[File]]
 
     def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
     ) -> UserSchemaUpdate: ...
-
-class UserSchemaUpdateWithPermissionsWriteNickname(AwesomeBaseModel):
-    """update schema for User model with permissions .write.nickname"""
-
-    discord_id: Optional[int]
-    minecraft_nickname: Optional[str]
-    biography: Optional[str]
-    roles: Optional[list[Role]]
-    token: Optional[Token]
-    punishments: Optional[list[Punishment]]
-    balance: Optional[Balance]
-    application: Optional[Application]
-    transactions: Optional[list[Transaction]]
-    received_transactions: Optional[list[Transaction]]
-    webhooks: Optional[list[Webhook]]
-    claims_as_claimant: Optional[list[Claim]]
-    claims_as_defendant: Optional[list[Claim]]
-    news: Optional[list[News]]
-    authored_tickets: Optional[list[Ticket]]
-    assigned_tickets: Optional[list[Ticket]]
-    ticket_messages: Optional[list[TicketMessage]]
-    files: Optional[list[File]]
-
-    def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
-    ) -> UserSchemaUpdateWithPermissionsWriteNickname: ...
 
 class UserSchemaUpdateWithPermissionsAdmin(AwesomeBaseModel):
     """update schema for User model with permissions .admin"""
@@ -212,8 +186,34 @@ class UserSchemaUpdateWithPermissionsAdmin(AwesomeBaseModel):
     files: Optional[list[File]]
 
     def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
     ) -> UserSchemaUpdateWithPermissionsAdmin: ...
+
+class UserSchemaUpdateWithPermissionsWriteNickname(AwesomeBaseModel):
+    """update schema for User model with permissions .write.nickname"""
+
+    discord_id: Optional[int]
+    minecraft_nickname: Optional[str]
+    biography: Optional[str]
+    roles: Optional[list[Role]]
+    token: Optional[Token]
+    punishments: Optional[list[Punishment]]
+    balance: Optional[Balance]
+    application: Optional[Application]
+    transactions: Optional[list[Transaction]]
+    received_transactions: Optional[list[Transaction]]
+    webhooks: Optional[list[Webhook]]
+    claims_as_claimant: Optional[list[Claim]]
+    claims_as_defendant: Optional[list[Claim]]
+    news: Optional[list[News]]
+    authored_tickets: Optional[list[Ticket]]
+    assigned_tickets: Optional[list[Ticket]]
+    ticket_messages: Optional[list[TicketMessage]]
+    files: Optional[list[File]]
+
+    def with_permissions(
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
+    ) -> UserSchemaUpdateWithPermissionsWriteNickname: ...
 
 class UserSchemaUpdateAdmin(AwesomeBaseModel):
     """update_admin schema for User model"""
@@ -239,35 +239,8 @@ class UserSchemaUpdateAdmin(AwesomeBaseModel):
     files: Optional[list[File]]
 
     def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
     ) -> UserSchemaUpdateAdmin: ...
-
-class UserSchemaUpdateAdminWithPermissionsWriteNickname(AwesomeBaseModel):
-    """update_admin schema for User model with permissions .write.nickname"""
-
-    discord_id: Optional[int]
-    minecraft_nickname: Optional[str]
-    is_superuser: Optional[bool]
-    biography: Optional[str]
-    roles: Optional[list[Role]]
-    token: Optional[Token]
-    punishments: Optional[list[Punishment]]
-    balance: Optional[Balance]
-    application: Optional[Application]
-    transactions: Optional[list[Transaction]]
-    received_transactions: Optional[list[Transaction]]
-    webhooks: Optional[list[Webhook]]
-    claims_as_claimant: Optional[list[Claim]]
-    claims_as_defendant: Optional[list[Claim]]
-    news: Optional[list[News]]
-    authored_tickets: Optional[list[Ticket]]
-    assigned_tickets: Optional[list[Ticket]]
-    ticket_messages: Optional[list[TicketMessage]]
-    files: Optional[list[File]]
-
-    def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
-    ) -> UserSchemaUpdateAdminWithPermissionsWriteNickname: ...
 
 class UserSchemaUpdateAdminWithPermissionsAdmin(AwesomeBaseModel):
     """update_admin schema for User model with permissions .admin"""
@@ -293,8 +266,35 @@ class UserSchemaUpdateAdminWithPermissionsAdmin(AwesomeBaseModel):
     files: Optional[list[File]]
 
     def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
     ) -> UserSchemaUpdateAdminWithPermissionsAdmin: ...
+
+class UserSchemaUpdateAdminWithPermissionsWriteNickname(AwesomeBaseModel):
+    """update_admin schema for User model with permissions .write.nickname"""
+
+    discord_id: Optional[int]
+    minecraft_nickname: Optional[str]
+    is_superuser: Optional[bool]
+    biography: Optional[str]
+    roles: Optional[list[Role]]
+    token: Optional[Token]
+    punishments: Optional[list[Punishment]]
+    balance: Optional[Balance]
+    application: Optional[Application]
+    transactions: Optional[list[Transaction]]
+    received_transactions: Optional[list[Transaction]]
+    webhooks: Optional[list[Webhook]]
+    claims_as_claimant: Optional[list[Claim]]
+    claims_as_defendant: Optional[list[Claim]]
+    news: Optional[list[News]]
+    authored_tickets: Optional[list[Ticket]]
+    assigned_tickets: Optional[list[Ticket]]
+    ticket_messages: Optional[list[TicketMessage]]
+    files: Optional[list[File]]
+
+    def with_permissions(
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
+    ) -> UserSchemaUpdateAdminWithPermissionsWriteNickname: ...
 
 class UserSchemaResponse(AwesomeBaseModel):
     """response schema for User model"""
@@ -309,24 +309,8 @@ class UserSchemaResponse(AwesomeBaseModel):
     access: Any
 
     def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
     ) -> UserSchemaResponse: ...
-
-class UserSchemaResponseWithPermissionsWriteNickname(AwesomeBaseModel):
-    """response schema for User model with permissions .write.nickname"""
-
-    id: int
-    updated_at: datetime
-    created_at: datetime
-    discord_id: Optional[int]
-    minecraft_nickname: Optional[str]
-    is_superuser: Optional[bool]
-    biography: Optional[str]
-    access: Any
-
-    def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
-    ) -> UserSchemaResponseWithPermissionsWriteNickname: ...
 
 class UserSchemaResponseWithPermissionsAdmin(AwesomeBaseModel):
     """response schema for User model with permissions .admin"""
@@ -341,8 +325,24 @@ class UserSchemaResponseWithPermissionsAdmin(AwesomeBaseModel):
     access: Any
 
     def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
     ) -> UserSchemaResponseWithPermissionsAdmin: ...
+
+class UserSchemaResponseWithPermissionsWriteNickname(AwesomeBaseModel):
+    """response schema for User model with permissions .write.nickname"""
+
+    id: int
+    updated_at: datetime
+    created_at: datetime
+    discord_id: Optional[int]
+    minecraft_nickname: Optional[str]
+    is_superuser: Optional[bool]
+    biography: Optional[str]
+    access: Any
+
+    def with_permissions(
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
+    ) -> UserSchemaResponseWithPermissionsWriteNickname: ...
 
 class UserSchemaResponseSelf(AwesomeBaseModel):
     """response_self schema for User model"""
@@ -357,24 +357,8 @@ class UserSchemaResponseSelf(AwesomeBaseModel):
     access: Any
 
     def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
     ) -> UserSchemaResponseSelf: ...
-
-class UserSchemaResponseSelfWithPermissionsWriteNickname(AwesomeBaseModel):
-    """response_self schema for User model with permissions .write.nickname"""
-
-    id: int
-    updated_at: datetime
-    created_at: datetime
-    discord_id: Optional[int]
-    minecraft_nickname: Optional[str]
-    is_superuser: Optional[bool]
-    biography: Optional[str]
-    access: Any
-
-    def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
-    ) -> UserSchemaResponseSelfWithPermissionsWriteNickname: ...
 
 class UserSchemaResponseSelfWithPermissionsAdmin(AwesomeBaseModel):
     """response_self schema for User model with permissions .admin"""
@@ -389,8 +373,24 @@ class UserSchemaResponseSelfWithPermissionsAdmin(AwesomeBaseModel):
     access: Any
 
     def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
     ) -> UserSchemaResponseSelfWithPermissionsAdmin: ...
+
+class UserSchemaResponseSelfWithPermissionsWriteNickname(AwesomeBaseModel):
+    """response_self schema for User model with permissions .write.nickname"""
+
+    id: int
+    updated_at: datetime
+    created_at: datetime
+    discord_id: Optional[int]
+    minecraft_nickname: Optional[str]
+    is_superuser: Optional[bool]
+    biography: Optional[str]
+    access: Any
+
+    def with_permissions(
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
+    ) -> UserSchemaResponseSelfWithPermissionsWriteNickname: ...
 
 class UserScopes:
     """Scopes for the User model."""
@@ -407,18 +407,8 @@ class UserScopeMinecraftNickname(AwesomeBaseModel):
     minecraft_nickname: Optional[str]
 
     def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
     ) -> UserScopeMinecraftNickname: ...
-
-class UserScopeMinecraftNicknameWithPermissionsWriteNickname(AwesomeBaseModel):
-    """minecraft_nickname schema for User model with permissions .write.nickname"""
-
-    id: int
-    minecraft_nickname: Optional[str]
-
-    def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
-    ) -> UserScopeMinecraftNicknameWithPermissionsWriteNickname: ...
 
 class UserScopeMinecraftNicknameWithPermissionsAdmin(AwesomeBaseModel):
     """minecraft_nickname schema for User model with permissions .admin"""
@@ -427,8 +417,18 @@ class UserScopeMinecraftNicknameWithPermissionsAdmin(AwesomeBaseModel):
     minecraft_nickname: Optional[str]
 
     def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
     ) -> UserScopeMinecraftNicknameWithPermissionsAdmin: ...
+
+class UserScopeMinecraftNicknameWithPermissionsWriteNickname(AwesomeBaseModel):
+    """minecraft_nickname schema for User model with permissions .write.nickname"""
+
+    id: int
+    minecraft_nickname: Optional[str]
+
+    def with_permissions(
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
+    ) -> UserScopeMinecraftNicknameWithPermissionsWriteNickname: ...
 
 class UserScopeDiscordId(AwesomeBaseModel):
     """discord_id schema for User model"""
@@ -437,18 +437,8 @@ class UserScopeDiscordId(AwesomeBaseModel):
     discord_id: Optional[int]
 
     def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
     ) -> UserScopeDiscordId: ...
-
-class UserScopeDiscordIdWithPermissionsWriteNickname(AwesomeBaseModel):
-    """discord_id schema for User model with permissions .write.nickname"""
-
-    id: int
-    discord_id: Optional[int]
-
-    def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
-    ) -> UserScopeDiscordIdWithPermissionsWriteNickname: ...
 
 class UserScopeDiscordIdWithPermissionsAdmin(AwesomeBaseModel):
     """discord_id schema for User model with permissions .admin"""
@@ -457,8 +447,18 @@ class UserScopeDiscordIdWithPermissionsAdmin(AwesomeBaseModel):
     discord_id: Optional[int]
 
     def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
     ) -> UserScopeDiscordIdWithPermissionsAdmin: ...
+
+class UserScopeDiscordIdWithPermissionsWriteNickname(AwesomeBaseModel):
+    """discord_id schema for User model with permissions .write.nickname"""
+
+    id: int
+    discord_id: Optional[int]
+
+    def with_permissions(
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
+    ) -> UserScopeDiscordIdWithPermissionsWriteNickname: ...
 
 class UserScopeSuperuser(AwesomeBaseModel):
     """superuser schema for User model"""
@@ -471,22 +471,8 @@ class UserScopeSuperuser(AwesomeBaseModel):
     created_at: datetime
 
     def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
     ) -> UserScopeSuperuser: ...
-
-class UserScopeSuperuserWithPermissionsWriteNickname(AwesomeBaseModel):
-    """superuser schema for User model with permissions .write.nickname"""
-
-    id: int
-    discord_id: Optional[int]
-    minecraft_nickname: Optional[str]
-    is_superuser: Optional[bool]
-    updated_at: datetime
-    created_at: datetime
-
-    def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
-    ) -> UserScopeSuperuserWithPermissionsWriteNickname: ...
 
 class UserScopeSuperuserWithPermissionsAdmin(AwesomeBaseModel):
     """superuser schema for User model with permissions .admin"""
@@ -499,8 +485,22 @@ class UserScopeSuperuserWithPermissionsAdmin(AwesomeBaseModel):
     created_at: datetime
 
     def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
     ) -> UserScopeSuperuserWithPermissionsAdmin: ...
+
+class UserScopeSuperuserWithPermissionsWriteNickname(AwesomeBaseModel):
+    """superuser schema for User model with permissions .write.nickname"""
+
+    id: int
+    discord_id: Optional[int]
+    minecraft_nickname: Optional[str]
+    is_superuser: Optional[bool]
+    updated_at: datetime
+    created_at: datetime
+
+    def with_permissions(
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
+    ) -> UserScopeSuperuserWithPermissionsWriteNickname: ...
 
 class UserScopeAccess(AwesomeBaseModel):
     """access schema for User model"""
@@ -509,18 +509,8 @@ class UserScopeAccess(AwesomeBaseModel):
     access: Any
 
     def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
     ) -> UserScopeAccess: ...
-
-class UserScopeAccessWithPermissionsWriteNickname(AwesomeBaseModel):
-    """access schema for User model with permissions .write.nickname"""
-
-    id: int
-    access: Any
-
-    def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
-    ) -> UserScopeAccessWithPermissionsWriteNickname: ...
 
 class UserScopeAccessWithPermissionsAdmin(AwesomeBaseModel):
     """access schema for User model with permissions .admin"""
@@ -529,24 +519,51 @@ class UserScopeAccessWithPermissionsAdmin(AwesomeBaseModel):
     access: Any
 
     def with_permissions(
-        self, permissions: list[Literal[".write.nickname", ".admin"]]
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
     ) -> UserScopeAccessWithPermissionsAdmin: ...
+
+class UserScopeAccessWithPermissionsWriteNickname(AwesomeBaseModel):
+    """access schema for User model with permissions .write.nickname"""
+
+    id: int
+    access: Any
+
+    def with_permissions(
+        self, permissions: list[Literal[".admin", ".write.nickname"]]
+    ) -> UserScopeAccessWithPermissionsWriteNickname: ...
 
 class UserFilter(BaseModel):
     """Pydantic-class for filtering the User model."""
 
-    id: Optional[int] = None
-    min_id: Optional[Any] = None
-    max_id: Optional[Any] = None
     updated_at: Optional[datetime] = None
     min_updated_at: Optional[Any] = None
     max_updated_at: Optional[Any] = None
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
     discord_id: Optional[int] = None
     min_discord_id: Optional[Any] = None
     max_discord_id: Optional[Any] = None
     minecraft_nickname: Optional[str] = None
     is_superuser: Optional[bool] = None
     biography: Optional[str] = None
+    roles_id: Optional[Any] = None
+    roles_name: Optional[Any] = None
+    token_id: Optional[Any] = None
+    punishments_id: Optional[Any] = None
+    balance_id: Optional[Any] = None
+    application_id: Optional[Any] = None
+    transactions_id: Optional[Any] = None
+    received_transactions_id: Optional[Any] = None
+    webhooks_id: Optional[Any] = None
+    webhooks_name: Optional[Any] = None
+    claims_as_claimant_id: Optional[Any] = None
+    claims_as_defendant_id: Optional[Any] = None
+    news_id: Optional[Any] = None
+    authored_tickets_id: Optional[Any] = None
+    assigned_tickets_id: Optional[Any] = None
+    ticket_messages_id: Optional[Any] = None
+    files_id: Optional[Any] = None
 
 class UserSort(StrEnum):
     """Enum for sorting the User model."""

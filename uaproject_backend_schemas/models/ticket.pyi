@@ -70,8 +70,8 @@ class TicketSchemaUpdateAssign(AwesomeBaseModel):
 class TicketSchemaResponse(AwesomeBaseModel):
     """response schema for Ticket model"""
 
-    id: int
     updated_at: datetime
+    id: int
     title: str
     description: str
     author_id: int
@@ -86,8 +86,8 @@ class TicketSchemaResponse(AwesomeBaseModel):
 class TicketSchemaResponseSelf(AwesomeBaseModel):
     """response_self schema for Ticket model"""
 
-    id: int
     updated_at: datetime
+    id: int
     title: str
     description: str
     author_id: int
@@ -130,12 +130,12 @@ class TicketScopeAssignment(AwesomeBaseModel):
 class TicketFilter(BaseModel):
     """Pydantic-class for filtering the Ticket model."""
 
-    id: Optional[int] = None
-    min_id: Optional[Any] = None
-    max_id: Optional[Any] = None
     updated_at: Optional[datetime] = None
     min_updated_at: Optional[Any] = None
     max_updated_at: Optional[Any] = None
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
     title: Optional[str] = None
     description: Optional[str] = None
     author_id: Optional[int] = None
@@ -146,6 +146,7 @@ class TicketFilter(BaseModel):
     max_assigned_to_id: Optional[Any] = None
     status: Optional[TicketStatus] = None
     priority: Optional[TicketPriority] = None
+    messages_id: Optional[Any] = None
 
 class TicketSort(StrEnum):
     """Enum for sorting the Ticket model."""

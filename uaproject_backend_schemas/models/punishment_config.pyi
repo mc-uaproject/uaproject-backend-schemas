@@ -105,6 +105,7 @@ class PunishmentConfigFilter(BaseModel):
     warn_decay_days: Optional[int] = None
     min_warn_decay_days: Optional[Any] = None
     max_warn_decay_days: Optional[Any] = None
+    punishments_id: Optional[Any] = None
 
 class PunishmentConfigSort(StrEnum):
     """Enum for sorting the PunishmentConfig model."""
