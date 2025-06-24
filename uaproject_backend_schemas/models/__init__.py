@@ -7,6 +7,7 @@ from .judging import Judging
 from .news import News
 from .punishment import Punishment
 from .punishment_config import PunishmentConfig
+from .purchased_item import PurchasedItem
 from .role import Role
 from .service import Service
 from .ticket import Ticket
@@ -27,6 +28,7 @@ Judging.model_rebuild()
 News.model_rebuild()
 Punishment.model_rebuild()
 PunishmentConfig.model_rebuild()
+PurchasedItem.model_rebuild()
 Role.model_rebuild()
 Service.model_rebuild()
 Ticket.model_rebuild()
@@ -48,6 +50,7 @@ __all__ = [
     "News",
     "Punishment",
     "PunishmentConfig",
+    "PurchasedItem",
     "Role",
     "Service",
     "Ticket",

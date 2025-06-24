@@ -6,3 +6,4 @@ class PurchasedItemStatus(StrEnum):
     SUSPENDED = "suspended"
     EXPIRED = "expired"
     CANCELLED = "cancelled"
+    REPLACED = "replaced"  # For upgraded services
