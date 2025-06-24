@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 class AwesomeBaseModel(BaseModel):
     model_config = {
         "ser_json_encoders": {
-            Decimal: float,
+            Decimal: str,
             datetime.datetime: lambda v: v.isoformat(),
             datetime.date: lambda v: v.isoformat(),
             datetime.time: lambda v: v.isoformat(),
