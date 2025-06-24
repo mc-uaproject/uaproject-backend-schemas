@@ -12,6 +12,7 @@ from uaproject_backend_schemas.awesome.model import AwesomeModel
 class UserRoles(AwesomeModel):
     """Base userroles model."""
 
+    id: int
     role_id: int
     updated_at: datetime
     user_id: int
@@ -43,6 +44,7 @@ class UserRolesSchemaResponse(AwesomeBaseModel):
     """response schema for UserRoles model"""
 
     updated_at: datetime
+    id: int
     user_id: int
     role_id: int
 
@@ -55,6 +57,9 @@ class UserRolesFilter(BaseModel):
     updated_at: Optional[datetime] = None
     min_updated_at: Optional[Any] = None
     max_updated_at: Optional[Any] = None
+    id: Optional[int] = None
+    min_id: Optional[Any] = None
+    max_id: Optional[Any] = None
     user_id: Optional[int] = None
     min_user_id: Optional[Any] = None
     max_user_id: Optional[Any] = None
@@ -65,5 +70,6 @@ class UserRolesFilter(BaseModel):
 class UserRolesSort(StrEnum):
     """Enum for sorting the UserRoles model."""
 
+    ID = "id"
     CREATED_AT = "created_at"
     UPDATED_AT = "updated_at"
