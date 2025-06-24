@@ -9,6 +9,7 @@ from pydantic import BaseModel
 
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
+from uaproject_backend_schemas.models.purchased_item import PurchasedItem
 from uaproject_backend_schemas.models.schemas.transaction import TransactionType
 from uaproject_backend_schemas.models.service import Service
 from uaproject_backend_schemas.models.user import User
@@ -19,6 +20,7 @@ class Transaction(AwesomeModel):
     amount: Decimal
     description: Optional[str]
     id: int
+    purchased_item: Optional[PurchasedItem]
     recipient: Optional[User]
     recipient_id: int
     service: Optional[Service]
@@ -53,6 +55,7 @@ class TransactionSchemaCreate(AwesomeBaseModel):
     service: Optional[Service]
     user: Optional[User]
     recipient: Optional[User]
+    purchased_item: Optional[PurchasedItem]
 
 class TransactionSchemaUpdate(AwesomeBaseModel):
     """update schema for Transaction model"""
@@ -67,6 +70,7 @@ class TransactionSchemaUpdate(AwesomeBaseModel):
     service: Optional[Service]
     user: Optional[User]
     recipient: Optional[User]
+    purchased_item: Optional[PurchasedItem]
 
 class TransactionSchemaResponse(AwesomeBaseModel):
     """response schema for Transaction model"""
@@ -83,6 +87,7 @@ class TransactionSchemaResponse(AwesomeBaseModel):
     service: Optional[Service]
     user: Optional[User]
     recipient: Optional[User]
+    purchased_item: Optional[PurchasedItem]
 
 class TransactionScopes:
     """Scopes for the Transaction model."""
@@ -108,7 +113,6 @@ class TransactionFilter(BaseModel):
     service_id: Optional[int] = None
     min_service_id: Optional[Any] = None
     max_service_id: Optional[Any] = None
-    service_name: Optional[Any] = None
 
 class TransactionSort(StrEnum):
     """Enum for sorting the Transaction model."""

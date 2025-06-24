@@ -9,6 +9,7 @@ from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.models.schemas.transaction import TransactionType
 
 if TYPE_CHECKING:
+    from uaproject_backend_schemas.models.purchased_item import PurchasedItem
     from uaproject_backend_schemas.models.service import Service
     from uaproject_backend_schemas.models.user import User
 
@@ -43,6 +44,10 @@ class Transaction(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     recipient: Optional["User"] = Relationship(
         back_populates="received_transactions",
         sa_relationship_kwargs={"foreign_keys": "[Transaction.recipient_id]"},
+    )
+    purchased_item: Optional["PurchasedItem"] = Relationship(
+        back_populates="transaction",
+        sa_relationship_kwargs={"foreign_keys": "[PurchasedItem.transaction_id]", "uselist": False},
     )
 
 if __name__ == "__main__":

@@ -14,6 +14,7 @@ from uaproject_backend_schemas.models.schemas.service import (
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.models.file import File
+    from uaproject_backend_schemas.models.purchased_item import PurchasedItem
 
 
 class Service(AwesomeModel, IDMixin, TimestampsMixin, table=True):
@@ -37,3 +38,7 @@ class Service(AwesomeModel, IDMixin, TimestampsMixin, table=True):
 
     # MinIO file relationship (one-to-one)
     icon_file: Optional["File"] = Relationship(back_populates="service")
+    purchased_items: List["PurchasedItem"] = Relationship(
+        back_populates="service",
+        sa_relationship_kwargs={"foreign_keys": "[PurchasedItem.service_id]", "lazy": "selectin"},
+    )

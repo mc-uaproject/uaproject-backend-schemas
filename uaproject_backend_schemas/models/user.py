@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from uaproject_backend_schemas.models.file import File
     from uaproject_backend_schemas.models.news import News
     from uaproject_backend_schemas.models.punishment import Punishment
+    from uaproject_backend_schemas.models.purchased_item import PurchasedItem
     from uaproject_backend_schemas.models.role import Role
     from uaproject_backend_schemas.models.ticket import Ticket
     from uaproject_backend_schemas.models.ticket_message import TicketMessage
@@ -107,6 +108,10 @@ class User(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     files: List["File"] = Relationship(
         back_populates="user",
         sa_relationship_kwargs={"foreign_keys": "[File.user_id]", "lazy": "selectin"},
+    )
+    purchased_items: List["PurchasedItem"] = Relationship(
+        back_populates="user",
+        sa_relationship_kwargs={"foreign_keys": "[PurchasedItem.user_id]", "lazy": "selectin"},
     )
 
     class Schemas(AwesomeModel.Schemas):

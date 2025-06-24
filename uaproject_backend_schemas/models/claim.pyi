@@ -82,8 +82,6 @@ class ClaimFilter(BaseModel):
     judging_id: Optional[int] = None
     min_judging_id: Optional[Any] = None
     max_judging_id: Optional[Any] = None
-    claimants_id: Optional[Any] = None
-    defendants_id: Optional[Any] = None
 
 class ClaimSort(StrEnum):
     """Enum for sorting the Claim model."""

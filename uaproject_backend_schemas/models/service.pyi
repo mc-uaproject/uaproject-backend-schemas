@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.models.file import File
+from uaproject_backend_schemas.models.purchased_item import PurchasedItem
 from uaproject_backend_schemas.models.schemas.service import (
     ServiceDiscount,
     ServicePoint,
@@ -32,6 +33,7 @@ class Service(AwesomeModel):
     name: str
     points: Optional[list[ServicePoint]]
     price: Decimal
+    purchased_items: list[PurchasedItem]
     service_metadata: Optional[dict[str, Any]]
     type: ServiceType
     updated_at: datetime
@@ -68,6 +70,7 @@ class ServiceSchemaCreate(AwesomeBaseModel):
     service_metadata: Optional[dict[str, Any]]
     discounts: Optional[list[ServiceDiscount]]
     icon_file: Optional[File]
+    purchased_items: Optional[list[PurchasedItem]]
 
 class ServiceSchemaUpdate(AwesomeBaseModel):
     """update schema for Service model"""
@@ -88,6 +91,7 @@ class ServiceSchemaUpdate(AwesomeBaseModel):
     service_metadata: Optional[dict[str, Any]]
     discounts: Optional[list[ServiceDiscount]]
     icon_file: Optional[File]
+    purchased_items: Optional[list[PurchasedItem]]
 
 class ServiceSchemaResponse(AwesomeBaseModel):
     """response schema for Service model"""
@@ -110,6 +114,7 @@ class ServiceSchemaResponse(AwesomeBaseModel):
     service_metadata: Optional[dict[str, Any]]
     discounts: Optional[list[ServiceDiscount]]
     icon_file: Optional[File]
+    purchased_items: list[PurchasedItem]
 
 class ServiceScopes:
     """Scopes for the Service model."""
@@ -137,7 +142,6 @@ class ServiceFilter(BaseModel):
     is_upgradable: Optional[bool] = None
     upgrade_from: Optional[str] = None
     upgrade_to: Optional[str] = None
-    icon_file_id: Optional[Any] = None
 
 class ServiceSort(StrEnum):
     """Enum for sorting the Service model."""

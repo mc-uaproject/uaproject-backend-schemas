@@ -216,7 +216,6 @@ class ApplicationFilter(BaseModel):
     community_projects_readiness: Optional[str] = None
     healthy_community_definition: Optional[str] = None
     ideal_server_description: Optional[str] = None
-    sections_id: Optional[Any] = None
 
 class ApplicationSort(StrEnum):
     """Enum for sorting the Application model."""

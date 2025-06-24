@@ -78,7 +78,6 @@ class RoleFilter(BaseModel):
     weight: Optional[int] = None
     min_weight: Optional[Any] = None
     max_weight: Optional[Any] = None
-    users_id: Optional[Any] = None
 
 class RoleSort(StrEnum):
     """Enum for sorting the Role model."""
