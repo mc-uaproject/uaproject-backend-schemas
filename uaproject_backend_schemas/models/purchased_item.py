@@ -43,4 +43,4 @@ class PurchasedItem(
 
     user: Optional["User"] = Relationship(back_populates="purchased_items")
     service: Optional["Service"] = Relationship(back_populates="purchased_items")
-    transaction: Optional["Transaction"] = Relationship(back_populates="purchased_items")
+    transaction: Optional["Transaction"] = Relationship(back_populates="purchased_item")
