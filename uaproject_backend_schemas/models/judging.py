@@ -22,7 +22,6 @@ class JudgingVerdict(StrEnum):
 class Judging(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "judgings"
     __scope_prefix__ = "judging"
-    model_config = {"arbitrary_types_allowed": True}
 
     judge_id: int = AwesomeField(
         sa_column=Column(BigInteger, ForeignKey("users.id"), nullable=False)

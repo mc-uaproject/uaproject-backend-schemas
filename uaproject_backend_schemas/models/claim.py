@@ -35,7 +35,6 @@ claim_defendant_link = Table(
 class Claim(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "claims"
     __scope_prefix__ = "claim"
-    model_config = {"arbitrary_types_allowed": True}
 
     title: str = AwesomeField(max_length=255, nullable=False)
     description: str = AwesomeField(max_length=2000, nullable=True)

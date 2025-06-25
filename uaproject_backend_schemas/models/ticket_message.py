@@ -17,7 +17,6 @@ if TYPE_CHECKING:
 class TicketMessage(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "ticket_messages"
     __scope_prefix__ = "ticket_message"
-    model_config = {"arbitrary_types_allowed": True}
 
     ticket_id: int = AwesomeField(
         sa_column=Column(BigInteger(), ForeignKey("tickets.id"), nullable=False)

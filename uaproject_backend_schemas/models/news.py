@@ -25,7 +25,6 @@ if TYPE_CHECKING:
 class News(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "news"
     __scope_prefix__ = "news"
-    model_config = {"arbitrary_types_allowed": True}
 
     title: str = AwesomeField(max_length=255, nullable=False)
     summary: Optional[str] = AwesomeField(max_length=500, nullable=True)

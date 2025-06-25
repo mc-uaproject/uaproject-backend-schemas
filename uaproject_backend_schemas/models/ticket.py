@@ -17,7 +17,6 @@ if TYPE_CHECKING:
 class Ticket(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "tickets"
     __scope_prefix__ = "ticket"
-    model_config = {"arbitrary_types_allowed": True}
 
     title: str = AwesomeField(max_length=255)
     description: str = AwesomeField(max_length=4096)

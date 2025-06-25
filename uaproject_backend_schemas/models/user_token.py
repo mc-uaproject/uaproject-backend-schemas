@@ -16,7 +16,6 @@ if TYPE_CHECKING:
 class Token(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "user_tokens"
     __scope_prefix__ = "token"
-    model_config = {"arbitrary_types_allowed": True}
 
     token: UUID = AwesomeField(
         read_permissions=["token.read"],

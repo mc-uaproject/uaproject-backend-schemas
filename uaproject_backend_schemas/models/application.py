@@ -50,8 +50,6 @@ EVERVAULT_EDITABLE_FIELDS = [
 class Application(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "applications"
     __scope_prefix__ = "application"
-    model_config = {"arbitrary_types_allowed": True}
-
     # Core fields
     user_id: int = AwesomeField(
         sa_column=Column(BigInteger(), ForeignKey("users.id"), nullable=False, unique=True)

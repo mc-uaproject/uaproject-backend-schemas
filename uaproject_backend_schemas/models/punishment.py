@@ -17,7 +17,6 @@ if TYPE_CHECKING:
 class Punishment(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "punishments"
     __scope_prefix__ = "punishment"
-    model_config = {"arbitrary_types_allowed": True}
 
     user_id: int = AwesomeField(
         sa_column=Column(BigInteger(), ForeignKey("users.id"), nullable=False)

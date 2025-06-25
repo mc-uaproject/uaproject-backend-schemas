@@ -14,7 +14,6 @@ if TYPE_CHECKING:
 class PunishmentConfig(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "punishment_configs"
     __scope_prefix__ = "punishment_config"
-    model_config = {"arbitrary_types_allowed": True}
 
     name: str = AwesomeField(max_length=100)
     description: Optional[str] = AwesomeField(default=None)

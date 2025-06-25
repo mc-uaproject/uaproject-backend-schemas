@@ -28,7 +28,6 @@ if TYPE_CHECKING:
 class File(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "files"
     __scope_prefix__ = "file"
-    model_config = {"arbitrary_types_allowed": True}
 
     # Storage info
     bucket: str = AwesomeField(
