@@ -202,16 +202,9 @@ class User(AwesomeModel, IDMixin, TimestampsMixin, table=True):
         # Cache computed permissions to avoid repeated computation
         user_permissions = {}
 
-        if not hasattr(self, "_computed_permissions"):
-            sorted_roles = sorted(self.roles, key=lambda r: r.weight, reverse=True)
-            for role in sorted_roles:
-                for user_permission in role.permissions:
-                    for user_permission_key, user_permission_value in user_permission.items():
-                        user_permissions[user_permission_key] = user_permission_value
+        sorted_roles = sorted(self.roles, key=lambda r: r.weight, reverse=False)
+        for role in sorted_roles:
+            for user_permission_key, user_permission_value in role.permissions.items():
+                user_permissions[user_permission_key] = user_permission_value
 
         return user_permissions
-
-
-if __name__ == "__main__":
-    print(User.schemas.list())
-    print(User.sort)

@@ -16,7 +16,7 @@ class Role(AwesomeModel, IDMixin, TimestampsMixin, table=True):
 
     name: str = AwesomeField(max_length=100)
     display_name: Optional[str] = AwesomeField(default=None)
-    permissions: List[Dict[str, bool]] = AwesomeField(default=[], sa_column=Column(JSON))
+    permissions: Dict[str, bool] = AwesomeField(default={}, sa_column=Column(JSON))
     weight: int = AwesomeField(default=0)
 
     users: List["User"] = Relationship(
