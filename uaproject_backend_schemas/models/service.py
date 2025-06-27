@@ -40,5 +40,5 @@ class Service(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     icon_file: Optional["File"] = Relationship(back_populates="service")
     purchased_items: List["PurchasedItem"] = Relationship(
         back_populates="service",
-        sa_relationship_kwargs={"foreign_keys": "[PurchasedItem.service_id]", "lazy": "selectin"},
+        sa_relationship_kwargs={"foreign_keys": "[PurchasedItem.service_id]"},
     )

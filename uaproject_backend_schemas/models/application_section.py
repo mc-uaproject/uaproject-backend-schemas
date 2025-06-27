@@ -41,7 +41,6 @@ class ApplicationSection(AwesomeModel, IDMixin, TimestampsMixin, table=True):
         back_populates="sections",
         sa_relationship_kwargs={
             "foreign_keys": "[ApplicationSection.application_id]",
-            "lazy": "selectin",
         },
     )
 

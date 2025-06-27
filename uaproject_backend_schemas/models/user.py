@@ -47,69 +47,59 @@ class User(AwesomeModel, IDMixin, TimestampsMixin, table=True):
 
     roles: List[Role] = Relationship(
         back_populates="users",
-        sa_relationship_kwargs={"secondary": "user_roles", "lazy": "selectin"},
+        sa_relationship_kwargs={"secondary": "user_roles"},
     )
     token: Optional["Token"] = Relationship(
         back_populates="user",
         sa_relationship_kwargs={
             "uselist": False,
-            "lazy": "joined",
         },
     )
     punishments: List["Punishment"] = Relationship(
-        back_populates="user",
-        sa_relationship_kwargs={"foreign_keys": "[Punishment.user_id]", "lazy": "subquery"},
+        back_populates="user", sa_relationship_kwargs={"foreign_keys": "[Punishment.user_id]"}
     )
     balance: Optional["Balance"] = Relationship(
-        back_populates="user", sa_relationship_kwargs={"uselist": False, "lazy": "selectin"}
+        back_populates="user", sa_relationship_kwargs={"uselist": False}
     )
     application: Optional["Application"] = Relationship(
-        back_populates="user", sa_relationship_kwargs={"uselist": False, "lazy": "selectin"}
+        back_populates="user", sa_relationship_kwargs={"uselist": False}
     )
     transactions: List["Transaction"] = Relationship(
-        back_populates="user",
-        sa_relationship_kwargs={"foreign_keys": "[Transaction.user_id]", "lazy": "subquery"},
+        back_populates="user", sa_relationship_kwargs={"foreign_keys": "[Transaction.user_id]"}
     )
     received_transactions: List["Transaction"] = Relationship(
         back_populates="recipient",
-        sa_relationship_kwargs={"foreign_keys": "[Transaction.recipient_id]", "lazy": "subquery"},
+        sa_relationship_kwargs={"foreign_keys": "[Transaction.recipient_id]"},
     )
     webhooks: List["Webhook"] = Relationship(
-        back_populates="user",
-        sa_relationship_kwargs={"foreign_keys": "[Webhook.user_id]", "lazy": "selectin"},
+        back_populates="user", sa_relationship_kwargs={"foreign_keys": "[Webhook.user_id]"}
     )
     claims_as_claimant: List["Claim"] = Relationship(
-        back_populates="claimants",
-        sa_relationship_kwargs={"secondary": "claim_claimant_link", "lazy": "selectin"},
+        back_populates="claimants", sa_relationship_kwargs={"secondary": "claim_claimant_link"}
     )
     claims_as_defendant: List["Claim"] = Relationship(
-        back_populates="defendants",
-        sa_relationship_kwargs={"secondary": "claim_defendant_link", "lazy": "selectin"},
+        back_populates="defendants", sa_relationship_kwargs={"secondary": "claim_defendant_link"}
     )
     news: List["News"] = Relationship(
-        back_populates="author",
-        sa_relationship_kwargs={"foreign_keys": "[News.author_id]", "lazy": "selectin"},
+        back_populates="author", sa_relationship_kwargs={"foreign_keys": "[News.author_id]"}
     )
     authored_tickets: List["Ticket"] = Relationship(
-        back_populates="author",
-        sa_relationship_kwargs={"foreign_keys": "[Ticket.author_id]", "lazy": "selectin"},
+        back_populates="author", sa_relationship_kwargs={"foreign_keys": "[Ticket.author_id]"}
     )
     assigned_tickets: List["Ticket"] = Relationship(
         back_populates="assigned_to",
-        sa_relationship_kwargs={"foreign_keys": "[Ticket.assigned_to_id]", "lazy": "selectin"},
+        sa_relationship_kwargs={"foreign_keys": "[Ticket.assigned_to_id]"},
     )
     ticket_messages: List["TicketMessage"] = Relationship(
         back_populates="author",
-        sa_relationship_kwargs={"foreign_keys": "[TicketMessage.author_id]", "lazy": "selectin"},
+        sa_relationship_kwargs={"foreign_keys": "[TicketMessage.author_id]"},
     )
     # MinIO files uploaded by user
     files: List["File"] = Relationship(
-        back_populates="user",
-        sa_relationship_kwargs={"foreign_keys": "[File.user_id]", "lazy": "selectin"},
+        back_populates="user", sa_relationship_kwargs={"foreign_keys": "[File.user_id]"}
     )
     purchased_items: List["PurchasedItem"] = Relationship(
-        back_populates="user",
-        sa_relationship_kwargs={"foreign_keys": "[PurchasedItem.user_id]", "lazy": "selectin"},
+        back_populates="user", sa_relationship_kwargs={"foreign_keys": "[PurchasedItem.user_id]"}
     )
 
     class Schemas(AwesomeModel.Schemas):
