@@ -61,10 +61,10 @@ class User(AwesomeModel, IDMixin, TimestampsMixin, table=True):
         sa_relationship_kwargs={"foreign_keys": "[Punishment.user_id]", "lazy": "subquery"},
     )
     balance: Optional["Balance"] = Relationship(
-        back_populates="user", sa_relationship_kwargs={"uselist": False, "lazy": "joined"}
+        back_populates="user", sa_relationship_kwargs={"uselist": False, "lazy": "selectin"}
     )
     application: Optional["Application"] = Relationship(
-        back_populates="user", sa_relationship_kwargs={"uselist": False, "lazy": "joined"}
+        back_populates="user", sa_relationship_kwargs={"uselist": False, "lazy": "selectin"}
     )
     transactions: List["Transaction"] = Relationship(
         back_populates="user",
