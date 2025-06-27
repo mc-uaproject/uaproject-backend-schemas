@@ -305,7 +305,11 @@ class AwesomeSchemas:
                     and f in self.model_cls.__annotations__
                 ):
                     field_type = self.model_cls.__annotations__[f]
+                    # Якщо це Mapped[...] — беремо внутрішній тип
                     origin = getattr(field_type, "__origin__", None)
+                    if origin is not None and origin.__name__ == "Mapped":
+                        field_type = field_type.__args__[0]
+                        origin = getattr(field_type, "__origin__", None)
                     if origin in (list, List):
                         field_definitions[f] = (
                             field_type,
