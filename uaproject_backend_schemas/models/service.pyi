@@ -142,6 +142,8 @@ class ServiceFilter(BaseModel):
     is_upgradable: Optional[bool] = None
     upgrade_from: Optional[str] = None
     upgrade_to: Optional[str] = None
+    icon_file_id: Optional[Any] = None
+    purchased_items_id: Optional[Any] = None
 
 class ServiceSort(StrEnum):
     """Enum for sorting the Service model."""

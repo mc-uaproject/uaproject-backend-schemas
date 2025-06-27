@@ -114,6 +114,7 @@ class TicketMessageFilter(BaseModel):
     content: Optional[str] = None
     is_system_message: Optional[bool] = None
     edited_at: Optional[str] = None
+    attachment_files_id: Optional[Any] = None
 
 class TicketMessageSort(StrEnum):
     """Enum for sorting the TicketMessage model."""

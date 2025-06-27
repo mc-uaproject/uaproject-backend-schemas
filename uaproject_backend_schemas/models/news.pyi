@@ -124,6 +124,7 @@ class NewsFilter(BaseModel):
     is_archived: Optional[bool] = None
     type: Optional[NewsType] = None
     importance: Optional[ImportanceType] = None
+    images_id: Optional[Any] = None
 
 class NewsSort(StrEnum):
     """Enum for sorting the News model."""

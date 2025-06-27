@@ -235,6 +235,7 @@ class WebhookFilter(BaseModel):
     average_response_time_ms: Optional[float] = None
     min_average_response_time_ms: Optional[Any] = None
     max_average_response_time_ms: Optional[Any] = None
+    logs_id: Optional[Any] = None
 
 class WebhookSort(StrEnum):
     """Enum for sorting the Webhook model."""

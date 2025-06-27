@@ -141,6 +141,7 @@ class PunishmentFilter(BaseModel):
     config_id: Optional[int] = None
     min_config_id: Optional[Any] = None
     max_config_id: Optional[Any] = None
+    config_name: Optional[Any] = None
 
 class PunishmentSort(StrEnum):
     """Enum for sorting the Punishment model."""

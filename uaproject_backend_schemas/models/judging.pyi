@@ -75,6 +75,7 @@ class JudgingFilter(BaseModel):
     max_judge_id: Optional[Any] = None
     decision: Optional[str] = None
     verdict: Optional[JudgingVerdict] = None
+    claims_id: Optional[Any] = None
 
 class JudgingSort(StrEnum):
     """Enum for sorting the Judging model."""

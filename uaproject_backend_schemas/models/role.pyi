@@ -16,7 +16,7 @@ class Role(AwesomeModel):
     display_name: Optional[str]
     id: int
     name: str
-    permissions: list[dict[str, bool]]
+    permissions: dict[str, bool]
     updated_at: datetime
     users: list[User]
     weight: int
@@ -37,7 +37,7 @@ class RoleSchemaCreate(AwesomeBaseModel):
 
     name: Optional[str]
     display_name: Optional[str]
-    permissions: Optional[list[dict[str, bool]]]
+    permissions: Optional[dict[str, bool]]
     weight: Optional[int]
     users: Optional[list[User]]
 
@@ -46,7 +46,7 @@ class RoleSchemaUpdate(AwesomeBaseModel):
 
     name: Optional[str]
     display_name: Optional[str]
-    permissions: Optional[list[dict[str, bool]]]
+    permissions: Optional[dict[str, bool]]
     weight: Optional[int]
     users: Optional[list[User]]
 
@@ -57,7 +57,7 @@ class RoleSchemaResponse(AwesomeBaseModel):
     id: int
     name: str
     display_name: Optional[str]
-    permissions: list[dict[str, bool]]
+    permissions: dict[str, bool]
     weight: int
     users: list[User]
 
@@ -78,6 +78,7 @@ class RoleFilter(BaseModel):
     weight: Optional[int] = None
     min_weight: Optional[Any] = None
     max_weight: Optional[Any] = None
+    users_id: Optional[Any] = None
 
 class RoleSort(StrEnum):
     """Enum for sorting the Role model."""

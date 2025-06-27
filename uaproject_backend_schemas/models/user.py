@@ -8,7 +8,6 @@ from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.schemas import SchemaDefinition
-from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
 from uaproject_backend_schemas.models.user_token import Token
 
 if TYPE_CHECKING:
@@ -139,45 +138,9 @@ class User(AwesomeModel, IDMixin, TimestampsMixin, table=True):
                 "is_superuser",
                 "biography",
                 "access",
+                "roles",
             ]
             permissions = [".read.other"]
-
-        class ResponseSelf(SchemaDefinition):
-            fields = [
-                "id",
-                "updated_at",
-                "created_at",
-                "discord_id",
-                "minecraft_nickname",
-                "is_superuser",
-                "biography",
-                "access",
-            ]
-            permissions = [".read.self"]
-
-    class Scopes(AwesomeModel.Scopes):
-        class MinecraftNickname(ScopeDefinition):
-            trigger_fields = ["minecraft_nickname"]
-            fields = ["id", "minecraft_nickname"]
-
-        class DiscordId(ScopeDefinition):
-            trigger_fields = ["discord_id"]
-            fields = ["id", "discord_id"]
-
-        class Superuser(ScopeDefinition):
-            trigger_fields = ["is_superuser"]
-            fields = [
-                "id",
-                "discord_id",
-                "minecraft_nickname",
-                "is_superuser",
-                "updated_at",
-                "created_at",
-            ]
-
-        class Access(ScopeDefinition):
-            trigger_fields = ["access"]
-            fields = ["id", "access"]
 
     @model_validator(mode="before")
     def validate_fields(cls, values: Optional[dict[str, str]]) -> Optional[dict[str, str]]:
@@ -199,7 +162,6 @@ class User(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     @property
     def permissions(self) -> Dict[str, bool]:
         """Computed permissions with caching for performance."""
-        # Cache computed permissions to avoid repeated computation
         user_permissions = {}
 
         sorted_roles = sorted(self.roles, key=lambda r: r.weight, reverse=False)

@@ -146,6 +146,7 @@ class TicketFilter(BaseModel):
     max_assigned_to_id: Optional[Any] = None
     status: Optional[TicketStatus] = None
     priority: Optional[TicketPriority] = None
+    messages_id: Optional[Any] = None
 
 class TicketSort(StrEnum):
     """Enum for sorting the Ticket model."""

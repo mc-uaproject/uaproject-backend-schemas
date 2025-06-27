@@ -74,7 +74,7 @@ class AwesomeSchemas:
             and inspect.isclass(getattr(self._home, attr))
             and (
                 issubclass(getattr(self._home, attr), self._definition)
-                or issubclass(getattr(self._home, attr), BaseModel)
+                or issubclass(getattr(self._home, attr), AwesomeBaseModel)
             )
             for attr in dir(self._home)
             if not attr.startswith("_") and attr not in ["get", "list", "with_permissions"]
@@ -165,7 +165,7 @@ class AwesomeSchemas:
             raise AttributeError(f"Schema '{schema_name}' not found")
 
         all_fields = self._get_all_fields(model_cls)
-        if inspect.isclass(schema_cls) and issubclass(schema_cls, BaseModel):
+        if inspect.isclass(schema_cls) and issubclass(schema_cls, AwesomeBaseModel):
             return (
                 list(schema_cls.model_fields.keys())
                 if hasattr(schema_cls, "model_fields")
@@ -187,12 +187,12 @@ class AwesomeSchemas:
             return fields
         return all_fields.copy()
 
-    def _get_schema_definition(self, name_lower: str) -> Optional[Type[BaseModel]]:
+    def _get_schema_definition(self, name_lower: str) -> Optional[Type[AwesomeBaseModel]]:
         """Get schema definition."""
         for attr in dir(self._home):
             if camel_to_snake(attr) == name_lower:
                 schema_attr = getattr(self._home, attr)
-                if inspect.isclass(schema_attr) and issubclass(schema_attr, BaseModel):
+                if inspect.isclass(schema_attr) and issubclass(schema_attr, AwesomeBaseModel):
                     return schema_attr
         return None
 
@@ -249,7 +249,7 @@ class AwesomeSchemas:
             fields, relationships, formatted_permissions, optional
         )
         filtered_fields = self._filter_fields_by_permissions(
-            field_definitions, formatted_permissions, optional
+            field_definitions, optional
         )
 
         schema_class_name = f"{self.model_cls.__name__}{name.capitalize()}Schema"
@@ -300,6 +300,21 @@ class AwesomeSchemas:
                     continue
 
             if f not in model_field_info:
+                if (
+                    hasattr(self.model_cls, "__annotations__")
+                    and f in self.model_cls.__annotations__
+                ):
+                    field_type = self.model_cls.__annotations__[f]
+                    origin = getattr(field_type, "__origin__", None)
+                    if origin in (list, List):
+                        field_definitions[f] = (
+                            field_type,
+                            AwesomeFieldInfo(
+                                annotation=field_type, required=False, default_factory=list
+                            ),
+                        )
+                    else:
+                        field_definitions[f] = (field_type, None)
                 continue
 
             field = getattr(self.model_cls, f)
@@ -332,10 +347,13 @@ class AwesomeSchemas:
         field_required = getattr(field_info, "is_required", lambda: True)()
 
         from sqlmodel.main import Undefined
+
         is_field_optional = optional is True or (isinstance(optional, list) and f in optional)
         if is_field_optional:
             field_required = False
-            if (field_default is None or field_default is Undefined) and field_default_factory is None:
+            if (
+                field_default is None or field_default is Undefined
+            ) and field_default_factory is None:
                 field_default = None
 
         return {
@@ -370,7 +388,6 @@ class AwesomeSchemas:
     def _filter_fields_by_permissions(
         self,
         field_definitions: Dict[str, Any],
-        permissions: List[str] = None,
         optional: Optional[bool | List[str]] = None,
     ) -> Dict[str, Any]:
         filtered_fields = {}
@@ -382,10 +399,13 @@ class AwesomeSchemas:
             if f not in self.model_cls.model_fields or not isinstance(
                 self.model_cls.model_fields[f], AwesomeFieldInfo
             ):
-                filtered_fields[f] = (
-                    t,
-                    AwesomeFieldInfo(annotation=t, required=False, default=None),
-                )
+                if _ is not None:
+                    filtered_fields[f] = (t, _)
+                else:
+                    filtered_fields[f] = (
+                        t,
+                        AwesomeFieldInfo(annotation=t, required=False, default=None),
+                    )
                 continue
 
             field_info = self.model_cls.model_fields[f]

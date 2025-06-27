@@ -112,6 +112,7 @@ class PurchasedItemFilter(BaseModel):
     expires_at: Optional[datetime] = None
     min_expires_at: Optional[Any] = None
     max_expires_at: Optional[Any] = None
+    service_name: Optional[Any] = None
 
 class PurchasedItemSort(StrEnum):
     """Enum for sorting the PurchasedItem model."""
