@@ -1,4 +1,6 @@
+import importlib
 import inspect
+import typing
 from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Type, TypeVar
 
 from pydantic import BaseModel, create_model
@@ -63,6 +65,7 @@ class AwesomeSchemas:
         self._cache: Dict[str, Type[BaseModel]] = {}
         self._names: Dict[str, str] = {}
         self._definition = definition
+        self._dynamic_types: Dict[str, type] = {}
 
         if hasattr(self.model_cls, home):
             self._home = getattr(self.model_cls, home)
@@ -222,11 +225,25 @@ class AwesomeSchemas:
     def _get_field_type(
         self, field_name: str, field_type: Any, relationships: Dict[str, str]
     ) -> Any:
-        """Get field type considering relationships."""
+        """Get field type considering relationships and dynamically import related models if needed."""
         if field_name in relationships:
             related_schema_name = relationships[field_name]
             related_schema_class = globals().get(related_schema_name)
             return related_schema_class if related_schema_class is not None else Any
+        origin = getattr(field_type, "__origin__", None)
+        args = getattr(field_type, "__args__", ())
+        if origin in (list, List, typing.List) and args:
+            inner_type = args[0]
+            if hasattr(inner_type, "__name__") and not isinstance(inner_type, type(None)):
+                class_name = inner_type.__name__
+                module_name = f"uaproject_backend_schemas.models.{class_name.lower()}"
+                try:
+                    module = importlib.import_module(module_name)
+                    imported_class = getattr(module, class_name)
+                    self._dynamic_types[class_name] = imported_class
+                    return List[imported_class]
+                except (ModuleNotFoundError, AttributeError):
+                    pass
         return field_type
 
     def _format_permissions(self, permissions: List[str]) -> List[str]:
@@ -248,13 +265,14 @@ class AwesomeSchemas:
         field_definitions = self._get_field_definitions(
             fields, relationships, formatted_permissions, optional
         )
-        filtered_fields = self._filter_fields_by_permissions(
-            field_definitions, optional
-        )
+        filtered_fields = self._filter_fields_by_permissions(field_definitions, optional)
 
         schema_class_name = f"{self.model_cls.__name__}{name.capitalize()}Schema"
         if permissions:
             schema_class_name += "WithPermissions"
+
+        for k, v in self._dynamic_types.items():
+            globals()[k] = v
 
         base_model = create_model(
             schema_class_name,
@@ -263,7 +281,27 @@ class AwesomeSchemas:
         )
 
         self._setup_schema_model(base_model, fields, relationships, name, formatted_permissions)
+
         return base_model
+
+    def _get_field_type_from_annotations(self, f: str) -> Any:
+        """Get field type from __annotations__ model, considering Mapped and List."""
+        if hasattr(self.model_cls, "__annotations__") and f in self.model_cls.__annotations__:
+            field_type = self.model_cls.__annotations__[f]
+            origin = getattr(field_type, "__origin__", None)
+            if origin is not None and origin.__name__ == "Mapped":
+                field_type = field_type.__args__[0]
+                origin = getattr(field_type, "__origin__", None)
+            if origin in (list, List):
+                return (
+                    field_type,
+                    AwesomeFieldInfo(
+                        annotation=field_type, required=False, default_factory=list
+                    ),
+                )
+            else:
+                return (field_type, None)
+        return None
 
     def _get_field_definitions(
         self,
@@ -300,25 +338,9 @@ class AwesomeSchemas:
                     continue
 
             if f not in model_field_info:
-                if (
-                    hasattr(self.model_cls, "__annotations__")
-                    and f in self.model_cls.__annotations__
-                ):
-                    field_type = self.model_cls.__annotations__[f]
-                    # Якщо це Mapped[...] — беремо внутрішній тип
-                    origin = getattr(field_type, "__origin__", None)
-                    if origin is not None and origin.__name__ == "Mapped":
-                        field_type = field_type.__args__[0]
-                        origin = getattr(field_type, "__origin__", None)
-                    if origin in (list, List):
-                        field_definitions[f] = (
-                            field_type,
-                            AwesomeFieldInfo(
-                                annotation=field_type, required=False, default_factory=list
-                            ),
-                        )
-                    else:
-                        field_definitions[f] = (field_type, None)
+                result = self._get_field_type_from_annotations(f)
+                if result is not None:
+                    field_definitions[f] = result
                 continue
 
             field = getattr(self.model_cls, f)

@@ -8,6 +8,7 @@ from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.schemas import SchemaDefinition
+from uaproject_backend_schemas.models.role import Role
 from uaproject_backend_schemas.models.user_token import Token
 
 if TYPE_CHECKING:
@@ -18,7 +19,6 @@ if TYPE_CHECKING:
     from uaproject_backend_schemas.models.news import News
     from uaproject_backend_schemas.models.punishment import Punishment
     from uaproject_backend_schemas.models.purchased_item import PurchasedItem
-    from uaproject_backend_schemas.models.role import Role
     from uaproject_backend_schemas.models.ticket import Ticket
     from uaproject_backend_schemas.models.ticket_message import TicketMessage
     from uaproject_backend_schemas.models.transaction import Transaction
@@ -45,7 +45,7 @@ class User(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     )
     biography: Optional[str] = AwesomeField(default=None, nullable=True, max_length=2048)
 
-    roles: List["Role"] = Relationship(
+    roles: List[Role] = Relationship(
         back_populates="users",
         sa_relationship_kwargs={"secondary": "user_roles", "lazy": "selectin"},
     )
