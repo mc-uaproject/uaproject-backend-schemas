@@ -46,80 +46,80 @@ class TransactionSchemas:
 class TransactionSchemaCreate(AwesomeBaseModel):
     """create schema for Transaction model"""
 
-    recipient_id: Optional[int]
-    user_id: Optional[int]
-    amount: Optional[Decimal]
-    transaction_metadata: Optional[dict[str, Any]]
-    description: Optional[str]
-    type: Optional[TransactionType]
     service_id: Optional[int]
+    amount: Optional[Decimal]
+    user_id: Optional[int]
+    recipient_id: Optional[int]
+    transaction_metadata: Optional[dict[str, Any]]
+    type: Optional[TransactionType]
+    description: Optional[str]
 
 class TransactionSchemaRedis(AwesomeBaseModel):
     """redis schema for Transaction model"""
 
-    user: Optional[User]
-    recipient: Optional[User]
-    recipient_id: Optional[int]
-    user_id: Optional[int]
-    purchased_item: Optional[PurchasedItem]
-    amount: Optional[Decimal]
-    transaction_metadata: Optional[dict[str, Any]]
-    updated_at: Optional[datetime]
-    service: Optional[Service]
-    description: Optional[str]
-    type: Optional[TransactionType]
     id: Optional[int]
-    created_at: Optional[datetime]
     service_id: Optional[int]
+    user: Optional[User]
+    amount: Optional[Decimal]
+    service: Optional[Service]
+    user_id: Optional[int]
+    recipient_id: Optional[int]
+    transaction_metadata: Optional[dict[str, Any]]
+    created_at: Optional[datetime]
+    recipient: Optional[User]
+    updated_at: Optional[datetime]
+    type: Optional[TransactionType]
+    purchased_item: Optional[PurchasedItem]
+    description: Optional[str]
 
 class TransactionSchemaResponse(AwesomeBaseModel):
     """response schema for Transaction model"""
 
-    recipient_id: int
-    user_id: int
-    amount: Decimal
-    transaction_metadata: Optional[dict[str, Any]]
-    updated_at: Optional[datetime]
-    description: Optional[str]
-    type: TransactionType
     id: Optional[int]
-    created_at: Optional[datetime]
     service_id: Optional[int]
+    amount: Decimal
+    user_id: int
+    recipient_id: int
+    transaction_metadata: Optional[dict[str, Any]]
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
+    type: TransactionType
+    description: Optional[str]
 
 class TransactionSchemaUpdate(AwesomeBaseModel):
     """update schema for Transaction model"""
 
-    recipient_id: Optional[int]
-    user_id: Optional[int]
-    amount: Optional[Decimal]
-    transaction_metadata: Optional[dict[str, Any]]
-    description: Optional[str]
-    type: Optional[TransactionType]
     service_id: Optional[int]
+    amount: Optional[Decimal]
+    user_id: Optional[int]
+    recipient_id: Optional[int]
+    transaction_metadata: Optional[dict[str, Any]]
+    type: Optional[TransactionType]
+    description: Optional[str]
 
 class TransactionFilter(BaseModel):
     """Pydantic-class for filtering the Transaction model."""
 
     updated_at: Optional[datetime] = None
-    min_updated_at: Optional[Any] = None
-    max_updated_at: Optional[Any] = None
+    min_updated_at: Optional[datetime] = None
+    max_updated_at: Optional[datetime] = None
     id: Optional[int] = None
-    min_id: Optional[Any] = None
-    max_id: Optional[Any] = None
+    min_id: Optional[int] = None
+    max_id: Optional[int] = None
     user_id: Optional[int] = None
-    min_user_id: Optional[Any] = None
-    max_user_id: Optional[Any] = None
+    min_user_id: Optional[int] = None
+    max_user_id: Optional[int] = None
     amount: Optional[Decimal] = None
     type: Optional[TransactionType] = None
     description: Optional[str] = None
     recipient_id: Optional[int] = None
-    min_recipient_id: Optional[Any] = None
-    max_recipient_id: Optional[Any] = None
+    min_recipient_id: Optional[int] = None
+    max_recipient_id: Optional[int] = None
     service_id: Optional[int] = None
-    min_service_id: Optional[Any] = None
-    max_service_id: Optional[Any] = None
-    service_name: Optional[Any] = None
-    purchased_item_id: Optional[Any] = None
+    min_service_id: Optional[int] = None
+    max_service_id: Optional[int] = None
+    service_name: Optional[str] = None
+    purchased_item_id: Optional[int] = None
 
 class TransactionSort(StrEnum):
     """Enum for sorting the Transaction model."""

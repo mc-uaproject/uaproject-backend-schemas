@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from uaproject_backend_schemas.models.user import User
 
 
-class Token(AwesomeModel, IDMixin, TimestampsMixin, table=True):
+class UserToken(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "user_tokens"
     __scope_prefix__ = "token"
 

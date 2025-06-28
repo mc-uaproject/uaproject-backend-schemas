@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -48,27 +48,27 @@ class ClaimSchemaCreate(AwesomeBaseModel):
 class ClaimSchemaRedis(AwesomeBaseModel):
     """redis schema for Claim model"""
 
-    judging: Optional[Judging]
-    status: Optional[ClaimStatus]
     judging_id: Optional[int]
-    claimants: Optional[list[User]]
-    updated_at: Optional[datetime]
-    defendants: Optional[list[User]]
-    title: Optional[str]
-    description: Optional[str]
     id: Optional[int]
+    status: Optional[ClaimStatus]
+    judging: Optional[Judging]
+    title: Optional[str]
     created_at: Optional[datetime]
+    updated_at: Optional[datetime]
+    claimants: Optional[list[User]]
+    defendants: Optional[list[User]]
+    description: Optional[str]
 
 class ClaimSchemaResponse(AwesomeBaseModel):
     """response schema for Claim model"""
 
-    status: ClaimStatus
     judging_id: Optional[int]
-    updated_at: Optional[datetime]
-    title: str
-    description: str
     id: Optional[int]
+    status: ClaimStatus
+    title: str
     created_at: Optional[datetime]
+    updated_at: Optional[datetime]
+    description: str
 
 class ClaimSchemaUpdate(AwesomeBaseModel):
     """update schema for Claim model"""
@@ -82,19 +82,19 @@ class ClaimFilter(BaseModel):
     """Pydantic-class for filtering the Claim model."""
 
     updated_at: Optional[datetime] = None
-    min_updated_at: Optional[Any] = None
-    max_updated_at: Optional[Any] = None
+    min_updated_at: Optional[datetime] = None
+    max_updated_at: Optional[datetime] = None
     id: Optional[int] = None
-    min_id: Optional[Any] = None
-    max_id: Optional[Any] = None
+    min_id: Optional[int] = None
+    max_id: Optional[int] = None
     title: Optional[str] = None
     description: Optional[str] = None
     status: Optional[ClaimStatus] = None
     judging_id: Optional[int] = None
-    min_judging_id: Optional[Any] = None
-    max_judging_id: Optional[Any] = None
-    claimants_id: Optional[Any] = None
-    defendants_id: Optional[Any] = None
+    min_judging_id: Optional[int] = None
+    max_judging_id: Optional[int] = None
+    claimants_id: Optional[int] = None
+    defendants_id: Optional[int] = None
 
 class ClaimSort(StrEnum):
     """Enum for sorting the Claim model."""

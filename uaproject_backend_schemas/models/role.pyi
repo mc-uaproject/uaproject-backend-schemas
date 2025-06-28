@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -36,57 +36,57 @@ class RoleSchemas:
 class RoleSchemaCreate(AwesomeBaseModel):
     """create schema for Role model"""
 
+    display_name: Optional[str]
     weight: Optional[int]
     permissions: Optional[dict[str, bool]]
-    display_name: Optional[str]
     name: Optional[str]
 
 class RoleSchemaRedis(AwesomeBaseModel):
     """redis schema for Role model"""
 
+    id: Optional[int]
+    display_name: Optional[str]
+    users: Optional[list[User]]
     weight: Optional[int]
     permissions: Optional[dict[str, bool]]
-    updated_at: Optional[datetime]
-    display_name: Optional[str]
     created_at: Optional[datetime]
-    users: Optional[list[User]]
-    id: Optional[int]
+    updated_at: Optional[datetime]
     name: Optional[str]
 
 class RoleSchemaResponse(AwesomeBaseModel):
     """response schema for Role model"""
 
+    id: Optional[int]
+    display_name: Optional[str]
     weight: Optional[int]
     permissions: Optional[dict[str, bool]]
-    updated_at: Optional[datetime]
-    display_name: Optional[str]
     created_at: Optional[datetime]
-    id: Optional[int]
+    updated_at: Optional[datetime]
     name: str
 
 class RoleSchemaUpdate(AwesomeBaseModel):
     """update schema for Role model"""
 
+    display_name: Optional[str]
     weight: Optional[int]
     permissions: Optional[dict[str, bool]]
-    display_name: Optional[str]
     name: Optional[str]
 
 class RoleFilter(BaseModel):
     """Pydantic-class for filtering the Role model."""
 
     updated_at: Optional[datetime] = None
-    min_updated_at: Optional[Any] = None
-    max_updated_at: Optional[Any] = None
+    min_updated_at: Optional[datetime] = None
+    max_updated_at: Optional[datetime] = None
     id: Optional[int] = None
-    min_id: Optional[Any] = None
-    max_id: Optional[Any] = None
+    min_id: Optional[int] = None
+    max_id: Optional[int] = None
     name: Optional[str] = None
     display_name: Optional[str] = None
     weight: Optional[int] = None
-    min_weight: Optional[Any] = None
-    max_weight: Optional[Any] = None
-    users_id: Optional[Any] = None
+    min_weight: Optional[int] = None
+    max_weight: Optional[int] = None
+    users_id: Optional[int] = None
 
 class RoleSort(StrEnum):
     """Enum for sorting the Role model."""

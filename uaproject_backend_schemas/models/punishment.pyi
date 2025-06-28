@@ -44,85 +44,85 @@ class PunishmentSchemas:
 class PunishmentSchemaCreate(AwesomeBaseModel):
     """create schema for Punishment model"""
 
-    status: Optional[PunishmentStatus]
-    admin_id: Optional[int]
-    user_id: Optional[int]
-    config_id: Optional[int]
     expires_at: Optional[datetime]
+    status: Optional[PunishmentStatus]
+    user_id: Optional[int]
+    admin_id: Optional[int]
+    reason: Optional[str]
     punishment_metadata: Optional[dict[str, Any]]
     type: Optional[PunishmentType]
-    reason: Optional[str]
+    config_id: Optional[int]
 
 class PunishmentSchemaRedis(AwesomeBaseModel):
     """redis schema for Punishment model"""
 
-    status: Optional[PunishmentStatus]
+    expires_at: Optional[datetime]
+    id: Optional[int]
     user: Optional[User]
-    admin: Optional[User]
-    admin_id: Optional[int]
+    status: Optional[PunishmentStatus]
     config: Optional[PunishmentConfig]
     user_id: Optional[int]
-    config_id: Optional[int]
-    expires_at: Optional[datetime]
-    punishment_metadata: Optional[dict[str, Any]]
-    updated_at: Optional[datetime]
-    type: Optional[PunishmentType]
-    id: Optional[int]
-    created_at: Optional[datetime]
+    admin_id: Optional[int]
     reason: Optional[str]
+    punishment_metadata: Optional[dict[str, Any]]
+    admin: Optional[User]
+    created_at: Optional[datetime]
+    type: Optional[PunishmentType]
+    updated_at: Optional[datetime]
+    config_id: Optional[int]
 
 class PunishmentSchemaResponse(AwesomeBaseModel):
     """response schema for Punishment model"""
 
-    status: PunishmentStatus
-    admin_id: Optional[int]
-    user_id: int
-    config_id: Optional[int]
     expires_at: Optional[datetime]
-    punishment_metadata: Optional[dict[str, Any]]
-    updated_at: Optional[datetime]
-    type: PunishmentType
     id: Optional[int]
-    created_at: Optional[datetime]
+    status: PunishmentStatus
+    user_id: int
+    admin_id: Optional[int]
     reason: Optional[str]
+    punishment_metadata: Optional[dict[str, Any]]
+    created_at: Optional[datetime]
+    type: PunishmentType
+    updated_at: Optional[datetime]
+    config_id: Optional[int]
 
 class PunishmentSchemaUpdate(AwesomeBaseModel):
     """update schema for Punishment model"""
 
-    status: Optional[PunishmentStatus]
-    admin_id: Optional[int]
-    user_id: Optional[int]
-    config_id: Optional[int]
     expires_at: Optional[datetime]
+    status: Optional[PunishmentStatus]
+    user_id: Optional[int]
+    admin_id: Optional[int]
+    reason: Optional[str]
     punishment_metadata: Optional[dict[str, Any]]
     type: Optional[PunishmentType]
-    reason: Optional[str]
+    config_id: Optional[int]
 
 class PunishmentFilter(BaseModel):
     """Pydantic-class for filtering the Punishment model."""
 
     updated_at: Optional[datetime] = None
-    min_updated_at: Optional[Any] = None
-    max_updated_at: Optional[Any] = None
+    min_updated_at: Optional[datetime] = None
+    max_updated_at: Optional[datetime] = None
     id: Optional[int] = None
-    min_id: Optional[Any] = None
-    max_id: Optional[Any] = None
+    min_id: Optional[int] = None
+    max_id: Optional[int] = None
     user_id: Optional[int] = None
-    min_user_id: Optional[Any] = None
-    max_user_id: Optional[Any] = None
+    min_user_id: Optional[int] = None
+    max_user_id: Optional[int] = None
     admin_id: Optional[int] = None
-    min_admin_id: Optional[Any] = None
-    max_admin_id: Optional[Any] = None
+    min_admin_id: Optional[int] = None
+    max_admin_id: Optional[int] = None
     type: Optional[PunishmentType] = None
     status: Optional[PunishmentStatus] = None
     reason: Optional[str] = None
     expires_at: Optional[datetime] = None
-    min_expires_at: Optional[Any] = None
-    max_expires_at: Optional[Any] = None
+    min_expires_at: Optional[datetime] = None
+    max_expires_at: Optional[datetime] = None
     config_id: Optional[int] = None
-    min_config_id: Optional[Any] = None
-    max_config_id: Optional[Any] = None
-    config_name: Optional[Any] = None
+    min_config_id: Optional[int] = None
+    max_config_id: Optional[int] = None
+    config_name: Optional[str] = None
 
 class PunishmentSort(StrEnum):
     """Enum for sorting the Punishment model."""

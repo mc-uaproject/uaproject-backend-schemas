@@ -71,202 +71,202 @@ class WebhookSchemas:
 class WebhookSchemaCreate(AwesomeBaseModel):
     """create schema for Webhook model"""
 
-    triggers: Optional[list[WebhookTrigger]]
-    user_id: Optional[int]
-    endpoint: Optional[SerializableHttpUrl]
-    schedule_timezone: Optional[str]
-    priority: Optional[int]
-    last_error_at: Optional[datetime]
-    last_response_time_ms: Optional[int]
-    auth_config: Optional[dict[str, Any]]
     last_triggered_at: Optional[datetime]
+    payload_config: Optional[WebhookPayloadTemplate]
+    total_triggers: Optional[int]
+    failed_triggers: Optional[int]
+    priority: Optional[int]
+    schedule_cron: Optional[str]
+    last_response_status: Optional[int]
+    verify_ssl: Optional[bool]
+    is_system: Optional[bool]
+    last_success_at: Optional[datetime]
+    auth_config: Optional[dict[str, Any]]
+    user_id: Optional[int]
+    schedule_timezone: Optional[str]
+    success_triggers: Optional[int]
+    last_error: Optional[str]
+    average_response_time_ms: Optional[float]
+    tags: Optional[list[str]]
     timeout: Optional[int]
     webhook_metadata: Optional[dict[str, Any]]
-    last_success_at: Optional[datetime]
-    auth_type: Optional[WebhookAuthType]
-    average_response_time_ms: Optional[float]
-    last_error: Optional[str]
-    follow_redirects: Optional[bool]
-    description: Optional[str]
-    name: Optional[str]
-    schedule_cron: Optional[str]
-    status: Optional[WebhookStatus]
-    verify_ssl: Optional[bool]
-    success_triggers: Optional[int]
-    failed_triggers: Optional[int]
-    total_triggers: Optional[int]
-    tags: Optional[list[str]]
-    payload_config: Optional[WebhookPayloadTemplate]
-    is_system: Optional[bool]
     retry_policy: Optional[WebhookRetryPolicy]
-    last_response_status: Optional[int]
+    description: Optional[str]
+    status: Optional[WebhookStatus]
+    last_error_at: Optional[datetime]
+    endpoint: Optional[SerializableHttpUrl]
+    last_response_time_ms: Optional[int]
+    triggers: Optional[list[WebhookTrigger]]
+    follow_redirects: Optional[bool]
+    auth_type: Optional[WebhookAuthType]
+    name: Optional[str]
 
 class WebhookSchemaRedis(AwesomeBaseModel):
     """redis schema for Webhook model"""
 
-    triggers: Optional[list[WebhookTrigger]]
-    user_id: Optional[int]
-    endpoint: Optional[SerializableHttpUrl]
-    user: Optional[User]
-    schedule_timezone: Optional[str]
-    logs: Optional[list[WebhookLog]]
-    priority: Optional[int]
-    last_error_at: Optional[datetime]
-    last_response_time_ms: Optional[int]
-    auth_config: Optional[dict[str, Any]]
     last_triggered_at: Optional[datetime]
+    payload_config: Optional[WebhookPayloadTemplate]
+    logs: Optional[list[WebhookLog]]
+    created_at: Optional[datetime]
+    total_triggers: Optional[int]
+    failed_triggers: Optional[int]
+    user: Optional[User]
+    priority: Optional[int]
+    schedule_cron: Optional[str]
+    last_response_status: Optional[int]
+    verify_ssl: Optional[bool]
+    is_system: Optional[bool]
+    last_success_at: Optional[datetime]
+    auth_config: Optional[dict[str, Any]]
+    user_id: Optional[int]
+    schedule_timezone: Optional[str]
+    success_triggers: Optional[int]
+    last_error: Optional[str]
+    average_response_time_ms: Optional[float]
+    tags: Optional[list[str]]
+    updated_at: Optional[datetime]
     timeout: Optional[int]
     webhook_metadata: Optional[dict[str, Any]]
-    last_success_at: Optional[datetime]
-    auth_type: Optional[WebhookAuthType]
-    average_response_time_ms: Optional[float]
-    last_error: Optional[str]
-    updated_at: Optional[datetime]
-    follow_redirects: Optional[bool]
-    description: Optional[str]
-    created_at: Optional[datetime]
-    name: Optional[str]
-    schedule_cron: Optional[str]
-    status: Optional[WebhookStatus]
-    verify_ssl: Optional[bool]
-    success_triggers: Optional[int]
-    failed_triggers: Optional[int]
-    total_triggers: Optional[int]
-    tags: Optional[list[str]]
-    payload_config: Optional[WebhookPayloadTemplate]
-    is_system: Optional[bool]
     retry_policy: Optional[WebhookRetryPolicy]
+    description: Optional[str]
     id: Optional[int]
-    last_response_status: Optional[int]
+    status: Optional[WebhookStatus]
+    last_error_at: Optional[datetime]
+    endpoint: Optional[SerializableHttpUrl]
+    last_response_time_ms: Optional[int]
+    triggers: Optional[list[WebhookTrigger]]
+    follow_redirects: Optional[bool]
+    auth_type: Optional[WebhookAuthType]
+    name: Optional[str]
 
 class WebhookSchemaResponse(AwesomeBaseModel):
     """response schema for Webhook model"""
 
-    triggers: list[WebhookTrigger]
-    user_id: Optional[int]
-    endpoint: SerializableHttpUrl
-    schedule_timezone: Optional[str]
-    priority: Optional[int]
-    last_error_at: Optional[datetime]
-    last_response_time_ms: Optional[int]
-    auth_config: Optional[dict[str, Any]]
     last_triggered_at: Optional[datetime]
+    payload_config: WebhookPayloadTemplate
+    created_at: Optional[datetime]
+    total_triggers: Optional[int]
+    failed_triggers: Optional[int]
+    priority: Optional[int]
+    schedule_cron: Optional[str]
+    last_response_status: Optional[int]
+    verify_ssl: Optional[bool]
+    is_system: Optional[bool]
+    last_success_at: Optional[datetime]
+    auth_config: Optional[dict[str, Any]]
+    user_id: Optional[int]
+    schedule_timezone: Optional[str]
+    success_triggers: Optional[int]
+    last_error: Optional[str]
+    average_response_time_ms: Optional[float]
+    tags: Optional[list[str]]
+    updated_at: Optional[datetime]
     timeout: Optional[int]
     webhook_metadata: Optional[dict[str, Any]]
-    last_success_at: Optional[datetime]
-    auth_type: Optional[WebhookAuthType]
-    average_response_time_ms: Optional[float]
-    last_error: Optional[str]
-    updated_at: Optional[datetime]
-    follow_redirects: Optional[bool]
-    description: Optional[str]
-    created_at: Optional[datetime]
-    name: str
-    schedule_cron: Optional[str]
-    status: WebhookStatus
-    verify_ssl: Optional[bool]
-    success_triggers: Optional[int]
-    failed_triggers: Optional[int]
-    total_triggers: Optional[int]
-    tags: Optional[list[str]]
-    payload_config: WebhookPayloadTemplate
-    is_system: Optional[bool]
     retry_policy: WebhookRetryPolicy
+    description: Optional[str]
     id: Optional[int]
-    last_response_status: Optional[int]
+    status: WebhookStatus
+    last_error_at: Optional[datetime]
+    endpoint: SerializableHttpUrl
+    last_response_time_ms: Optional[int]
+    triggers: list[WebhookTrigger]
+    follow_redirects: Optional[bool]
+    auth_type: Optional[WebhookAuthType]
+    name: str
 
 class WebhookSchemaUpdate(AwesomeBaseModel):
     """update schema for Webhook model"""
 
-    triggers: Optional[list[WebhookTrigger]]
-    user_id: Optional[int]
-    endpoint: Optional[SerializableHttpUrl]
-    schedule_timezone: Optional[str]
-    priority: Optional[int]
-    last_error_at: Optional[datetime]
-    last_response_time_ms: Optional[int]
-    auth_config: Optional[dict[str, Any]]
     last_triggered_at: Optional[datetime]
+    payload_config: Optional[WebhookPayloadTemplate]
+    total_triggers: Optional[int]
+    failed_triggers: Optional[int]
+    priority: Optional[int]
+    schedule_cron: Optional[str]
+    last_response_status: Optional[int]
+    verify_ssl: Optional[bool]
+    is_system: Optional[bool]
+    last_success_at: Optional[datetime]
+    auth_config: Optional[dict[str, Any]]
+    user_id: Optional[int]
+    schedule_timezone: Optional[str]
+    success_triggers: Optional[int]
+    last_error: Optional[str]
+    average_response_time_ms: Optional[float]
+    tags: Optional[list[str]]
     timeout: Optional[int]
     webhook_metadata: Optional[dict[str, Any]]
-    last_success_at: Optional[datetime]
-    auth_type: Optional[WebhookAuthType]
-    average_response_time_ms: Optional[float]
-    last_error: Optional[str]
-    follow_redirects: Optional[bool]
-    description: Optional[str]
-    name: Optional[str]
-    schedule_cron: Optional[str]
-    status: Optional[WebhookStatus]
-    verify_ssl: Optional[bool]
-    success_triggers: Optional[int]
-    failed_triggers: Optional[int]
-    total_triggers: Optional[int]
-    tags: Optional[list[str]]
-    payload_config: Optional[WebhookPayloadTemplate]
-    is_system: Optional[bool]
     retry_policy: Optional[WebhookRetryPolicy]
-    last_response_status: Optional[int]
+    description: Optional[str]
+    status: Optional[WebhookStatus]
+    last_error_at: Optional[datetime]
+    endpoint: Optional[SerializableHttpUrl]
+    last_response_time_ms: Optional[int]
+    triggers: Optional[list[WebhookTrigger]]
+    follow_redirects: Optional[bool]
+    auth_type: Optional[WebhookAuthType]
+    name: Optional[str]
 
 class WebhookFilter(BaseModel):
     """Pydantic-class for filtering the Webhook model."""
 
     updated_at: Optional[datetime] = None
-    min_updated_at: Optional[Any] = None
-    max_updated_at: Optional[Any] = None
+    min_updated_at: Optional[datetime] = None
+    max_updated_at: Optional[datetime] = None
     id: Optional[int] = None
-    min_id: Optional[Any] = None
-    max_id: Optional[Any] = None
+    min_id: Optional[int] = None
+    max_id: Optional[int] = None
     name: Optional[str] = None
     description: Optional[str] = None
     endpoint: Optional[SerializableHttpUrl] = None
     user_id: Optional[int] = None
-    min_user_id: Optional[Any] = None
-    max_user_id: Optional[Any] = None
+    min_user_id: Optional[int] = None
+    max_user_id: Optional[int] = None
     status: Optional[WebhookStatus] = None
     is_system: Optional[bool] = None
     priority: Optional[int] = None
-    min_priority: Optional[Any] = None
-    max_priority: Optional[Any] = None
+    min_priority: Optional[int] = None
+    max_priority: Optional[int] = None
     payload_config: Optional[WebhookPayloadTemplate] = None
     retry_policy: Optional[WebhookRetryPolicy] = None
     auth_type: Optional[WebhookAuthType] = None
     timeout: Optional[int] = None
-    min_timeout: Optional[Any] = None
-    max_timeout: Optional[Any] = None
+    min_timeout: Optional[int] = None
+    max_timeout: Optional[int] = None
     follow_redirects: Optional[bool] = None
     verify_ssl: Optional[bool] = None
     schedule_cron: Optional[str] = None
     schedule_timezone: Optional[str] = None
     last_triggered_at: Optional[datetime] = None
-    min_last_triggered_at: Optional[Any] = None
-    max_last_triggered_at: Optional[Any] = None
+    min_last_triggered_at: Optional[datetime] = None
+    max_last_triggered_at: Optional[datetime] = None
     last_success_at: Optional[datetime] = None
-    min_last_success_at: Optional[Any] = None
-    max_last_success_at: Optional[Any] = None
+    min_last_success_at: Optional[datetime] = None
+    max_last_success_at: Optional[datetime] = None
     last_error: Optional[str] = None
     last_error_at: Optional[datetime] = None
-    min_last_error_at: Optional[Any] = None
-    max_last_error_at: Optional[Any] = None
+    min_last_error_at: Optional[datetime] = None
+    max_last_error_at: Optional[datetime] = None
     last_response_status: Optional[int] = None
-    min_last_response_status: Optional[Any] = None
-    max_last_response_status: Optional[Any] = None
+    min_last_response_status: Optional[int] = None
+    max_last_response_status: Optional[int] = None
     last_response_time_ms: Optional[int] = None
-    min_last_response_time_ms: Optional[Any] = None
-    max_last_response_time_ms: Optional[Any] = None
+    min_last_response_time_ms: Optional[int] = None
+    max_last_response_time_ms: Optional[int] = None
     total_triggers: Optional[int] = None
-    min_total_triggers: Optional[Any] = None
-    max_total_triggers: Optional[Any] = None
+    min_total_triggers: Optional[int] = None
+    max_total_triggers: Optional[int] = None
     success_triggers: Optional[int] = None
-    min_success_triggers: Optional[Any] = None
-    max_success_triggers: Optional[Any] = None
+    min_success_triggers: Optional[int] = None
+    max_success_triggers: Optional[int] = None
     failed_triggers: Optional[int] = None
-    min_failed_triggers: Optional[Any] = None
-    max_failed_triggers: Optional[Any] = None
+    min_failed_triggers: Optional[int] = None
+    max_failed_triggers: Optional[int] = None
     average_response_time_ms: Optional[float] = None
-    min_average_response_time_ms: Optional[Any] = None
-    max_average_response_time_ms: Optional[Any] = None
-    logs_id: Optional[Any] = None
+    min_average_response_time_ms: Optional[float] = None
+    max_average_response_time_ms: Optional[float] = None
+    logs_id: Optional[int] = None
 
 class WebhookSort(StrEnum):
     """Enum for sorting the Webhook model."""

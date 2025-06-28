@@ -15,7 +15,7 @@ from .ticket_message import TicketMessage
 from .transaction import Transaction
 from .user import User
 from .user_roles import UserRoles
-from .user_token import Token
+from .user_token import UserToken
 from .webhook import Webhook
 from .webhook_log import WebhookLog
 
@@ -35,7 +35,7 @@ Ticket.model_rebuild()
 TicketMessage.model_rebuild()
 Transaction.model_rebuild()
 UserRoles.model_rebuild()
-Token.model_rebuild()
+UserToken.model_rebuild()
 User.model_rebuild()
 Webhook.model_rebuild()
 WebhookLog.model_rebuild()
@@ -57,7 +57,7 @@ __all__ = [
     "TicketMessage",
     "Transaction",
     "UserRoles",
-    "Token",
+    "UserToken",
     "User",
     "Webhook",
     "WebhookLog",

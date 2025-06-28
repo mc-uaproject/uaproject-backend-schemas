@@ -1,7 +1,6 @@
 import importlib
 import inspect
-import typing
-from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Type, TypeVar, Union
 
 from pydantic import BaseModel, create_model
 
@@ -224,21 +223,93 @@ class AwesomeSchemas:
             related_schema_name = relationships[field_name]
             related_schema_class = globals().get(related_schema_name)
             return related_schema_class if related_schema_class is not None else Any
+
+        # Handle ForwardRef
+        if hasattr(field_type, "__forward_arg__"):
+            class_name = field_type.__forward_arg__
+            return self._resolve_forward_ref(class_name)
+
         origin = getattr(field_type, "__origin__", None)
         args = getattr(field_type, "__args__", ())
-        if origin in (list, List, typing.List) and args:
+
+        # Handle Union (including Optional which is Union[T, None])
+        if origin is Union and args:
+            # Check if this is Optional[T] (Union[T, None])
+            if len(args) == 2 and type(None) in args:
+                # This is Optional[T]
+                inner_type = args[0] if args[1] is type(None) else args[1]
+
+                # Handle ForwardRef in Optional
+                if hasattr(inner_type, "__forward_arg__"):
+                    class_name = inner_type.__forward_arg__
+                    resolved_class = self._resolve_forward_ref(class_name)
+                    return (
+                        Optional[resolved_class] if resolved_class else Optional[Any]
+                    )
+
+                # Recursively resolve inner type
+                resolved_inner = self._get_field_type(field_name, inner_type, relationships)
+                return Optional[resolved_inner]
+
+        if origin in (list, List) and args:
             inner_type = args[0]
+
+            # Handle ForwardRef in List
+            if hasattr(inner_type, "__forward_arg__"):
+                class_name = inner_type.__forward_arg__
+                resolved_class = self._resolve_forward_ref(class_name)
+                return List[resolved_class] if resolved_class else List[Any]
+
+            # For regular types (str, int, etc.), use them as-is
+            # Only resolve ForwardRef for custom classes that need importing
             if hasattr(inner_type, "__name__") and not isinstance(inner_type, type(None)):
-                class_name = inner_type.__name__
-                module_name = f"uaproject_backend_schemas.models.{class_name.lower()}"
-                try:
-                    module = importlib.import_module(module_name)
-                    imported_class = getattr(module, class_name)
-                    self._dynamic_types[class_name] = imported_class
-                    return List[imported_class]
-                except (ModuleNotFoundError, AttributeError):
-                    pass
+                # Check if this is a built-in type or standard library type
+                if inner_type.__module__ in ('builtins', 'datetime', 'uuid', 'decimal'):
+                    return List[inner_type]
+                else:
+                    # This might be a custom class, try to resolve it
+                    class_name = inner_type.__name__
+                    resolved_class = self._resolve_forward_ref(class_name)
+                    return List[resolved_class] if resolved_class != Any else List[inner_type]
+
         return field_type
+
+    def _resolve_forward_ref(self, class_name: str) -> Any:
+        """Resolve a forward reference to an actual class."""
+        # First check if it's already in dynamic types cache
+        if class_name in self._dynamic_types:
+            return self._dynamic_types[class_name]
+
+        # Convert class name to snake_case for module import
+        snake_case_name = camel_to_snake(class_name)
+
+        # Try to import from models using snake_case
+        module_name = f"uaproject_backend_schemas.models.{snake_case_name}"
+        try:
+            module = importlib.import_module(module_name)
+            imported_class = getattr(module, class_name)
+            self._dynamic_types[class_name] = imported_class
+            return imported_class
+        except (ModuleNotFoundError, AttributeError):
+            pass
+
+        # Fallback: try with class name in lowercase
+        module_name = f"uaproject_backend_schemas.models.{class_name.lower()}"
+        try:
+            module = importlib.import_module(module_name)
+            imported_class = getattr(module, class_name)
+            self._dynamic_types[class_name] = imported_class
+            return imported_class
+        except (ModuleNotFoundError, AttributeError):
+            pass
+
+        # Try to get from globals (might be imported already)
+        if class_name in globals():
+            self._dynamic_types[class_name] = globals()[class_name]
+            return globals()[class_name]
+
+        # Return Any as fallback
+        return Any
 
     def _format_permissions(self, permissions: List[str]) -> List[str]:
         """Format permissions strings with model class attributes."""
@@ -286,13 +357,19 @@ class AwesomeSchemas:
             if origin is not None and origin.__name__ == "Mapped":
                 field_type = field_type.__args__[0]
                 origin = getattr(field_type, "__origin__", None)
+
+            # Resolve ForwardRef in field_type
+            resolved_field_type = self._get_field_type(f, field_type, {})
+
             if origin in (list, List):
                 return (
-                    field_type,
-                    AwesomeFieldInfo(annotation=field_type, required=False, default_factory=list),
+                    resolved_field_type,
+                    AwesomeFieldInfo(
+                        annotation=resolved_field_type, required=False, default_factory=list
+                    ),
                 )
             else:
-                return (field_type, None)
+                return (resolved_field_type, None)
         return None
 
     def _get_field_definitions(
@@ -339,7 +416,11 @@ class AwesomeSchemas:
             if not self._should_include_field(field, permissions):
                 continue
 
-            field_type = self._get_field_type(f, model_field_info[f], relationships)
+            # Prefer type annotation over model_field_info to avoid SQLAlchemy column types
+            if hasattr(self.model_cls, "__annotations__") and f in self.model_cls.__annotations__:
+                field_type = self._get_field_type(f, self.model_cls.__annotations__[f], relationships)
+            else:
+                field_type = self._get_field_type(f, model_field_info[f], relationships)
             field_definitions[f] = (field_type, None)
         return field_definitions
 

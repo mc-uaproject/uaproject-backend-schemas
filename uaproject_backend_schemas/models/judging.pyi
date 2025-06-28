@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -45,24 +45,24 @@ class JudgingSchemaCreate(AwesomeBaseModel):
 class JudgingSchemaRedis(AwesomeBaseModel):
     """redis schema for Judging model"""
 
+    id: Optional[int]
     verdict: Optional[JudgingVerdict]
-    judge: Optional[User]
-    decision: Optional[str]
     judge_id: Optional[int]
     claims: Optional[list[Claim]]
-    updated_at: Optional[datetime]
     created_at: Optional[datetime]
-    id: Optional[int]
+    updated_at: Optional[datetime]
+    judge: Optional[User]
+    decision: Optional[str]
 
 class JudgingSchemaResponse(AwesomeBaseModel):
     """response schema for Judging model"""
 
-    verdict: JudgingVerdict
-    decision: str
-    judge_id: int
-    updated_at: Optional[datetime]
-    created_at: Optional[datetime]
     id: Optional[int]
+    verdict: JudgingVerdict
+    judge_id: int
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
+    decision: str
 
 class JudgingSchemaUpdate(AwesomeBaseModel):
     """update schema for Judging model"""
@@ -75,17 +75,17 @@ class JudgingFilter(BaseModel):
     """Pydantic-class for filtering the Judging model."""
 
     updated_at: Optional[datetime] = None
-    min_updated_at: Optional[Any] = None
-    max_updated_at: Optional[Any] = None
+    min_updated_at: Optional[datetime] = None
+    max_updated_at: Optional[datetime] = None
     id: Optional[int] = None
-    min_id: Optional[Any] = None
-    max_id: Optional[Any] = None
+    min_id: Optional[int] = None
+    max_id: Optional[int] = None
     judge_id: Optional[int] = None
-    min_judge_id: Optional[Any] = None
-    max_judge_id: Optional[Any] = None
+    min_judge_id: Optional[int] = None
+    max_judge_id: Optional[int] = None
     decision: Optional[str] = None
     verdict: Optional[JudgingVerdict] = None
-    claims_id: Optional[Any] = None
+    claims_id: Optional[int] = None
 
 class JudgingSort(StrEnum):
     """Enum for sorting the Judging model."""

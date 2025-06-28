@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -43,38 +43,38 @@ class TicketMessageSchemas:
 class TicketMessageSchemaCreate(AwesomeBaseModel):
     """create schema for TicketMessage model"""
 
-    attachment_file_ids: Optional[list[int]]
     ticket_id: Optional[int]
     content: Optional[str]
+    attachment_file_ids: Optional[list[int]]
 
 class TicketMessageSchemaRedis(AwesomeBaseModel):
     """redis schema for TicketMessage model"""
 
-    is_system_message: Optional[bool]
-    author_id: Optional[int]
-    edited_at: Optional[str]
-    attachment_file_ids: Optional[list[int]]
-    ticket: Optional[Ticket]
-    ticket_id: Optional[int]
-    author: Optional[User]
-    attachment_files: Optional[list[File]]
-    updated_at: Optional[datetime]
-    created_at: Optional[datetime]
-    content: Optional[str]
     id: Optional[int]
+    is_system_message: Optional[bool]
+    ticket_id: Optional[int]
+    content: Optional[str]
+    author: Optional[User]
+    edited_at: Optional[str]
+    created_at: Optional[datetime]
+    author_id: Optional[int]
+    updated_at: Optional[datetime]
+    attachment_files: Optional[list[File]]
+    ticket: Optional[Ticket]
+    attachment_file_ids: Optional[list[int]]
 
 class TicketMessageSchemaResponse(AwesomeBaseModel):
     """response schema for TicketMessage model"""
 
-    is_system_message: Optional[bool]
-    author_id: int
-    edited_at: Optional[str]
-    attachment_file_ids: Optional[list[int]]
-    ticket_id: int
-    updated_at: Optional[datetime]
-    created_at: Optional[datetime]
-    content: str
     id: Optional[int]
+    is_system_message: Optional[bool]
+    ticket_id: int
+    content: str
+    edited_at: Optional[str]
+    created_at: Optional[datetime]
+    author_id: int
+    updated_at: Optional[datetime]
+    attachment_file_ids: Optional[list[int]]
 
 class TicketMessageSchemaResponseWithAuthor(AwesomeBaseModel):
     """response_with_author schema for TicketMessage model"""
@@ -99,21 +99,21 @@ class TicketMessageFilter(BaseModel):
     """Pydantic-class for filtering the TicketMessage model."""
 
     updated_at: Optional[datetime] = None
-    min_updated_at: Optional[Any] = None
-    max_updated_at: Optional[Any] = None
+    min_updated_at: Optional[datetime] = None
+    max_updated_at: Optional[datetime] = None
     id: Optional[int] = None
-    min_id: Optional[Any] = None
-    max_id: Optional[Any] = None
+    min_id: Optional[int] = None
+    max_id: Optional[int] = None
     ticket_id: Optional[int] = None
-    min_ticket_id: Optional[Any] = None
-    max_ticket_id: Optional[Any] = None
+    min_ticket_id: Optional[int] = None
+    max_ticket_id: Optional[int] = None
     author_id: Optional[int] = None
-    min_author_id: Optional[Any] = None
-    max_author_id: Optional[Any] = None
+    min_author_id: Optional[int] = None
+    max_author_id: Optional[int] = None
     content: Optional[str] = None
     is_system_message: Optional[bool] = None
     edited_at: Optional[str] = None
-    attachment_files_id: Optional[Any] = None
+    attachment_files_id: Optional[int] = None
 
 class TicketMessageSort(StrEnum):
     """Enum for sorting the TicketMessage model."""

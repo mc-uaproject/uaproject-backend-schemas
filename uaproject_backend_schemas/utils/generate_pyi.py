@@ -562,13 +562,11 @@ def generate_filter_class(model_cls: Type[AwesomeModel], filter_cls=None) -> str
     content = f"class {model_cls.__name__}Filter(BaseModel):\n"
     content += f'    """Pydantic-class for filtering the {model_cls.__name__} model."""\n'
     for name, field in filter_cls.model_fields.items():
-        if name in model_cls.model_fields:
-            ann = model_cls.model_fields[name].annotation
-            typ = unwrap_optional(ann)
-            typ_str = typ.__name__ if hasattr(typ, "__name__") else str(typ)
-            content += f"    {name}: Optional[{typ_str}] = None\n"
-        else:
-            content += f"    {name}: Optional[Any] = None\n"
+        # Use the type from the filter itself, not from the model
+        ann = field.annotation
+        typ = unwrap_optional(ann)
+        typ_str = typ.__name__ if hasattr(typ, "__name__") else str(typ)
+        content += f"    {name}: Optional[{typ_str}] = None\n"
     content += "\n"
     return content
 
@@ -663,12 +661,6 @@ def get_all_subclasses(cls):
         subclasses.add(subclass)
         subclasses.update(get_all_subclasses(subclass))
     return subclasses
-
-
-MODEL_IMPORT_OVERRIDES = {
-    "Token": "user_token",
-}
-
 
 def _collect_computed_fields(cls: Type[AwesomeModel]) -> dict[str, Any]:
     """Get computed field objects (not just names). Used for type annotation extraction."""
@@ -928,8 +920,7 @@ def _generate_stubs(
     for name, obj in unique_models.items():
         module_path = model_to_modules[name][0]
         stub_dir = ensure_stub_dir(module_path, project_root)
-        override = MODEL_IMPORT_OVERRIDES.get(name)
-        filename = override if override else camel_to_snake(name)
+        filename = camel_to_snake(name)
         stub_file = stub_dir / f"{filename}.pyi"
 
         file_start_time = time.perf_counter()

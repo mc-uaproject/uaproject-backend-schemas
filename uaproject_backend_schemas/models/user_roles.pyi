@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -32,48 +32,48 @@ class UserRolesSchemas:
 class UserRolesSchemaCreate(AwesomeBaseModel):
     """create schema for UserRoles model"""
 
-    user_id: Optional[int]
     role_id: Optional[int]
+    user_id: Optional[int]
 
 class UserRolesSchemaRedis(AwesomeBaseModel):
     """redis schema for UserRoles model"""
 
-    user_id: Optional[int]
-    updated_at: Optional[datetime]
-    created_at: Optional[datetime]
-    role_id: Optional[int]
     id: Optional[int]
+    role_id: Optional[int]
+    user_id: Optional[int]
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
 
 class UserRolesSchemaResponse(AwesomeBaseModel):
     """response schema for UserRoles model"""
 
-    user_id: int
-    updated_at: Optional[datetime]
-    created_at: Optional[datetime]
-    role_id: int
     id: Optional[int]
+    role_id: int
+    user_id: int
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
 
 class UserRolesSchemaUpdate(AwesomeBaseModel):
     """update schema for UserRoles model"""
 
-    user_id: Optional[int]
     role_id: Optional[int]
+    user_id: Optional[int]
 
 class UserRolesFilter(BaseModel):
     """Pydantic-class for filtering the UserRoles model."""
 
     updated_at: Optional[datetime] = None
-    min_updated_at: Optional[Any] = None
-    max_updated_at: Optional[Any] = None
+    min_updated_at: Optional[datetime] = None
+    max_updated_at: Optional[datetime] = None
     id: Optional[int] = None
-    min_id: Optional[Any] = None
-    max_id: Optional[Any] = None
+    min_id: Optional[int] = None
+    max_id: Optional[int] = None
     user_id: Optional[int] = None
-    min_user_id: Optional[Any] = None
-    max_user_id: Optional[Any] = None
+    min_user_id: Optional[int] = None
+    max_user_id: Optional[int] = None
     role_id: Optional[int] = None
-    min_role_id: Optional[Any] = None
-    max_role_id: Optional[Any] = None
+    min_role_id: Optional[int] = None
+    max_role_id: Optional[int] = None
 
 class UserRolesSort(StrEnum):
     """Enum for sorting the UserRoles model."""

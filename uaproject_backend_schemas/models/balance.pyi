@@ -3,7 +3,7 @@
 from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
-from typing import Any, Optional
+from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -43,33 +43,33 @@ class BalanceSchemaCreate(AwesomeBaseModel):
 class BalanceSchemaRedis(AwesomeBaseModel):
     """redis schema for Balance model"""
 
+    id: Optional[int]
     user: Optional[User]
+    amount: Optional[Decimal]
     user_id: Optional[int]
     identifier: Optional[UUID]
-    amount: Optional[Decimal]
-    updated_at: Optional[datetime]
     created_at: Optional[datetime]
-    id: Optional[int]
+    updated_at: Optional[datetime]
 
 class BalanceSchemaResponse(AwesomeBaseModel):
     """response schema for Balance model"""
 
+    id: Optional[int]
+    amount: Optional[Decimal]
     user_id: int
     identifier: Optional[UUID]
-    amount: Optional[Decimal]
-    updated_at: Optional[datetime]
     created_at: Optional[datetime]
-    id: Optional[int]
+    updated_at: Optional[datetime]
 
 class BalanceSchemaResponseSelf(AwesomeBaseModel):
     """response_self schema for Balance model"""
 
+    id: Optional[int]
+    amount: Optional[Decimal]
     user_id: int
     identifier: Optional[UUID]
-    amount: Optional[Decimal]
-    updated_at: Optional[datetime]
     created_at: Optional[datetime]
-    id: Optional[int]
+    updated_at: Optional[datetime]
 
 class BalanceSchemaUpdate(AwesomeBaseModel):
     """update schema for Balance model"""
@@ -81,14 +81,14 @@ class BalanceFilter(BaseModel):
     """Pydantic-class for filtering the Balance model."""
 
     updated_at: Optional[datetime] = None
-    min_updated_at: Optional[Any] = None
-    max_updated_at: Optional[Any] = None
+    min_updated_at: Optional[datetime] = None
+    max_updated_at: Optional[datetime] = None
     id: Optional[int] = None
-    min_id: Optional[Any] = None
-    max_id: Optional[Any] = None
+    min_id: Optional[int] = None
+    max_id: Optional[int] = None
     user_id: Optional[int] = None
-    min_user_id: Optional[Any] = None
-    max_user_id: Optional[Any] = None
+    min_user_id: Optional[int] = None
+    max_user_id: Optional[int] = None
     identifier: Optional[UUID] = None
     amount: Optional[Decimal] = None
 

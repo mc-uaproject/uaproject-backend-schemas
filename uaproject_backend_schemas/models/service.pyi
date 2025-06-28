@@ -55,96 +55,96 @@ class ServiceSchemas:
 class ServiceSchemaCreate(AwesomeBaseModel):
     """create schema for Service model"""
 
-    points: Optional[list[ServicePoint]]
-    price: Optional[Decimal]
-    is_active: Optional[bool]
-    discounts: Optional[list[ServiceDiscount]]
-    type: Optional[ServiceType]
-    upgrade_from: Optional[str]
-    duration_months: Optional[int]
-    image: Optional[str]
     display_name: Optional[str]
+    is_active: Optional[bool]
     is_upgradable: Optional[bool]
-    description: Optional[str]
+    category: Optional[str]
+    price: Optional[Decimal]
+    discounts: Optional[list[ServiceDiscount]]
+    upgrade_to: Optional[str]
+    image: Optional[str]
+    duration_months: Optional[int]
+    points: Optional[list[ServicePoint]]
+    type: Optional[ServiceType]
     service_metadata: Optional[dict[str, Any]]
     name: Optional[str]
-    upgrade_to: Optional[str]
-    category: Optional[str]
+    upgrade_from: Optional[str]
+    description: Optional[str]
 
 class ServiceSchemaRedis(AwesomeBaseModel):
     """redis schema for Service model"""
 
-    price: Optional[Decimal]
-    service_metadata: Optional[dict[str, Any]]
-    category: Optional[str]
-    points: Optional[list[ServicePoint]]
-    image: Optional[str]
-    is_upgradable: Optional[bool]
-    type: Optional[ServiceType]
-    upgrade_from: Optional[str]
-    upgrade_to: Optional[str]
-    purchased_items: Optional[list[PurchasedItem]]
-    updated_at: Optional[datetime]
-    duration_months: Optional[int]
-    discounts: Optional[list[ServiceDiscount]]
-    created_at: Optional[datetime]
-    description: Optional[str]
-    name: Optional[str]
     icon_file: Optional[File]
+    created_at: Optional[datetime]
+    type: Optional[ServiceType]
     is_active: Optional[bool]
+    discounts: Optional[list[ServiceDiscount]]
+    duration_months: Optional[int]
+    points: Optional[list[ServicePoint]]
+    service_metadata: Optional[dict[str, Any]]
+    upgrade_from: Optional[str]
     display_name: Optional[str]
+    is_upgradable: Optional[bool]
+    upgrade_to: Optional[str]
+    image: Optional[str]
+    updated_at: Optional[datetime]
+    purchased_items: Optional[list[PurchasedItem]]
+    description: Optional[str]
     id: Optional[int]
+    category: Optional[str]
+    price: Optional[Decimal]
+    name: Optional[str]
 
 class ServiceSchemaResponse(AwesomeBaseModel):
     """response schema for Service model"""
 
-    points: Optional[list[ServicePoint]]
-    price: Decimal
-    created_at: Optional[datetime]
-    is_active: Optional[bool]
-    discounts: Optional[list[ServiceDiscount]]
-    type: ServiceType
-    upgrade_from: Optional[str]
-    updated_at: Optional[datetime]
-    duration_months: Optional[int]
-    image: Optional[str]
-    display_name: Optional[str]
-    is_upgradable: Optional[bool]
-    description: Optional[str]
-    service_metadata: Optional[dict[str, Any]]
     id: Optional[int]
-    name: str
-    upgrade_to: Optional[str]
+    display_name: Optional[str]
+    is_active: Optional[bool]
+    is_upgradable: Optional[bool]
     category: Optional[str]
+    price: Decimal
+    discounts: Optional[list[ServiceDiscount]]
+    upgrade_to: Optional[str]
+    created_at: Optional[datetime]
+    image: Optional[str]
+    duration_months: Optional[int]
+    updated_at: Optional[datetime]
+    points: Optional[list[ServicePoint]]
+    type: ServiceType
+    service_metadata: Optional[dict[str, Any]]
+    name: str
+    upgrade_from: Optional[str]
+    description: Optional[str]
 
 class ServiceSchemaUpdate(AwesomeBaseModel):
     """update schema for Service model"""
 
-    points: Optional[list[ServicePoint]]
-    price: Optional[Decimal]
-    is_active: Optional[bool]
-    discounts: Optional[list[ServiceDiscount]]
-    type: Optional[ServiceType]
-    upgrade_from: Optional[str]
-    duration_months: Optional[int]
-    image: Optional[str]
     display_name: Optional[str]
+    is_active: Optional[bool]
     is_upgradable: Optional[bool]
-    description: Optional[str]
+    category: Optional[str]
+    price: Optional[Decimal]
+    discounts: Optional[list[ServiceDiscount]]
+    upgrade_to: Optional[str]
+    image: Optional[str]
+    duration_months: Optional[int]
+    points: Optional[list[ServicePoint]]
+    type: Optional[ServiceType]
     service_metadata: Optional[dict[str, Any]]
     name: Optional[str]
-    upgrade_to: Optional[str]
-    category: Optional[str]
+    upgrade_from: Optional[str]
+    description: Optional[str]
 
 class ServiceFilter(BaseModel):
     """Pydantic-class for filtering the Service model."""
 
     updated_at: Optional[datetime] = None
-    min_updated_at: Optional[Any] = None
-    max_updated_at: Optional[Any] = None
+    min_updated_at: Optional[datetime] = None
+    max_updated_at: Optional[datetime] = None
     id: Optional[int] = None
-    min_id: Optional[Any] = None
-    max_id: Optional[Any] = None
+    min_id: Optional[int] = None
+    max_id: Optional[int] = None
     name: Optional[str] = None
     display_name: Optional[str] = None
     description: Optional[str] = None
@@ -154,13 +154,13 @@ class ServiceFilter(BaseModel):
     category: Optional[str] = None
     type: Optional[ServiceType] = None
     duration_months: Optional[int] = None
-    min_duration_months: Optional[Any] = None
-    max_duration_months: Optional[Any] = None
+    min_duration_months: Optional[int] = None
+    max_duration_months: Optional[int] = None
     is_upgradable: Optional[bool] = None
     upgrade_from: Optional[str] = None
     upgrade_to: Optional[str] = None
-    icon_file_id: Optional[Any] = None
-    purchased_items_id: Optional[Any] = None
+    icon_file_id: Optional[int] = None
+    purchased_items_id: Optional[int] = None
 
 class ServiceSort(StrEnum):
     """Enum for sorting the Service model."""

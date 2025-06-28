@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -46,55 +46,55 @@ class TicketSchemaCreate(AwesomeBaseModel):
     """create schema for Ticket model"""
 
     status: Optional[TicketStatus]
-    author_id: Optional[int]
     priority: Optional[TicketPriority]
     title: Optional[str]
+    author_id: Optional[int]
     description: Optional[str]
 
 class TicketSchemaRedis(AwesomeBaseModel):
     """redis schema for Ticket model"""
 
-    status: Optional[TicketStatus]
-    author_id: Optional[int]
-    added_user_ids: Optional[list[int]]
-    messages: Optional[list[TicketMessage]]
-    priority: Optional[TicketPriority]
-    assigned_to_id: Optional[int]
     assigned_to: Optional[User]
-    author: Optional[User]
-    updated_at: Optional[datetime]
-    title: Optional[str]
-    description: Optional[str]
     id: Optional[int]
+    assigned_to_id: Optional[int]
+    messages: Optional[list[TicketMessage]]
+    status: Optional[TicketStatus]
+    priority: Optional[TicketPriority]
+    author: Optional[User]
+    added_user_ids: Optional[list[int]]
+    title: Optional[str]
+    author_id: Optional[int]
     created_at: Optional[datetime]
+    updated_at: Optional[datetime]
+    description: Optional[str]
 
 class TicketSchemaResponse(AwesomeBaseModel):
     """response schema for Ticket model"""
 
-    status: TicketStatus
-    author_id: int
-    added_user_ids: list[int]
-    priority: TicketPriority
-    assigned_to_id: Optional[int]
-    updated_at: Optional[datetime]
-    title: str
-    description: str
     id: Optional[int]
+    assigned_to_id: Optional[int]
+    status: TicketStatus
+    priority: TicketPriority
+    added_user_ids: list[int]
+    title: str
+    author_id: int
     created_at: Optional[datetime]
+    updated_at: Optional[datetime]
+    description: str
 
 class TicketSchemaResponseSelf(AwesomeBaseModel):
     """response_self schema for Ticket model"""
 
-    status: TicketStatus
-    author_id: int
-    added_user_ids: list[int]
-    priority: TicketPriority
-    assigned_to_id: Optional[int]
-    updated_at: Optional[datetime]
-    title: str
-    description: str
     id: Optional[int]
+    assigned_to_id: Optional[int]
+    status: TicketStatus
+    priority: TicketPriority
+    added_user_ids: list[int]
+    title: str
+    author_id: int
     created_at: Optional[datetime]
+    updated_at: Optional[datetime]
+    description: str
 
 class TicketSchemaUpdate(AwesomeBaseModel):
     """update schema for Ticket model"""
@@ -116,22 +116,22 @@ class TicketFilter(BaseModel):
     """Pydantic-class for filtering the Ticket model."""
 
     updated_at: Optional[datetime] = None
-    min_updated_at: Optional[Any] = None
-    max_updated_at: Optional[Any] = None
+    min_updated_at: Optional[datetime] = None
+    max_updated_at: Optional[datetime] = None
     id: Optional[int] = None
-    min_id: Optional[Any] = None
-    max_id: Optional[Any] = None
+    min_id: Optional[int] = None
+    max_id: Optional[int] = None
     title: Optional[str] = None
     description: Optional[str] = None
     author_id: Optional[int] = None
-    min_author_id: Optional[Any] = None
-    max_author_id: Optional[Any] = None
+    min_author_id: Optional[int] = None
+    max_author_id: Optional[int] = None
     assigned_to_id: Optional[int] = None
-    min_assigned_to_id: Optional[Any] = None
-    max_assigned_to_id: Optional[Any] = None
+    min_assigned_to_id: Optional[int] = None
+    max_assigned_to_id: Optional[int] = None
     status: Optional[TicketStatus] = None
     priority: Optional[TicketPriority] = None
-    messages_id: Optional[Any] = None
+    messages_id: Optional[int] = None
 
 class TicketSort(StrEnum):
     """Enum for sorting the Ticket model."""

@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -56,25 +56,25 @@ class ApplicationSchemas:
 class ApplicationSchemaCreate(AwesomeBaseModel):
     """create schema for Application model"""
 
-    russian_word_reaction: Optional[str]
-    server_source: Optional[str]
     useful_skills_detailed: Optional[str]
-    user_id: Optional[int]
-    useful_skills: Optional[str]
-    long_project_experience: Optional[str]
-    healthy_community_definition: Optional[str]
-    conflict_reaction: Optional[str]
-    community_projects_readiness: Optional[str]
-    birth_date: Optional[datetime]
-    private_server_experience: Optional[str]
-    new_rule_reaction: Optional[str]
-    admin_decision_attitude: Optional[str]
     server_experience_negative: Optional[str]
-    quiz_answer: Optional[str]
-    version: Optional[str]
-    ideal_server_description: Optional[str]
+    community_projects_readiness: Optional[str]
+    healthy_community_definition: Optional[str]
     editable_fields: Optional[list[str]]
+    admin_decision_attitude: Optional[str]
     launcher: Optional[str]
+    birth_date: Optional[datetime]
+    long_project_experience: Optional[str]
+    private_server_experience: Optional[str]
+    conflict_reaction: Optional[str]
+    quiz_answer: Optional[str]
+    user_id: Optional[int]
+    server_source: Optional[str]
+    russian_word_reaction: Optional[str]
+    ideal_server_description: Optional[str]
+    useful_skills: Optional[str]
+    version: Optional[str]
+    new_rule_reaction: Optional[str]
 
 class ApplicationSchemaCreateEvervault(AwesomeBaseModel):
     """create_evervault schema for Application model"""
@@ -110,94 +110,94 @@ class ApplicationSchemaCreateV2(AwesomeBaseModel):
 class ApplicationSchemaRedis(AwesomeBaseModel):
     """redis schema for Application model"""
 
-    russian_word_reaction: Optional[str]
-    server_source: Optional[str]
     useful_skills_detailed: Optional[str]
-    user_id: Optional[int]
-    useful_skills: Optional[str]
-    long_project_experience: Optional[str]
-    healthy_community_definition: Optional[str]
-    user: Optional[User]
-    conflict_reaction: Optional[str]
-    community_projects_readiness: Optional[str]
-    birth_date: Optional[datetime]
-    updated_at: Optional[datetime]
-    private_server_experience: Optional[str]
-    created_at: Optional[datetime]
-    new_rule_reaction: Optional[str]
-    admin_decision_attitude: Optional[str]
     server_experience_negative: Optional[str]
-    sections: Optional[list[ApplicationSection]]
-    quiz_answer: Optional[str]
-    version: Optional[str]
-    ideal_server_description: Optional[str]
+    community_projects_readiness: Optional[str]
+    created_at: Optional[datetime]
+    healthy_community_definition: Optional[str]
     editable_fields: Optional[list[str]]
+    admin_decision_attitude: Optional[str]
     launcher: Optional[str]
+    user: Optional[User]
+    birth_date: Optional[datetime]
+    long_project_experience: Optional[str]
+    private_server_experience: Optional[str]
+    conflict_reaction: Optional[str]
+    quiz_answer: Optional[str]
+    user_id: Optional[int]
+    server_source: Optional[str]
+    updated_at: Optional[datetime]
+    russian_word_reaction: Optional[str]
+    sections: Optional[list[ApplicationSection]]
     id: Optional[int]
+    ideal_server_description: Optional[str]
+    useful_skills: Optional[str]
+    version: Optional[str]
+    new_rule_reaction: Optional[str]
 
 class ApplicationSchemaResponse(AwesomeBaseModel):
     """response schema for Application model"""
 
-    russian_word_reaction: Optional[str]
-    server_source: Optional[str]
     useful_skills_detailed: Optional[str]
-    user_id: int
-    useful_skills: Optional[str]
-    long_project_experience: Optional[str]
-    healthy_community_definition: Optional[str]
-    conflict_reaction: Optional[str]
-    community_projects_readiness: Optional[str]
-    birth_date: Optional[datetime]
-    updated_at: Optional[datetime]
-    private_server_experience: Optional[str]
-    created_at: Optional[datetime]
-    new_rule_reaction: Optional[str]
-    admin_decision_attitude: Optional[str]
     server_experience_negative: Optional[str]
-    quiz_answer: Optional[str]
-    version: Optional[str]
-    ideal_server_description: Optional[str]
+    community_projects_readiness: Optional[str]
+    created_at: Optional[datetime]
+    healthy_community_definition: Optional[str]
     editable_fields: Optional[list[str]]
+    admin_decision_attitude: Optional[str]
     launcher: Optional[str]
+    birth_date: Optional[datetime]
+    long_project_experience: Optional[str]
+    private_server_experience: Optional[str]
+    conflict_reaction: Optional[str]
+    quiz_answer: Optional[str]
+    user_id: int
+    server_source: Optional[str]
+    updated_at: Optional[datetime]
+    russian_word_reaction: Optional[str]
     id: Optional[int]
+    ideal_server_description: Optional[str]
+    useful_skills: Optional[str]
+    version: Optional[str]
+    new_rule_reaction: Optional[str]
 
 class ApplicationSchemaUpdate(AwesomeBaseModel):
     """update schema for Application model"""
 
-    russian_word_reaction: Optional[str]
-    server_source: Optional[str]
     useful_skills_detailed: Optional[str]
-    useful_skills: Optional[str]
-    long_project_experience: Optional[str]
-    healthy_community_definition: Optional[str]
-    conflict_reaction: Optional[str]
-    community_projects_readiness: Optional[str]
-    birth_date: Optional[datetime]
-    private_server_experience: Optional[str]
-    new_rule_reaction: Optional[str]
-    admin_decision_attitude: Optional[str]
     server_experience_negative: Optional[str]
-    quiz_answer: Optional[str]
-    ideal_server_description: Optional[str]
+    community_projects_readiness: Optional[str]
+    healthy_community_definition: Optional[str]
     editable_fields: Optional[list[str]]
+    admin_decision_attitude: Optional[str]
     launcher: Optional[str]
+    birth_date: Optional[datetime]
+    long_project_experience: Optional[str]
+    private_server_experience: Optional[str]
+    conflict_reaction: Optional[str]
+    quiz_answer: Optional[str]
+    server_source: Optional[str]
+    russian_word_reaction: Optional[str]
+    ideal_server_description: Optional[str]
+    useful_skills: Optional[str]
+    new_rule_reaction: Optional[str]
 
 class ApplicationFilter(BaseModel):
     """Pydantic-class for filtering the Application model."""
 
     updated_at: Optional[datetime] = None
-    min_updated_at: Optional[Any] = None
-    max_updated_at: Optional[Any] = None
+    min_updated_at: Optional[datetime] = None
+    max_updated_at: Optional[datetime] = None
     id: Optional[int] = None
-    min_id: Optional[Any] = None
-    max_id: Optional[Any] = None
+    min_id: Optional[int] = None
+    max_id: Optional[int] = None
     user_id: Optional[int] = None
-    min_user_id: Optional[Any] = None
-    max_user_id: Optional[Any] = None
+    min_user_id: Optional[int] = None
+    max_user_id: Optional[int] = None
     version: Optional[str] = None
     birth_date: Optional[datetime] = None
-    min_birth_date: Optional[Any] = None
-    max_birth_date: Optional[Any] = None
+    min_birth_date: Optional[datetime] = None
+    max_birth_date: Optional[datetime] = None
     launcher: Optional[str] = None
     server_source: Optional[str] = None
     private_server_experience: Optional[str] = None
@@ -213,7 +213,7 @@ class ApplicationFilter(BaseModel):
     community_projects_readiness: Optional[str] = None
     healthy_community_definition: Optional[str] = None
     ideal_server_description: Optional[str] = None
-    sections_id: Optional[Any] = None
+    sections_id: Optional[int] = None
 
 class ApplicationSort(StrEnum):
     """Enum for sorting the Application model."""

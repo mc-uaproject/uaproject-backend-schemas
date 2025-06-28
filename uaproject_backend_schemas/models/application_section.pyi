@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -42,95 +42,95 @@ class ApplicationSectionSchemas:
 class ApplicationSectionSchemaAdminUpdate(AwesomeBaseModel):
     """admin_update schema for ApplicationSection model"""
 
-    status: Optional[ServerAccessStatus]
-    reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
     server_type: Optional[ServerType]
-    section_data: Optional[dict]
+    status: Optional[ServerAccessStatus]
     reviewed_by: Optional[int]
+    reviewed_at: Optional[datetime]
+    section_data: Optional[dict]
 
 class ApplicationSectionSchemaCreate(AwesomeBaseModel):
     """create schema for ApplicationSection model"""
 
-    status: Optional[ServerAccessStatus]
-    application_id: Optional[int]
     rejection_reason: Optional[str]
     server_type: Optional[ServerType]
+    status: Optional[ServerAccessStatus]
+    application_id: Optional[int]
     section_data: Optional[dict]
 
 class ApplicationSectionSchemaRedis(AwesomeBaseModel):
     """redis schema for ApplicationSection model"""
 
-    status: Optional[ServerAccessStatus]
-    application_id: Optional[int]
     application: Optional[Application]
-    reviewed_at: Optional[datetime]
+    id: Optional[int]
     rejection_reason: Optional[str]
     server_type: Optional[ServerType]
-    updated_at: Optional[datetime]
-    section_data: Optional[dict]
-    created_at: Optional[datetime]
-    id: Optional[int]
+    status: Optional[ServerAccessStatus]
     reviewed_by: Optional[int]
+    application_id: Optional[int]
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
+    reviewed_at: Optional[datetime]
+    section_data: Optional[dict]
 
 class ApplicationSectionSchemaResponse(AwesomeBaseModel):
     """response schema for ApplicationSection model"""
 
-    status: Optional[ServerAccessStatus]
-    application_id: int
-    reviewed_at: Optional[datetime]
+    id: Optional[int]
     rejection_reason: Optional[str]
     server_type: ServerType
-    updated_at: Optional[datetime]
-    section_data: Optional[dict]
-    created_at: Optional[datetime]
-    id: Optional[int]
+    status: Optional[ServerAccessStatus]
     reviewed_by: Optional[int]
+    application_id: int
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
+    reviewed_at: Optional[datetime]
+    section_data: Optional[dict]
 
 class ApplicationSectionSchemaResponseDetailed(AwesomeBaseModel):
     """response_detailed schema for ApplicationSection model"""
 
-    status: Optional[ServerAccessStatus]
-    application_id: int
-    reviewed_at: Optional[datetime]
+    id: Optional[int]
     rejection_reason: Optional[str]
     server_type: ServerType
-    updated_at: Optional[datetime]
-    section_data: Optional[dict]
-    created_at: Optional[datetime]
-    id: Optional[int]
+    status: Optional[ServerAccessStatus]
     reviewed_by: Optional[int]
+    application_id: int
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
+    reviewed_at: Optional[datetime]
+    section_data: Optional[dict]
 
 class ApplicationSectionSchemaUpdate(AwesomeBaseModel):
     """update schema for ApplicationSection model"""
 
-    status: Optional[ServerAccessStatus]
-    reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    section_data: Optional[dict]
+    status: Optional[ServerAccessStatus]
     reviewed_by: Optional[int]
+    reviewed_at: Optional[datetime]
+    section_data: Optional[dict]
 
 class ApplicationSectionFilter(BaseModel):
     """Pydantic-class for filtering the ApplicationSection model."""
 
     updated_at: Optional[datetime] = None
-    min_updated_at: Optional[Any] = None
-    max_updated_at: Optional[Any] = None
+    min_updated_at: Optional[datetime] = None
+    max_updated_at: Optional[datetime] = None
     id: Optional[int] = None
-    min_id: Optional[Any] = None
-    max_id: Optional[Any] = None
+    min_id: Optional[int] = None
+    max_id: Optional[int] = None
     application_id: Optional[int] = None
-    min_application_id: Optional[Any] = None
-    max_application_id: Optional[Any] = None
+    min_application_id: Optional[int] = None
+    max_application_id: Optional[int] = None
     server_type: Optional[ServerType] = None
     section_data: Optional[dict] = None
     status: Optional[ServerAccessStatus] = None
     reviewed_by: Optional[int] = None
-    min_reviewed_by: Optional[Any] = None
-    max_reviewed_by: Optional[Any] = None
+    min_reviewed_by: Optional[int] = None
+    max_reviewed_by: Optional[int] = None
     reviewed_at: Optional[datetime] = None
-    min_reviewed_at: Optional[Any] = None
-    max_reviewed_at: Optional[Any] = None
+    min_reviewed_at: Optional[datetime] = None
+    max_reviewed_at: Optional[datetime] = None
     rejection_reason: Optional[str] = None
 
 class ApplicationSectionSort(StrEnum):

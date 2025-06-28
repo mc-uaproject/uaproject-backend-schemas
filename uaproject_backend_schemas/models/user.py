@@ -9,7 +9,7 @@ from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.schemas import SchemaDefinition
 from uaproject_backend_schemas.models.role import Role
-from uaproject_backend_schemas.models.user_token import Token
+from uaproject_backend_schemas.models.user_token import UserToken
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.models.application import Application
@@ -49,7 +49,7 @@ class User(AwesomeModel, IDMixin, TimestampsMixin, table=True):
         back_populates="users",
         sa_relationship_kwargs={"secondary": "user_roles"},
     )
-    token: Optional["Token"] = Relationship(
+    token: Optional["UserToken"] = Relationship(
         back_populates="user",
         sa_relationship_kwargs={
             "uselist": False,
