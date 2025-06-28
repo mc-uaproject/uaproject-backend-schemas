@@ -21,6 +21,7 @@ class File(AwesomeModel):
     checksum: Optional[str]
     checksum_type: str
     content_type: str
+    created_at: datetime
     id: int
     model_id: Optional[int]
     model_name: Optional[str]
@@ -41,7 +42,6 @@ class File(AwesomeModel):
     webhook_logs_as_request: list[WebhookLog]
     webhook_logs_as_response: list[WebhookLog]
     schemas: FileSchemas
-    scopes: FileScopes
     filter: type[FileFilter]
     sort: type[FileSort]
 
@@ -49,104 +49,94 @@ class FileSchemas:
     """Schemas for the File model."""
 
     create: FileSchemaCreate
-    update: FileSchemaUpdate
-    response: FileSchemaResponse
+    redis: FileSchemaRedis
     request_upload: FileSchemaRequestUpload
+    response: FileSchemaResponse
+    update: FileSchemaUpdate
 
 class FileSchemaCreate(AwesomeBaseModel):
     """create schema for File model"""
 
-    bucket: Optional[str]
-    path: Optional[str]
-    original_name: Optional[str]
-    content_type: Optional[str]
+    news_id: Optional[int]
     size: Optional[int]
-    checksum: Optional[str]
-    checksum_type: Optional[str]
+    model_name: Optional[str]
     user_id: Optional[int]
-    model_name: Optional[str]
+    path: Optional[str]
+    content_type: Optional[str]
     model_id: Optional[int]
+    bucket: Optional[str]
     ticket_message_id: Optional[int]
-    news_id: Optional[int]
+    checksum_type: Optional[str]
+    original_name: Optional[str]
     service_id: Optional[int]
+    checksum: Optional[str]
+
+class FileSchemaRedis(AwesomeBaseModel):
+    """redis schema for File model"""
+
+    model_name: Optional[str]
+    user_id: Optional[int]
     user: Optional[User]
     ticket_message: Optional[TicketMessage]
-    news: Optional[News]
-    service: Optional[Service]
-    webhook_logs_as_request: Optional[list[WebhookLog]]
-    webhook_logs_as_response: Optional[list[WebhookLog]]
-
-class FileSchemaUpdate(AwesomeBaseModel):
-    """update schema for File model"""
-
-    status: Optional[str]
-    checksum: Optional[str]
-
-class FileSchemaResponse(AwesomeBaseModel):
-    """response schema for File model"""
-
-    updated_at: datetime
-    id: int
-    bucket: str
-    path: str
-    original_name: str
-    content_type: str
-    size: int
-    checksum: Optional[str]
-    checksum_type: str
-    user_id: int
-    model_name: Optional[str]
-    model_id: Optional[int]
-    status: str
     uploaded_at: Optional[datetime]
-    ticket_message_id: Optional[int]
-    news_id: Optional[int]
+    bucket: Optional[str]
+    original_name: Optional[str]
     service_id: Optional[int]
-    user: Optional[User]
-    ticket_message: Optional[TicketMessage]
+    checksum_type: Optional[str]
     news: Optional[News]
+    news_id: Optional[int]
+    checksum: Optional[str]
+    webhook_logs_as_request: Optional[list[WebhookLog]]
+    size: Optional[int]
+    content_type: Optional[str]
+    webhook_logs_as_response: Optional[list[WebhookLog]]
+    updated_at: Optional[datetime]
+    ticket_message_id: Optional[int]
+    created_at: Optional[datetime]
+    status: Optional[str]
+    path: Optional[str]
+    model_id: Optional[int]
     service: Optional[Service]
-    webhook_logs_as_request: list[WebhookLog]
-    webhook_logs_as_response: list[WebhookLog]
+    id: Optional[int]
 
 class FileSchemaRequestUpload(AwesomeBaseModel):
     """request_upload schema for File model"""
 
+    id: Optional[int]
     model_name: Optional[str]
     model_id: Optional[int]
     original_name: str
     content_type: str
     size: int
 
-class FileScopes:
-    """Scopes for the File model."""
+class FileSchemaResponse(AwesomeBaseModel):
+    """response schema for File model"""
 
-    user_files: FileScopeUserFiles
-    model_files: FileScopeModelFiles
-
-class FileScopeUserFiles(AwesomeBaseModel):
-    """user_files schema for File model"""
-
-    id: int
-    bucket: str
-    path: str
-    original_name: str
-    content_type: str
-    size: int
+    news_id: Optional[int]
     status: str
-    created_at: datetime
-
-class FileScopeModelFiles(AwesomeBaseModel):
-    """model_files schema for File model"""
-
-    id: int
-    bucket: str
-    path: str
-    original_name: str
-    content_type: str
     size: int
-    status: str
-    created_at: datetime
+    model_name: Optional[str]
+    user_id: int
+    path: str
+    content_type: str
+    model_id: Optional[int]
+    uploaded_at: Optional[datetime]
+    updated_at: Optional[datetime]
+    bucket: str
+    ticket_message_id: Optional[int]
+    checksum_type: Optional[str]
+    id: Optional[int]
+    created_at: Optional[datetime]
+    original_name: str
+    service_id: Optional[int]
+    checksum: Optional[str]
+
+class FileSchemaUpdate(AwesomeBaseModel):
+    """update schema for File model"""
+
+    id: Optional[int]
+    status: Optional[str]
+    checksum: Optional[str]
 
 class FileFilter(BaseModel):
     """Pydantic-class for filtering the File model."""

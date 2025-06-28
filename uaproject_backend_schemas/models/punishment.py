@@ -6,7 +6,6 @@ from sqlmodel import JSON, BigInteger, Column, DateTime, Enum, ForeignKey, Relat
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
-from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
 from uaproject_backend_schemas.models.schemas.punishment import PunishmentStatus, PunishmentType
 
 if TYPE_CHECKING:
@@ -51,13 +50,3 @@ class Punishment(AwesomeModel, IDMixin, TimestampsMixin, table=True):
         sa_relationship_kwargs={"foreign_keys": "[Punishment.admin_id]"},
     )
     config: Optional["PunishmentConfig"] = Relationship(back_populates="punishments")
-
-    class Scopes(AwesomeModel.Scopes):
-        class Created(ScopeDefinition):
-            trigger_fields = ["created_at"]
-            fields = ["id", "user_id", "created_at"]
-            permissions = ["punishment.read"]
-
-        class StatusChanged(ScopeDefinition):
-            trigger_fields = ["status"]
-            permissions = ["punishment.read"]

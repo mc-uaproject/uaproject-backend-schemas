@@ -20,6 +20,7 @@ class TicketMessage(AwesomeModel):
     author: Optional[User]
     author_id: int
     content: str
+    created_at: datetime
     edited_at: Optional[str]
     id: int
     is_system_message: bool
@@ -27,7 +28,6 @@ class TicketMessage(AwesomeModel):
     ticket_id: int
     updated_at: datetime
     schemas: TicketMessageSchemas
-    scopes: TicketMessageScopes
     filter: type[TicketMessageFilter]
     sort: type[TicketMessageSort]
 
@@ -35,66 +35,65 @@ class TicketMessageSchemas:
     """Schemas for the TicketMessage model."""
 
     create: TicketMessageSchemaCreate
-    update: TicketMessageSchemaUpdate
+    redis: TicketMessageSchemaRedis
     response: TicketMessageSchemaResponse
     response_with_author: TicketMessageSchemaResponseWithAuthor
+    update: TicketMessageSchemaUpdate
 
 class TicketMessageSchemaCreate(AwesomeBaseModel):
     """create schema for TicketMessage model"""
 
+    attachment_file_ids: Optional[list[int]]
     ticket_id: Optional[int]
     content: Optional[str]
+
+class TicketMessageSchemaRedis(AwesomeBaseModel):
+    """redis schema for TicketMessage model"""
+
+    is_system_message: Optional[bool]
+    author_id: Optional[int]
+    edited_at: Optional[str]
     attachment_file_ids: Optional[list[int]]
     ticket: Optional[Ticket]
+    ticket_id: Optional[int]
     author: Optional[User]
     attachment_files: Optional[list[File]]
-
-class TicketMessageSchemaUpdate(AwesomeBaseModel):
-    """update schema for TicketMessage model"""
-
+    updated_at: Optional[datetime]
+    created_at: Optional[datetime]
     content: Optional[str]
+    id: Optional[int]
 
 class TicketMessageSchemaResponse(AwesomeBaseModel):
     """response schema for TicketMessage model"""
 
-    updated_at: datetime
-    id: int
-    ticket_id: int
+    is_system_message: Optional[bool]
     author_id: int
-    content: str
-    attachment_file_ids: Optional[list[int]]
-    is_system_message: bool
     edited_at: Optional[str]
-    ticket: Optional[Ticket]
-    author: Optional[User]
-    attachment_files: list[File]
+    attachment_file_ids: Optional[list[int]]
+    ticket_id: int
+    updated_at: Optional[datetime]
+    created_at: Optional[datetime]
+    content: str
+    id: Optional[int]
 
 class TicketMessageSchemaResponseWithAuthor(AwesomeBaseModel):
     """response_with_author schema for TicketMessage model"""
 
-    id: int
+    id: Optional[int]
     ticket_id: int
     author_id: int
     content: str
     attachment_file_ids: Optional[list[int]]
-    is_system_message: bool
+    is_system_message: Optional[bool]
     edited_at: Optional[str]
-    created_at: datetime
-    updated_at: datetime
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
 
-class TicketMessageScopes:
-    """Scopes for the TicketMessage model."""
+class TicketMessageSchemaUpdate(AwesomeBaseModel):
+    """update schema for TicketMessage model"""
 
-    ticket_messages: TicketMessageScopeTicketMessages
-
-class TicketMessageScopeTicketMessages(AwesomeBaseModel):
-    """ticket_messages schema for TicketMessage model"""
-
-    id: int
-    ticket_id: int
-    author_id: int
-    content: str
-    created_at: datetime
+    id: Optional[int]
+    content: Optional[str]
 
 class TicketMessageFilter(BaseModel):
     """Pydantic-class for filtering the TicketMessage model."""

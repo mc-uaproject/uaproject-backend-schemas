@@ -5,7 +5,6 @@ from sqlmodel import JSON, Column, Relationship
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
-from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.models.punishment import Punishment
@@ -23,7 +22,3 @@ class PunishmentConfig(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     config_data: Dict[str, Any] = AwesomeField(sa_column=Column(JSON, nullable=False, default={}))
 
     punishments: List["Punishment"] = Relationship(back_populates="config")
-
-    class Scopes(AwesomeModel.Scopes):
-        class Changed(ScopeDefinition):
-            permissions = ["punishment_config.read"]

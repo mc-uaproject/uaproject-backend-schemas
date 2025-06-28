@@ -16,6 +16,7 @@ from uaproject_backend_schemas.models.user import User
 class PurchasedItem(AwesomeModel):
     """Base purchaseditem model."""
 
+    created_at: datetime
     expires_at: Optional[datetime]
     id: int
     purchase_metadata: Optional[dict[str, Any]]
@@ -29,7 +30,6 @@ class PurchasedItem(AwesomeModel):
     user: Optional[User]
     user_id: int
     schemas: PurchasedItemSchemas
-    scopes: PurchasedItemScopes
     filter: type[PurchasedItemFilter]
     sort: type[PurchasedItemSort]
 
@@ -37,55 +37,62 @@ class PurchasedItemSchemas:
     """Schemas for the PurchasedItem model."""
 
     create: PurchasedItemSchemaCreate
-    update: PurchasedItemSchemaUpdate
+    redis: PurchasedItemSchemaRedis
     response: PurchasedItemSchemaResponse
+    update: PurchasedItemSchemaUpdate
 
 class PurchasedItemSchemaCreate(AwesomeBaseModel):
     """create schema for PurchasedItem model"""
 
-    user_id: Optional[int]
-    service_id: Optional[int]
     transaction_id: Optional[int]
     status: Optional[PurchasedItemStatus]
     quantity: Optional[int]
-    expires_at: Optional[datetime]
-    purchase_metadata: Optional[dict[str, Any]]
-    user: Optional[User]
-    service: Optional[Service]
-    transaction: Optional[Transaction]
-
-class PurchasedItemSchemaUpdate(AwesomeBaseModel):
-    """update schema for PurchasedItem model"""
-
     user_id: Optional[int]
+    purchase_metadata: Optional[dict[str, Any]]
+    expires_at: Optional[datetime]
     service_id: Optional[int]
+
+class PurchasedItemSchemaRedis(AwesomeBaseModel):
+    """redis schema for PurchasedItem model"""
+
     transaction_id: Optional[int]
     status: Optional[PurchasedItemStatus]
     quantity: Optional[int]
-    expires_at: Optional[datetime]
-    purchase_metadata: Optional[dict[str, Any]]
     user: Optional[User]
-    service: Optional[Service]
+    user_id: Optional[int]
+    purchase_metadata: Optional[dict[str, Any]]
     transaction: Optional[Transaction]
+    expires_at: Optional[datetime]
+    updated_at: Optional[datetime]
+    service: Optional[Service]
+    created_at: Optional[datetime]
+    id: Optional[int]
+    service_id: Optional[int]
 
 class PurchasedItemSchemaResponse(AwesomeBaseModel):
     """response schema for PurchasedItem model"""
 
-    updated_at: datetime
-    id: int
-    user_id: int
-    service_id: int
-    transaction_id: int
-    status: PurchasedItemStatus
-    quantity: int
-    expires_at: Optional[datetime]
+    transaction_id: Optional[int]
+    status: Optional[PurchasedItemStatus]
+    quantity: Optional[int]
+    user_id: Optional[int]
     purchase_metadata: Optional[dict[str, Any]]
-    user: Optional[User]
-    service: Optional[Service]
-    transaction: Optional[Transaction]
+    expires_at: Optional[datetime]
+    updated_at: Optional[datetime]
+    created_at: Optional[datetime]
+    id: Optional[int]
+    service_id: Optional[int]
 
-class PurchasedItemScopes:
-    """Scopes for the PurchasedItem model."""
+class PurchasedItemSchemaUpdate(AwesomeBaseModel):
+    """update schema for PurchasedItem model"""
+
+    transaction_id: Optional[int]
+    status: Optional[PurchasedItemStatus]
+    quantity: Optional[int]
+    user_id: Optional[int]
+    purchase_metadata: Optional[dict[str, Any]]
+    expires_at: Optional[datetime]
+    service_id: Optional[int]
 
 class PurchasedItemFilter(BaseModel):
     """Pydantic-class for filtering the PurchasedItem model."""

@@ -16,6 +16,7 @@ class ApplicationSection(AwesomeModel):
 
     application: Application
     application_id: int
+    created_at: datetime
     id: int
     rejection_reason: Optional[str]
     reviewed_at: Optional[datetime]
@@ -25,126 +26,89 @@ class ApplicationSection(AwesomeModel):
     status: ServerAccessStatus
     updated_at: datetime
     schemas: ApplicationSectionSchemas
-    scopes: ApplicationSectionScopes
     filter: type[ApplicationSectionFilter]
     sort: type[ApplicationSectionSort]
 
 class ApplicationSectionSchemas:
     """Schemas for the ApplicationSection model."""
 
-    create: ApplicationSectionSchemaCreate
-    update: ApplicationSectionSchemaUpdate
     admin_update: ApplicationSectionSchemaAdminUpdate
+    create: ApplicationSectionSchemaCreate
+    redis: ApplicationSectionSchemaRedis
     response: ApplicationSectionSchemaResponse
     response_detailed: ApplicationSectionSchemaResponseDetailed
-
-class ApplicationSectionSchemaCreate(AwesomeBaseModel):
-    """create schema for ApplicationSection model"""
-
-    application_id: Optional[int]
-    server_type: Optional[ServerType]
-    section_data: Optional[dict]
-    status: Optional[ServerAccessStatus]
-    rejection_reason: Optional[str]
-    application: Optional[Application]
-
-class ApplicationSectionSchemaUpdate(AwesomeBaseModel):
-    """update schema for ApplicationSection model"""
-
-    section_data: Optional[dict]
-    status: Optional[ServerAccessStatus]
-    reviewed_by: Optional[int]
-    reviewed_at: Optional[datetime]
-    rejection_reason: Optional[str]
-    application: Optional[Application]
+    update: ApplicationSectionSchemaUpdate
 
 class ApplicationSectionSchemaAdminUpdate(AwesomeBaseModel):
     """admin_update schema for ApplicationSection model"""
 
-    server_type: Optional[ServerType]
-    section_data: Optional[dict]
     status: Optional[ServerAccessStatus]
-    reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
+    server_type: Optional[ServerType]
+    section_data: Optional[dict]
+    reviewed_by: Optional[int]
+
+class ApplicationSectionSchemaCreate(AwesomeBaseModel):
+    """create schema for ApplicationSection model"""
+
+    status: Optional[ServerAccessStatus]
+    application_id: Optional[int]
+    rejection_reason: Optional[str]
+    server_type: Optional[ServerType]
+    section_data: Optional[dict]
+
+class ApplicationSectionSchemaRedis(AwesomeBaseModel):
+    """redis schema for ApplicationSection model"""
+
+    status: Optional[ServerAccessStatus]
+    application_id: Optional[int]
     application: Optional[Application]
+    reviewed_at: Optional[datetime]
+    rejection_reason: Optional[str]
+    server_type: Optional[ServerType]
+    updated_at: Optional[datetime]
+    section_data: Optional[dict]
+    created_at: Optional[datetime]
+    id: Optional[int]
+    reviewed_by: Optional[int]
 
 class ApplicationSectionSchemaResponse(AwesomeBaseModel):
     """response schema for ApplicationSection model"""
 
-    updated_at: datetime
-    id: int
+    status: Optional[ServerAccessStatus]
     application_id: int
-    server_type: ServerType
-    section_data: dict
-    status: ServerAccessStatus
-    reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    application: Application
+    server_type: ServerType
+    updated_at: Optional[datetime]
+    section_data: Optional[dict]
+    created_at: Optional[datetime]
+    id: Optional[int]
+    reviewed_by: Optional[int]
 
 class ApplicationSectionSchemaResponseDetailed(AwesomeBaseModel):
     """response_detailed schema for ApplicationSection model"""
 
-    updated_at: datetime
-    id: int
+    status: Optional[ServerAccessStatus]
     application_id: int
-    server_type: ServerType
-    section_data: dict
-    status: ServerAccessStatus
-    reviewed_by: Optional[int]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    application: Application
-
-class ApplicationSectionScopes:
-    """Scopes for the ApplicationSection model."""
-
-    create_own: ApplicationSectionScopeCreateOwn
-    update_own: ApplicationSectionScopeUpdateOwn
-    admin_review: ApplicationSectionScopeAdminReview
-
-class ApplicationSectionScopeCreateOwn(AwesomeBaseModel):
-    """create_own schema for ApplicationSection model"""
-
-    updated_at: datetime
-    id: int
-    application_id: int
     server_type: ServerType
-    section_data: dict
-    status: ServerAccessStatus
+    updated_at: Optional[datetime]
+    section_data: Optional[dict]
+    created_at: Optional[datetime]
+    id: Optional[int]
     reviewed_by: Optional[int]
+
+class ApplicationSectionSchemaUpdate(AwesomeBaseModel):
+    """update schema for ApplicationSection model"""
+
+    status: Optional[ServerAccessStatus]
     reviewed_at: Optional[datetime]
     rejection_reason: Optional[str]
-    application: Application
-
-class ApplicationSectionScopeUpdateOwn(AwesomeBaseModel):
-    """update_own schema for ApplicationSection model"""
-
-    updated_at: datetime
-    id: int
-    application_id: int
-    server_type: ServerType
-    section_data: dict
-    status: ServerAccessStatus
+    section_data: Optional[dict]
     reviewed_by: Optional[int]
-    reviewed_at: Optional[datetime]
-    rejection_reason: Optional[str]
-    application: Application
-
-class ApplicationSectionScopeAdminReview(AwesomeBaseModel):
-    """admin_review schema for ApplicationSection model"""
-
-    updated_at: datetime
-    id: int
-    application_id: int
-    server_type: ServerType
-    section_data: dict
-    status: ServerAccessStatus
-    reviewed_by: Optional[int]
-    reviewed_at: Optional[datetime]
-    rejection_reason: Optional[str]
-    application: Application
 
 class ApplicationSectionFilter(BaseModel):
     """Pydantic-class for filtering the ApplicationSection model."""

@@ -6,7 +6,6 @@ from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.schemas import SchemaDefinition
-from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.models.file import File
@@ -84,13 +83,3 @@ class TicketMessage(AwesomeModel, IDMixin, TimestampsMixin, table=True):
             ]
             relationships = {"author": "UserResponseSchema"}
             permissions = [".read"]
-
-    class Scopes(AwesomeModel.Scopes):
-        class TicketMessages(ScopeDefinition):
-            trigger_fields = ["ticket_id"]
-            fields = ["id", "ticket_id", "author_id", "content", "created_at"]
-            permissions = [".read"]
-
-
-if __name__ == "__main__":
-    print(TicketMessage.schemas.list())

@@ -12,8 +12,11 @@ from typing import Any, List, Type, Union, get_args, get_origin
 
 from sqlalchemy.orm import Mapped
 
+from uaproject_backend_schemas.awesome.filters import AwesomeFilters
 from uaproject_backend_schemas.awesome.model import AwesomeModel
-from uaproject_backend_schemas.awesome.utils import snake_to_camel
+from uaproject_backend_schemas.awesome.schemas import AwesomeSchemas
+from uaproject_backend_schemas.awesome.sorts import AwesomeSorts
+from uaproject_backend_schemas.awesome.utils import camel_to_snake, snake_to_camel
 
 
 def expand_wildcard_modules(module_path: str) -> List[str]:
@@ -270,7 +273,7 @@ def collect_imports_from_types(used_types, std_types, py_imports, model_cls) -> 
 def collect_imports_from_generated_content(model_cls, std_types) -> set:
     imports = set()
     all_content = []
-    for _type in [("Schema", "schemas"), ("Scope", "scopes")]:
+    for _type in [("Schema", "schemas")]:
         for schema_key in (
             getattr(model_cls, _type[1], []).list()
             if hasattr(model_cls, _type[1]) and hasattr(getattr(model_cls, _type[1]), "list")
@@ -347,32 +350,18 @@ def generate_with_permissions_method(class_name: str, all_permissions: set[str])
 def _get_schema_fields(
     model_cls: Type[AwesomeModel], schema_name: str, _type: str = "Schema"
 ) -> list[str]:
-    """Get fields for a specific schema or scope definition."""
-    if _type.lower() == "schema":
-        home = getattr(model_cls, "Schemas", None)
-    else:
-        home = getattr(model_cls, "Scopes", None)
+    """Get fields for a specific schema by using the actual generated schema."""
+    try:
+        if _type.lower() == "schema":
+            schema_instance = getattr(model_cls.schemas, schema_name)
+        else:
+            schema_instance = getattr(model_cls.scopes, schema_name)
 
-    if not home:
+        # Get fields from the actual generated schema
+        return list(schema_instance.model_fields.keys())
+    except AttributeError:
+        # Fallback if schema doesn't exist yet
         return []
-
-    definition = getattr(home, snake_to_camel(schema_name), None)
-    if not definition:
-        return []
-
-    all_fields = list(model_cls.model_fields.keys())
-
-    computed_fields = _collect_computed_fields(model_cls)
-    all_fields.extend(computed_fields.keys())
-
-    rels = _get_relationship_fields(model_cls)
-    all_fields.extend(rels)
-
-    if hasattr(definition, "fields") and definition.fields:
-        return definition.fields
-
-    excluded = getattr(definition, "fields_exclude", []) or []
-    return [f for f in all_fields if f not in excluded]
 
 
 def _get_schema_definition(
@@ -388,6 +377,70 @@ def _get_schema_definition(
         return None
 
     return getattr(home, snake_to_camel(schema_name), None)
+
+
+def _format_field_line(field_name, field_type_str, is_optional):
+    if is_optional and not field_type_str.startswith("Optional["):
+        field_type_str = f"Optional[{field_type_str}]"
+    return f"    {field_name}: {field_type_str}"
+
+
+def _get_fallback_field_lines(model_cls, schema_name, _type):
+    lines = []
+    schema_fields = _get_schema_fields(model_cls, schema_name, _type)
+    schema_definition = _get_schema_definition(model_cls, schema_name, _type)
+    optional_setting = getattr(schema_definition, "optional", None) if schema_definition else None
+    for field_name in schema_fields:
+        ann = _get_field_annotation(model_cls, field_name)
+        field_type_str = _extract_clean_type(ann)
+        is_optional = False
+        if optional_setting is True:
+            is_optional = True
+        elif isinstance(optional_setting, list) and field_name in optional_setting:
+            is_optional = True
+        lines.append(_format_field_line(field_name, field_type_str, is_optional))
+    return lines
+
+
+def _get_class_fields_for_pyi(model_cls, schema_name, permissions, _type):
+    fields = []
+    try:
+        # Get the actual generated schema instance
+        if _type.lower() == "schema":
+            schema_instance = getattr(model_cls.schemas, schema_name)
+            if permissions:
+                schema_instance = schema_instance.with_permissions(permissions)
+        else:
+            schema_instance = getattr(model_cls.scopes, schema_name)
+
+        # Extract fields from the actual schema
+        for field_name, field_info in schema_instance.model_fields.items():
+            field_type = field_info.annotation
+            field_type_str = _extract_clean_type(field_type)
+            is_optional = False
+            if hasattr(field_info, "is_required") and not field_info.is_required():
+                is_optional = True
+            elif hasattr(field_info, "required") and not field_info.required:
+                is_optional = True
+            fields.append(_format_field_line(field_name, field_type_str, is_optional))
+
+    except AttributeError:
+        # Fallback to old logic if schema doesn't exist yet
+        fields = _get_fallback_field_lines(model_cls, schema_name, _type)
+    return fields
+
+
+def _get_class_docstring_and_permissions(model_cls, schema_name, permissions, _type, class_name):
+    docstring = f'    """{schema_name} schema for {model_cls.__name__} model'
+    if permissions:
+        docstring += f" with permissions {', '.join(permissions)}"
+    docstring += '"""\n'
+    all_permissions = get_permissions_from_model(model_cls)
+    with_permissions = ""
+    if all_permissions:
+        permissions_literal = " , ".join(f'"{p}"' for p in all_permissions)
+        with_permissions = f"    def with_permissions(self, permissions: list[Literal[{permissions_literal}]]) -> {class_name}: ...\n\n"
+    return docstring, with_permissions
 
 
 def generate_class(
@@ -406,42 +459,13 @@ def generate_class(
             for p in sorted(permissions)
         )
 
-    schema_fields = _get_schema_fields(model_cls, schema_name, _type)
-    schema_definition = _get_schema_definition(model_cls, schema_name, _type)
-
-    # Get optional setting from schema definition
-    optional_setting = getattr(schema_definition, "optional", None) if schema_definition else None
-
-    fields = []
-
-    for field_name in schema_fields:
-        ann = _get_field_annotation(model_cls, field_name)
-        field_type_str = _extract_clean_type(ann)
-
-        # Apply optional logic based on schema definition
-        if optional_setting is True:
-            # All fields are optional
-            if not field_type_str.startswith("Optional["):
-                field_type_str = f"Optional[{field_type_str}]"
-        elif isinstance(optional_setting, list) and field_name in optional_setting:
-            # Specific field is optional
-            if not field_type_str.startswith("Optional["):
-                field_type_str = f"Optional[{field_type_str}]"
-
-        fields.append(f"    {field_name}: {field_type_str}")
-
-    docstring = f'    """{schema_name} schema for {model_cls.__name__} model'
-    if permissions:
-        docstring += f" with permissions {', '.join(permissions)}"
-    docstring += '"""\n'
-
+    fields = _get_class_fields_for_pyi(model_cls, schema_name, permissions, _type)
+    docstring, with_permissions = _get_class_docstring_and_permissions(
+        model_cls, schema_name, permissions, _type, class_name
+    )
     fields_str = "\n".join(fields) if fields else "    pass"
     content = f"class {class_name}(AwesomeBaseModel):\n{docstring}\n{fields_str}\n\n"
-
-    all_permissions = get_permissions_from_model(model_cls)
-    if all_permissions:
-        permissions_literal = " , ".join(f'"{p}"' for p in all_permissions)
-        content += f"    def with_permissions(self, permissions: list[Literal[{permissions_literal}]]) -> {class_name}: ...\n\n"
+    content += with_permissions
     return content
 
 
@@ -499,14 +523,34 @@ def generate_sorts_class(model_cls: Type[AwesomeModel]) -> str:
     return content
 
 
+# unwrap_optional is now replaced with AwesomeFilters._unwrap_optional
 def unwrap_optional(ann):
-    origin = get_origin(ann)
-    if origin is Union:
-        args = [a for a in get_args(ann) if a is not type(None)]
-        if args:
-            return args[0]
-        return ann
-    return ann
+    """Wrapper for AwesomeFilters._unwrap_optional for backward compatibility."""
+    return AwesomeFilters._unwrap_optional(ann)
+
+
+def _get_filter_class_for_model(model_cls: Type[AwesomeModel]):
+    """Helper function to get filter class for a model, eliminating duplication."""
+    filters_cls = type(f"{model_cls.__name__}Filters", (AwesomeFilters,), {"model_cls": model_cls})
+    return filters_cls.get_pydantic_filter_class()
+
+
+def _get_sort_class_for_model(model_cls: Type[AwesomeModel]):
+    """Helper function to get sort class for a model, eliminating duplication."""
+    sorts_cls = type(f"{model_cls.__name__}Sorts", (AwesomeSorts,), {"model_cls": model_cls})
+    return sorts_cls.get_enum_sort_class()
+
+
+def _get_computed_field_names(model_cls: Type[AwesomeModel]) -> list[str]:
+    """Get computed field names using AwesomeSchemas logic."""
+    # Get all fields
+    all_fields = AwesomeSchemas._get_all_fields(model_cls, include_relationships=False)
+    # Get regular model fields
+    regular_fields = list(model_cls.model_fields.keys())
+    # Return computed fields (fields that are in all_fields but not in model_fields)
+    return [
+        field for field in all_fields if field not in regular_fields and not field.endswith("_id")
+    ]
 
 
 def generate_filter_class(model_cls: Type[AwesomeModel], filter_cls=None) -> str:
@@ -562,11 +606,15 @@ def collect_additional_imports(generated_content: str) -> set[str]:
 
 
 def _get_relationship_fields(model_cls: Type[AwesomeModel]) -> list[str]:
-    rels = []
-    for name in getattr(model_cls, "__annotations__", {}):
-        if name not in model_cls.model_fields:
-            rels.append(name)
-    return rels
+    """Get relationship fields using AwesomeSchemas logic."""
+    # Get all fields including relationships
+    all_fields_with_relationships = AwesomeSchemas._get_all_fields(
+        model_cls, include_relationships=True
+    )
+    # Get regular fields without relationships
+    regular_fields = AwesomeSchemas._get_all_fields(model_cls, include_relationships=False)
+    # Return only the relationship fields
+    return [field for field in all_fields_with_relationships if field not in regular_fields]
 
 
 def _extract_clean_type(ann: Any) -> str:
@@ -608,13 +656,6 @@ def _extract_clean_type(ann: Any) -> str:
     return f"{origin_name}[{inner_types}]"
 
 
-def camel_to_snake(name):
-    import re
-
-    s1 = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
-    return re.sub("([a-z0-9])([A-Z])", r"\1_\2", s1).lower()
-
-
 def get_all_subclasses(cls):
     """Recursively get all subclasses of a class."""
     subclasses = set()
@@ -630,6 +671,7 @@ MODEL_IMPORT_OVERRIDES = {
 
 
 def _collect_computed_fields(cls: Type[AwesomeModel]) -> dict[str, Any]:
+    """Get computed field objects (not just names). Used for type annotation extraction."""
     fields = {}
     for base in cls.__mro__:
         if not inspect.isclass(base) or not issubclass(base, AwesomeModel):
@@ -643,7 +685,7 @@ def _collect_computed_fields(cls: Type[AwesomeModel]) -> dict[str, Any]:
 def _generate_model_fields(model_cls: Type[AwesomeModel]) -> str:
     lines = []
     all_field_names = list(model_cls.model_fields.keys())
-    all_field_names.extend(_collect_computed_fields(model_cls).keys())
+    all_field_names.extend(_get_computed_field_names(model_cls))
     all_field_names.extend(_get_relationship_fields(model_cls))
 
     # Use a set to avoid duplicate fields from inheritance
@@ -658,9 +700,9 @@ def _generate_model_fields(model_cls: Type[AwesomeModel]) -> str:
 def _generate_schema_and_scope_sections(
     model_cls: Type[AwesomeModel], permissions: set[str]
 ) -> str:
-    """Generates schema and scope class definitions for the model."""
+    """Generates schema class definitions for the model."""
     content = ""
-    for _type in ["schemas", "scopes"]:
+    for _type in ["schemas"]:
         _type_instance = getattr(model_cls, _type, None)
 
         content += f"class {model_cls.__name__}{_type.capitalize()}:\n"
@@ -669,20 +711,41 @@ def _generate_schema_and_scope_sections(
         if not _type_instance:
             raise ValueError(f"No {_type[:-1]} found for {model_cls.__name__}")
 
-        for _type_key in _type_instance.list():
-            base_schema = (
-                f"{model_cls.__name__}{_type.capitalize()[:-1]}{snake_to_camel(_type_key)}"
-            )
-            content += f"    {_type_key}: {base_schema}\n"
+        type_list = _type_instance.list()
+
+        if type_list:  # Only process if there are items in the list
+            # Import once at the beginning
+            from uaproject_backend_schemas.awesome.utils import snake_to_camel
+
+            for _type_key in type_list:
+                # Try to get the schema class using snake_case name first,
+                # then try PascalCase if that fails
+                try:
+                    schema_class = getattr(_type_instance, _type_key)
+                except AttributeError:
+                    # Convert snake_case to PascalCase and try again
+                    pascal_name = snake_to_camel(_type_key)
+                    schema_class = getattr(_type_instance, pascal_name)
+
+                # For scopes, use generated class name; for schemas, use actual class name
+                if _type == "scopes":
+                    # Generate the expected class name for scopes
+                    camel_name = snake_to_camel(_type_key)
+                    base_schema = f"{model_cls.__name__}{_type.capitalize()[:-1]}{camel_name}"
+                else:
+                    # Use the actual class name for schemas
+                    base_schema = schema_class.__name__
+                content += f"    {_type_key}: {base_schema}\n"
 
         content += "\n"
 
-        for _type_key in _type_instance.list():
-            content += generate_class(model_cls, _type_key, _type=_type.capitalize()[:-1])
-            for perm in permissions:
-                content += generate_class(
-                    model_cls, _type_key, [perm], _type=_type.capitalize()[:-1]
-                )
+        if type_list:  # Only generate classes if there are items
+            for _type_key in type_list:
+                content += generate_class(model_cls, _type_key, _type=_type.capitalize()[:-1])
+                for perm in permissions:
+                    content += generate_class(
+                        model_cls, _type_key, [perm], _type=_type.capitalize()[:-1]
+                    )
     return content
 
 
@@ -707,10 +770,7 @@ def _generate_filter_section(model_cls: Type[AwesomeModel]) -> str:
     ):
         content += generate_filters_class(model_cls)
 
-    from uaproject_backend_schemas.awesome.filters import AwesomeFilters
-
-    filters_cls = type(f"{model_cls.__name__}Filters", (AwesomeFilters,), {"model_cls": model_cls})
-    filter_obj = filters_cls.get_pydantic_filter_class()
+    filter_obj = _get_filter_class_for_model(model_cls)
 
     if filter_obj and hasattr(filter_obj, "model_fields") and bool(filter_obj.model_fields):
         content += generate_filter_class(model_cls, filter_obj)
@@ -728,10 +788,7 @@ def _generate_sort_section(model_cls: Type[AwesomeModel]) -> str:
     ):
         content += generate_sorts_class(model_cls)
 
-    from uaproject_backend_schemas.awesome.sorts import AwesomeSorts
-
-    sorts_cls = type(f"{model_cls.__name__}Sorts", (AwesomeSorts,), {"model_cls": model_cls})
-    sort_obj = sorts_cls.get_enum_sort_class()
+    sort_obj = _get_sort_class_for_model(model_cls)
 
     if sort_obj and hasattr(sort_obj, "__members__") and bool(sort_obj.__members__):
         content += generate_sort_enum(model_cls, sort_obj)
@@ -756,7 +813,6 @@ def build_main_content(model_cls: Type[AwesomeModel], permissions: set[str]) -> 
     main_content += f'    """Base {model_cls.__name__.lower()} model."""\n'
     main_content += model_fields_str
     main_content += f"    schemas: {model_cls.__name__}Schemas\n"
-    main_content += f"    scopes: {model_cls.__name__}Scopes\n"
     if (
         hasattr(model_cls, "filters")
         and model_cls.filters
@@ -772,23 +828,13 @@ def build_main_content(model_cls: Type[AwesomeModel], permissions: set[str]) -> 
     ):
         main_content += f"    sorts: {model_cls.__name__}Sorts\n"
 
-    # Check for Pydantic filter class - force regeneration to avoid cache issues
-    from uaproject_backend_schemas.awesome.filters import AwesomeFilters
-
-    # Create fresh filters instance for this model
-    filters_cls = type(f"{model_cls.__name__}Filters", (AwesomeFilters,), {"model_cls": model_cls})
-    filter_obj = filters_cls.get_pydantic_filter_class()
-
+    # Check for Pydantic filter class
+    filter_obj = _get_filter_class_for_model(model_cls)
     if filter_obj and hasattr(filter_obj, "model_fields") and bool(filter_obj.model_fields):
         main_content += f"    filter: type[{model_cls.__name__}Filter]\n"
 
-    # Check for sort enum - force regeneration to avoid cache issues
-    from uaproject_backend_schemas.awesome.sorts import AwesomeSorts
-
-    # Create fresh sorts instance for this model
-    sorts_cls = type(f"{model_cls.__name__}Sorts", (AwesomeSorts,), {"model_cls": model_cls})
-    sort_obj = sorts_cls.get_enum_sort_class()
-
+    # Check for sort enum
+    sort_obj = _get_sort_class_for_model(model_cls)
     if sort_obj and hasattr(sort_obj, "__members__") and bool(sort_obj.__members__):
         main_content += f"    sort: type[{model_cls.__name__}Sort]\n"
     main_content += "\n"
@@ -805,7 +851,7 @@ def generate_pyi_for_model(model_cls: Type[AwesomeModel], module_path: str) -> s
     permissions = get_permissions_from_model(model_cls)
 
     all_field_names = list(model_cls.model_fields.keys())
-    all_field_names.extend(_collect_computed_fields(model_cls).keys())
+    all_field_names.extend(_get_computed_field_names(model_cls))
     all_field_names.extend(_get_relationship_fields(model_cls))
     all_field_names = list(set(all_field_names))
 

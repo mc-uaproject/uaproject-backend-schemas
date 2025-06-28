@@ -7,7 +7,6 @@ from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.schemas import SchemaDefinition
-from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
 from uaproject_backend_schemas.models.schemas.server import ServerAccessStatus, ServerType
 
 if TYPE_CHECKING:
@@ -68,16 +67,3 @@ class ApplicationSection(AwesomeModel, IDMixin, TimestampsMixin, table=True):
 
         class ResponseDetailed(SchemaDefinition):
             pass
-
-    class Scopes(AwesomeModel.Scopes):
-        class CreateOwn(ScopeDefinition):
-            description = "Create application sections for own applications"
-            permissions = [".create.self"]
-
-        class UpdateOwn(ScopeDefinition):
-            description = "Update own application sections"
-            permissions = [".update.self"]
-
-        class AdminReview(ScopeDefinition):
-            description = "Review and manage application sections"
-            permissions = [".update.admin", ".read.admin"]

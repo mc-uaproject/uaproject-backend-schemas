@@ -8,7 +8,6 @@ from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.schemas import SchemaDefinition
-from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
 from uaproject_backend_schemas.models.schemas.server import ServerAccessStatus, ServerType
 
 if TYPE_CHECKING:
@@ -46,6 +45,7 @@ EVERVAULT_EDITABLE_FIELDS = [
     "healthy_community_definition",
     "ideal_server_description",
 ]
+
 
 class Application(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "applications"
@@ -174,19 +174,6 @@ class Application(AwesomeModel, IDMixin, TimestampsMixin, table=True):
 
         class Response(SchemaDefinition):
             permissions = [".read"]
-
-    class Scopes(AwesomeModel.Scopes):
-        # REMOVED: Status scope - status moved to ApplicationSection
-
-        class EditableFields(ScopeDefinition):
-            trigger_fields = ["editable_fields"]
-            fields = ["id", "user_id", "editable_fields"]
-            permissions = ["read"]
-
-        class Form(ScopeDefinition):
-            trigger_fields = DEFAULT_EDITABLE_FIELDS
-            fields = ["id", "user_id", *DEFAULT_EDITABLE_FIELDS]
-            permissions = ["read"]
 
     @model_validator(mode="after")
     def validate_fields(self):

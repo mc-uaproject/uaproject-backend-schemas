@@ -18,6 +18,7 @@ class News(AwesomeModel):
     author: Optional[User]
     author_id: int
     content: str
+    created_at: datetime
     discord_message_id: Optional[str]
     event_time: Optional[datetime]
     id: int
@@ -33,7 +34,6 @@ class News(AwesomeModel):
     type: NewsType
     updated_at: datetime
     schemas: NewsSchemas
-    scopes: NewsScopes
     filter: type[NewsFilter]
     sort: type[NewsSort]
 
@@ -42,62 +42,99 @@ class NewsSchemas:
 
     create: NewsSchemaCreate
     publish: NewsSchemaPublish
-    update_meta: NewsSchemaUpdateMeta
+    redis: NewsSchemaRedis
     response: NewsSchemaResponse
+    update: NewsSchemaUpdate
+    update_meta: NewsSchemaUpdateMeta
 
 class NewsSchemaCreate(AwesomeBaseModel):
     """create schema for News model"""
 
-    title: Optional[str]
-    summary: Optional[str]
-    content: Optional[str]
-    discord_message_id: Optional[str]
-    telegram_message_id: Optional[str]
-    tags: Optional[list[str]]
     event_time: Optional[datetime]
-    is_pinned: Optional[bool]
-    is_archived: Optional[bool]
-    type: Optional[NewsType]
     importance: Optional[ImportanceType]
-    author: Optional[User]
-    images: Optional[list[File]]
+    tags: Optional[list[str]]
+    discord_message_id: Optional[str]
+    is_pinned: Optional[bool]
+    telegram_message_id: Optional[str]
+    is_archived: Optional[bool]
+    title: Optional[str]
+    type: Optional[NewsType]
+    content: Optional[str]
+    summary: Optional[str]
 
 class NewsSchemaPublish(AwesomeBaseModel):
     """publish schema for News model"""
 
-    is_published: bool
+    id: Optional[int]
+    is_published: Optional[bool]
 
-class NewsSchemaUpdateMeta(AwesomeBaseModel):
-    """update_meta schema for News model"""
+class NewsSchemaRedis(AwesomeBaseModel):
+    """redis schema for News model"""
 
-    is_pinned: bool
-    is_archived: bool
-    type: NewsType
-    importance: ImportanceType
+    images: Optional[list[File]]
+    author_id: Optional[int]
+    event_time: Optional[datetime]
+    importance: Optional[ImportanceType]
+    tags: Optional[list[str]]
+    discord_message_id: Optional[str]
+    is_published: Optional[bool]
+    author: Optional[User]
+    updated_at: Optional[datetime]
+    is_pinned: Optional[bool]
+    telegram_message_id: Optional[str]
+    is_archived: Optional[bool]
+    title: Optional[str]
+    type: Optional[NewsType]
+    content: Optional[str]
+    id: Optional[int]
+    created_at: Optional[datetime]
+    summary: Optional[str]
 
 class NewsSchemaResponse(AwesomeBaseModel):
     """response schema for News model"""
 
-    updated_at: datetime
-    id: int
-    title: str
-    summary: Optional[str]
-    content: str
-    is_published: bool
     author_id: int
-    discord_message_id: Optional[str]
-    telegram_message_id: Optional[str]
-    tags: list[str]
     event_time: Optional[datetime]
-    is_pinned: bool
-    is_archived: bool
+    importance: ImportanceType
+    tags: list[str]
+    discord_message_id: Optional[str]
+    is_published: Optional[bool]
+    updated_at: Optional[datetime]
+    is_pinned: Optional[bool]
+    telegram_message_id: Optional[str]
+    is_archived: Optional[bool]
+    title: str
+    type: NewsType
+    content: str
+    id: Optional[int]
+    created_at: Optional[datetime]
+    summary: Optional[str]
+
+class NewsSchemaUpdate(AwesomeBaseModel):
+    """update schema for News model"""
+
+    author_id: Optional[int]
+    event_time: Optional[datetime]
+    importance: Optional[ImportanceType]
+    tags: Optional[list[str]]
+    discord_message_id: Optional[str]
+    is_published: Optional[bool]
+    is_pinned: Optional[bool]
+    telegram_message_id: Optional[str]
+    is_archived: Optional[bool]
+    title: Optional[str]
+    type: Optional[NewsType]
+    content: Optional[str]
+    summary: Optional[str]
+
+class NewsSchemaUpdateMeta(AwesomeBaseModel):
+    """update_meta schema for News model"""
+
+    id: Optional[int]
+    is_pinned: Optional[bool]
+    is_archived: Optional[bool]
     type: NewsType
     importance: ImportanceType
-    author: Optional[User]
-    images: list[File]
-
-class NewsScopes:
-    """Scopes for the News model."""
 
 class NewsFilter(BaseModel):
     """Pydantic-class for filtering the News model."""

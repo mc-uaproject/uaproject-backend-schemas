@@ -6,7 +6,6 @@ from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.schemas import SchemaDefinition
-from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
 from uaproject_backend_schemas.models.schemas.ticket import TicketPriority, TicketStatus
 
 if TYPE_CHECKING:
@@ -88,24 +87,3 @@ class Ticket(AwesomeModel, IDMixin, TimestampsMixin, table=True):
 
         class ResponseSelf(SchemaDefinition):
             permissions = [".read.self"]
-
-    class Scopes(AwesomeModel.Scopes):
-        class Status(ScopeDefinition):
-            trigger_fields = ["status"]
-            fields = ["id", "author_id", "assigned_to_id", "status"]
-            permissions = ["read"]
-
-        class Priority(ScopeDefinition):
-            trigger_fields = ["priority"]
-            fields = ["id", "priority"]
-            permissions = ["read"]
-
-        class Assignment(ScopeDefinition):
-            trigger_fields = ["assigned_to_id"]
-            fields = ["id", "author_id", "assigned_to_id"]
-            permissions = ["read"]
-
-
-if __name__ == "__main__":
-    print(Ticket.schemas.list())
-    print(Ticket.sort)

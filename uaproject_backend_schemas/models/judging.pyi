@@ -16,6 +16,7 @@ class Judging(AwesomeModel):
     """Base judging model."""
 
     claims: list[Claim]
+    created_at: datetime
     decision: str
     id: int
     judge: Optional[User]
@@ -23,7 +24,6 @@ class Judging(AwesomeModel):
     updated_at: datetime
     verdict: JudgingVerdict
     schemas: JudgingSchemas
-    scopes: JudgingScopes
     filter: type[JudgingFilter]
     sort: type[JudgingSort]
 
@@ -31,6 +31,7 @@ class JudgingSchemas:
     """Schemas for the Judging model."""
 
     create: JudgingSchemaCreate
+    redis: JudgingSchemaRedis
     response: JudgingSchemaResponse
     update: JudgingSchemaUpdate
 
@@ -41,25 +42,34 @@ class JudgingSchemaCreate(AwesomeBaseModel):
     verdict: JudgingVerdict
     judge_id: int
 
+class JudgingSchemaRedis(AwesomeBaseModel):
+    """redis schema for Judging model"""
+
+    verdict: Optional[JudgingVerdict]
+    judge: Optional[User]
+    decision: Optional[str]
+    judge_id: Optional[int]
+    claims: Optional[list[Claim]]
+    updated_at: Optional[datetime]
+    created_at: Optional[datetime]
+    id: Optional[int]
+
 class JudgingSchemaResponse(AwesomeBaseModel):
     """response schema for Judging model"""
 
-    updated_at: datetime
-    id: int
-    judge_id: int
-    decision: str
     verdict: JudgingVerdict
-    judge: Optional[User]
-    claims: list[Claim]
+    decision: str
+    judge_id: int
+    updated_at: Optional[datetime]
+    created_at: Optional[datetime]
+    id: Optional[int]
 
 class JudgingSchemaUpdate(AwesomeBaseModel):
     """update schema for Judging model"""
 
+    id: Optional[int]
     decision: Optional[str]
     verdict: Optional[JudgingVerdict]
-
-class JudgingScopes:
-    """Scopes for the Judging model."""
 
 class JudgingFilter(BaseModel):
     """Pydantic-class for filtering the Judging model."""

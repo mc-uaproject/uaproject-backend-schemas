@@ -16,6 +16,7 @@ class Claim(AwesomeModel):
     """Base claim model."""
 
     claimants: list[User]
+    created_at: datetime
     defendants: list[User]
     description: str
     id: int
@@ -25,7 +26,6 @@ class Claim(AwesomeModel):
     title: str
     updated_at: datetime
     schemas: ClaimSchemas
-    scopes: ClaimScopes
     filter: type[ClaimFilter]
     sort: type[ClaimSort]
 
@@ -33,6 +33,7 @@ class ClaimSchemas:
     """Schemas for the Claim model."""
 
     create: ClaimSchemaCreate
+    redis: ClaimSchemaRedis
     response: ClaimSchemaResponse
     update: ClaimSchemaUpdate
 
@@ -41,31 +42,41 @@ class ClaimSchemaCreate(AwesomeBaseModel):
 
     title: str
     description: str
-    claimants: list[User]
-    defendants: list[User]
+    claimants: Optional[list[User]]
+    defendants: Optional[list[User]]
+
+class ClaimSchemaRedis(AwesomeBaseModel):
+    """redis schema for Claim model"""
+
+    judging: Optional[Judging]
+    status: Optional[ClaimStatus]
+    judging_id: Optional[int]
+    claimants: Optional[list[User]]
+    updated_at: Optional[datetime]
+    defendants: Optional[list[User]]
+    title: Optional[str]
+    description: Optional[str]
+    id: Optional[int]
+    created_at: Optional[datetime]
 
 class ClaimSchemaResponse(AwesomeBaseModel):
     """response schema for Claim model"""
 
-    updated_at: datetime
-    id: int
-    title: str
-    description: str
     status: ClaimStatus
     judging_id: Optional[int]
-    claimants: list[User]
-    defendants: list[User]
-    judging: Optional[Judging]
+    updated_at: Optional[datetime]
+    title: str
+    description: str
+    id: Optional[int]
+    created_at: Optional[datetime]
 
 class ClaimSchemaUpdate(AwesomeBaseModel):
     """update schema for Claim model"""
 
+    id: Optional[int]
     title: Optional[str]
     description: Optional[str]
     status: Optional[ClaimStatus]
-
-class ClaimScopes:
-    """Scopes for the Claim model."""
 
 class ClaimFilter(BaseModel):
     """Pydantic-class for filtering the Claim model."""

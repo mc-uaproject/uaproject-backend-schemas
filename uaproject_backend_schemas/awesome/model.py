@@ -11,7 +11,6 @@ from .events import AwesomeEvents
 from .fields import AwesomeFieldInfo
 from .filters import AwesomeFilters
 from .schemas import AwesomeSchemas
-from .scopes import AwesomeScopes
 from .sorts import AwesomeSorts
 
 T = TypeVar("T")
@@ -29,24 +28,17 @@ def classproperty(fget: Callable[[Type[Any]], T]) -> T:
 
 
 class AwesomeModel(SQLModel):
-    """Base model class extending SQLModel to support Scopes, Schemas, Actions and Events."""
-
-    class Scopes(AwesomeScopes):
-        """Nested Scopes class - defines specific ScopeDefinition inside it."""
-
-        pass
+    """Base model class extending SQLModel to support Schemas, Actions and Events."""
 
     class Schemas(AwesomeSchemas):
         """Nested Schemas class - allows defining SchemaDefinition or Pydantic models inside it."""
 
         pass
 
-    __scopes__: ClassVar[Optional[Type[AwesomeScopes]]] = None
     __schemas__: ClassVar[Optional[AwesomeSchemas]] = None
     actions: ClassVar[AwesomeActions]
     events: ClassVar[AwesomeEvents]
     model_fields: ClassVar[dict[str, AwesomeFieldInfo]]
-    scopes: ClassVar
     schemas: ClassVar
     filters: ClassVar
     filter: ClassVar
@@ -102,18 +94,6 @@ class AwesomeModel(SQLModel):
         for field_perms in field_permissions_gen:
             permissions.update(field_perms)
         return permissions
-
-    @classproperty
-    def scopes(cls) -> None | AwesomeScopes | Type[AwesomeScopes]:
-        """Get Scopes instance."""
-        cache_key = cls._get_cache_key("scopes")
-        if cache_key not in cls._property_cache:
-            scope_cls = getattr(cls, "Scopes", None)
-            if scope_cls:
-                cls._property_cache[cache_key] = scope_cls(cls)
-            else:
-                cls._property_cache[cache_key] = None
-        return cls._property_cache[cache_key]
 
     @classproperty
     def schemas(cls) -> AwesomeSchemas | Type[AwesomeSchemas]:
@@ -224,7 +204,7 @@ class AwesomeModel(SQLModel):
         return sorts_cls.get_enum_sort_class()
 
     def __init_subclass__(cls, **kwargs):
-        """Initialize Scopes, Schemas, Actions, Events subsystems when creating a subclass."""
+        """Initialize Schemas, Actions, Events subsystems when creating a subclass."""
         super().__init_subclass__(**kwargs)
         cls.actions = AwesomeActions(cls)
         cls.events = AwesomeEvents(cls)

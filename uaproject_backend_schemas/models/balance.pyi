@@ -16,13 +16,13 @@ class Balance(AwesomeModel):
     """Base balance model."""
 
     amount: Decimal
+    created_at: datetime
     id: int
     identifier: UUID
     updated_at: datetime
     user: User
     user_id: int
     schemas: BalanceSchemas
-    scopes: BalanceScopes
     filter: type[BalanceFilter]
     sort: type[BalanceSort]
 
@@ -30,52 +30,52 @@ class BalanceSchemas:
     """Schemas for the Balance model."""
 
     create: BalanceSchemaCreate
-    update: BalanceSchemaUpdate
+    redis: BalanceSchemaRedis
     response: BalanceSchemaResponse
     response_self: BalanceSchemaResponseSelf
+    update: BalanceSchemaUpdate
 
 class BalanceSchemaCreate(AwesomeBaseModel):
     """create schema for Balance model"""
 
-    amount: Decimal
-    user: User
+    amount: Optional[Decimal]
 
-class BalanceSchemaUpdate(AwesomeBaseModel):
-    """update schema for Balance model"""
+class BalanceSchemaRedis(AwesomeBaseModel):
+    """redis schema for Balance model"""
 
-    amount: Decimal
+    user: Optional[User]
+    user_id: Optional[int]
+    identifier: Optional[UUID]
+    amount: Optional[Decimal]
+    updated_at: Optional[datetime]
+    created_at: Optional[datetime]
+    id: Optional[int]
 
 class BalanceSchemaResponse(AwesomeBaseModel):
     """response schema for Balance model"""
 
-    updated_at: datetime
-    id: int
     user_id: int
-    identifier: UUID
-    amount: Decimal
-    user: User
+    identifier: Optional[UUID]
+    amount: Optional[Decimal]
+    updated_at: Optional[datetime]
+    created_at: Optional[datetime]
+    id: Optional[int]
 
 class BalanceSchemaResponseSelf(AwesomeBaseModel):
     """response_self schema for Balance model"""
 
-    updated_at: datetime
-    id: int
     user_id: int
-    identifier: UUID
-    amount: Decimal
-    user: User
+    identifier: Optional[UUID]
+    amount: Optional[Decimal]
+    updated_at: Optional[datetime]
+    created_at: Optional[datetime]
+    id: Optional[int]
 
-class BalanceScopes:
-    """Scopes for the Balance model."""
+class BalanceSchemaUpdate(AwesomeBaseModel):
+    """update schema for Balance model"""
 
-    amount: BalanceScopeAmount
-
-class BalanceScopeAmount(AwesomeBaseModel):
-    """amount schema for Balance model"""
-
-    id: int
-    user_id: int
-    amount: Decimal
+    id: Optional[int]
+    amount: Optional[Decimal]
 
 class BalanceFilter(BaseModel):
     """Pydantic-class for filtering the Balance model."""

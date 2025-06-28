@@ -7,7 +7,7 @@ from pydantic import BaseModel, create_model
 
 from .base_model import AwesomeBaseModel
 from .fields import AwesomeFieldInfo
-from .utils import camel_to_snake
+from .utils import camel_to_snake, snake_to_camel
 
 if TYPE_CHECKING:
     from .model import AwesomeModel
@@ -44,11 +44,16 @@ class FieldsDefinitionBase:
 
 class SchemaDefinition(FieldsDefinitionBase):
     optional: Optional[bool | List[str]] = None
+    relationships: Optional[bool | Dict[str, str] | List[str] | tuple] = None
 
-    def __init__(self, fields=None, fields_exclude=None, optional=None, permissions=None):
+    def __init__(
+        self, fields=None, fields_exclude=None, optional=None, permissions=None, relationships=None
+    ):
         super().__init__(fields=fields, fields_exclude=fields_exclude, permissions=permissions)
         if optional is not None:
             self.optional = optional
+        if relationships is not None:
+            self.relationships = relationships
 
 
 class AwesomeSchemas:
@@ -72,92 +77,81 @@ class AwesomeSchemas:
         else:
             raise AttributeError(f"Model {self.model_cls.__name__} has no attribute {home}")
 
-        has_custom_schemas = any(
-            hasattr(self._home, attr)
-            and inspect.isclass(getattr(self._home, attr))
-            and (
-                issubclass(getattr(self._home, attr), self._definition)
-                or issubclass(getattr(self._home, attr), AwesomeBaseModel)
-            )
-            for attr in dir(self._home)
-            if not attr.startswith("_") and attr not in ["get", "list", "with_permissions"]
-        )
+        # Always create default schemas if they don't exist
+        # Custom schemas will override these defaults
 
-        if has_custom_schemas:
-            return
+        if not hasattr(self._home, "Create"):
 
-        try:
-            if not hasattr(self._home, "Create"):
+            class Create(SchemaDefinition):
+                fields_exclude = ["id", "created_at", "updated_at"]
+                optional = True
+                permissions = [".write"]
 
-                class Create(SchemaDefinition):
-                    fields_exclude = ["id", "created_at", "updated_at"]
-                    optional = True
-                    permissions = [".write"]
+            setattr(self._home, "Create", Create)
 
-                setattr(self._home, "Create", Create)
+        if not hasattr(self._home, "Update"):
 
-            if not hasattr(self._home, "Update"):
+            class Update(SchemaDefinition):
+                fields_exclude = ["id", "created_at", "updated_at"]
+                optional = True
+                permissions = [".write"]
 
-                class Update(SchemaDefinition):
-                    fields_exclude = ["id", "created_at", "updated_at"]
-                    optional = True
-                    permissions = [".write"]
+            setattr(self._home, "Update", Update)
 
-                setattr(self._home, "Update", Update)
+        if not hasattr(self._home, "Response"):
 
-            if not hasattr(self._home, "Response"):
+            class Response(SchemaDefinition):
+                permissions = [".read"]
 
-                class Response(SchemaDefinition):
-                    permissions = [".read"]
+            setattr(self._home, "Response", Response)
 
-                setattr(self._home, "Response", Response)
-        except Exception:
-            if not hasattr(self._home, "Create"):
+        if not hasattr(self._home, "Redis"):
 
-                class Create(SchemaDefinition):
-                    fields_exclude = ["id", "created_at", "updated_at"]
-                    optional = True
+            class Redis(SchemaDefinition):
+                optional = True
+                relationships = True
 
-                setattr(self._home, "Create", Create)
-
-            if not hasattr(self._home, "Update"):
-
-                class Update(SchemaDefinition):
-                    fields_exclude = ["id", "created_at", "updated_at"]
-                    optional = True
-
-                setattr(self._home, "Update", Update)
-
-            if not hasattr(self._home, "Response"):
-
-                class Response(SchemaDefinition):
-                    pass
-
-                setattr(self._home, "Response", Response)
+            setattr(self._home, "Redis", Redis)
 
     def __iter__(self) -> Iterator[str]:
         return iter(self.model_cls.schemas.list())
 
     @classmethod
-    def _get_all_fields(cls, model_cls: Type[TModel]) -> List[str]:
-        """Get all model fields including computed fields."""
-        fields = []
+    def _get_all_fields(
+        cls, model_cls: Type[TModel], include_relationships: bool = False
+    ) -> List[str]:
+        """Get all model fields including computed fields. If include_relationships=True, also includes relationship fields."""
+        fields = set()
 
         if hasattr(model_cls, "model_fields"):
-            fields.extend(model_cls.model_fields.keys())
+            fields.update(model_cls.model_fields.keys())
         else:
-            fields.extend(model_cls.__annotations__.keys())
+            fields.update(model_cls.__annotations__.keys())
 
         if hasattr(model_cls, "model_computed_fields"):
-            fields.extend(model_cls.model_computed_fields.keys())
+            fields.update(model_cls.model_computed_fields.keys())
         else:
             for name, value in inspect.getmembers(model_cls):
                 if isinstance(value, property) and getattr(value, "__computed_field__", False):
-                    fields.append(name)
+                    fields.add(name)
 
-        return fields
+        if include_relationships:
+            # Add relationship fields
+            for name, value in inspect.getmembers(model_cls):
+                if hasattr(value, "__class__") and value.__class__.__name__ in (
+                    "RelationshipProperty",
+                    "InstrumentedAttribute",
+                ):
+                    # Additional check to ensure it's a relationship and not a regular column
+                    if hasattr(model_cls, "__table__") and hasattr(model_cls.__table__.c, name):
+                        continue  # Skip regular columns
+                    fields.add(name)
 
-    def _get_schema_fields(self, model_cls: Type[TModel], schema_name: str) -> List[str]:
+        return list(fields)
+
+    def _get_schema_fields(
+        self, model_cls: Type[TModel], schema_name: str, include_relationships: bool = False
+    ) -> List[str]:
         """Get fields from schema."""
         schema_cls = None
         for attr in dir(model_cls.Schemas):
@@ -167,7 +161,7 @@ class AwesomeSchemas:
         if schema_cls is None:
             raise AttributeError(f"Schema '{schema_name}' not found")
 
-        all_fields = self._get_all_fields(model_cls)
+        all_fields = self._get_all_fields(model_cls, include_relationships)
         if inspect.isclass(schema_cls) and issubclass(schema_cls, AwesomeBaseModel):
             return (
                 list(schema_cls.model_fields.keys())
@@ -267,7 +261,7 @@ class AwesomeSchemas:
         )
         filtered_fields = self._filter_fields_by_permissions(field_definitions, optional)
 
-        schema_class_name = f"{self.model_cls.__name__}{name.capitalize()}Schema"
+        schema_class_name = f"{self.model_cls.__name__}Schema{snake_to_camel(name)}"
         if permissions:
             schema_class_name += "WithPermissions"
 
@@ -295,9 +289,7 @@ class AwesomeSchemas:
             if origin in (list, List):
                 return (
                     field_type,
-                    AwesomeFieldInfo(
-                        annotation=field_type, required=False, default_factory=list
-                    ),
+                    AwesomeFieldInfo(annotation=field_type, required=False, default_factory=list),
                 )
             else:
                 return (field_type, None)
@@ -464,6 +456,42 @@ class AwesomeSchemas:
 
         base_model.with_permissions = classmethod(with_permissions)
 
+    def _resolve_schema_fields_and_relationships(self, name: str):
+        # Find schema class by name (case-insensitive)
+        schema_cls = None
+        for attr in dir(self._home):
+            if camel_to_snake(attr) == camel_to_snake(name):
+                schema_cls = getattr(self._home, attr)
+                break
+        if schema_cls is None:
+            raise AttributeError(f"Schema '{name}' not found")
+
+        relationships = getattr(schema_cls, "relationships", {})
+        include_relationship_fields = relationships is True
+        fields = self._get_schema_fields(self.model_cls, name, include_relationship_fields)
+        if relationships is None:
+            relationships = {}
+        elif relationships is True:
+            relationships = {}
+            for name_field, value in inspect.getmembers(self.model_cls):
+                if hasattr(value, "__class__") and value.__class__.__name__ in (
+                    "RelationshipProperty",
+                    "InstrumentedAttribute",
+                ):
+                    # Additional check to ensure it's a relationship and not a regular column
+                    if hasattr(self.model_cls, "__table__") and hasattr(
+                        self.model_cls.__table__.c, name_field
+                    ):
+                        continue  # Skip regular columns
+                    relationships[name_field] = name_field
+        elif (
+            not isinstance(relationships, dict)
+            and not isinstance(relationships, list)
+            and not isinstance(relationships, tuple)
+        ):
+            raise ValueError("Relationships must be True, a dictionary, list or tuple")
+        return fields, relationships, getattr(schema_cls, "optional", None)
+
     def __getattr__(self, name: str) -> type[AwesomeBaseModel]:
         """Dynamically create a Pydantic model for the specified representation."""
         if name.startswith("__"):
@@ -485,29 +513,14 @@ class AwesomeSchemas:
                 schema_cls = getattr(self._home, attr)
                 break
         if schema_cls is None:
-            raise AttributeError(
-                f"Schema or scope '{name}' not defined in model {self.model_cls.__name__}"
-            )
+            raise AttributeError(f"Schema '{name}' not defined in model {self.model_cls.__name__}")
 
         if hasattr(schema_cls, "permissions") and schema_cls.permissions:
             schema_cls.permissions = self._definition.format_permissions(
                 schema_cls.permissions, self.model_cls
             )
 
-        fields = self._get_schema_fields(self.model_cls, name)
-        relationships = getattr(schema_cls, "relationships", {})
-        optional = getattr(schema_cls, "optional", None)
-
-        if relationships is None:
-            relationships = {}
-
-        if (
-            not isinstance(relationships, dict)
-            and not isinstance(relationships, list)
-            and not isinstance(relationships, tuple)
-        ):
-            raise ValueError("Relationships must be a dictionary, list or tuple")
-
+        fields, relationships, optional = self._resolve_schema_fields_and_relationships(name)
         schema_model = self._create_schema_model(fields, relationships, name, optional=optional)
         self._cache[name_lower] = schema_model
         self._names[name_lower] = schema_model.__name__
@@ -519,9 +532,7 @@ class AwesomeSchemas:
             raise AttributeError("No schema selected")
 
         name = self._current_schema
-        fields = self._get_schema_fields(self.model_cls, name)
-        relationships = getattr(getattr(self._home, name.capitalize()), "relationships", {})
-
+        fields, relationships, _ = self._resolve_schema_fields_and_relationships(name)
         formatted_permissions = self._definition.format_permissions(permissions, self.model_cls)
         return self._create_schema_model(fields, relationships, name, formatted_permissions)
 
@@ -532,11 +543,21 @@ class AwesomeSchemas:
     def list(self) -> list[str]:
         """Get a list of all available schemas (in snake_case)."""
         names = []
-        for attr_name, attr_value in self._home.__dict__.items():
+
+        # Use dir() instead of __dict__ to catch all attributes including those set by setattr
+        for attr_name in dir(self._home):
             if attr_name.startswith("_"):
                 continue
+
+            if not hasattr(self._home, attr_name):
+                continue
+
+            attr_value = getattr(self._home, attr_name)
+
             if inspect.isclass(attr_value) and (
-                issubclass(attr_value, self._definition) or issubclass(attr_value, BaseModel)
+                issubclass(attr_value, self._definition)
+                or issubclass(attr_value, SchemaDefinition)
+                or issubclass(attr_value, BaseModel)
             ):
                 names.append(camel_to_snake(attr_name))
         return names

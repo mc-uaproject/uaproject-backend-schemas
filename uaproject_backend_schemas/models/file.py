@@ -15,7 +15,6 @@ from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.schemas import SchemaDefinition
-from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.models.news import News
@@ -151,32 +150,3 @@ class File(AwesomeModel, IDMixin, TimestampsMixin, table=True):
         class RequestUpload(SchemaDefinition):
             fields = ["model_name", "model_id", "original_name", "content_type", "size"]
             permissions = [".write"]
-
-    class Scopes(AwesomeModel.Scopes):
-        class UserFiles(ScopeDefinition):
-            trigger_fields = ["user_id"]
-            fields = [
-                "id",
-                "bucket",
-                "path",
-                "original_name",
-                "content_type",
-                "size",
-                "status",
-                "created_at",
-            ]
-            permissions = [".read.self"]
-
-        class ModelFiles(ScopeDefinition):
-            trigger_fields = ["model_name", "model_id"]
-            fields = [
-                "id",
-                "bucket",
-                "path",
-                "original_name",
-                "content_type",
-                "size",
-                "status",
-                "created_at",
-            ]
-            permissions = [".read"]

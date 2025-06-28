@@ -8,7 +8,6 @@ from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.schemas import SchemaDefinition
-from uaproject_backend_schemas.awesome.scopes import ScopeDefinition
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.models.user import User
@@ -40,9 +39,3 @@ class Balance(AwesomeModel, IDMixin, TimestampsMixin, table=True):
 
         class ResponseSelf(SchemaDefinition):
             permissions = [".read.self"]
-
-    class Scopes(AwesomeModel.Scopes):
-        class Amount(ScopeDefinition):
-            trigger_fields = ["amount"]
-            fields = ["id", "user_id", "amount"]
-            permissions = ["read"]
