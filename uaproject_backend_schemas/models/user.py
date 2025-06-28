@@ -127,7 +127,6 @@ class User(AwesomeModel, IDMixin, TimestampsMixin, table=True):
                 "minecraft_nickname",
                 "is_superuser",
                 "biography",
-                "access",
                 "roles",
             ]
             permissions = [".read.other"]

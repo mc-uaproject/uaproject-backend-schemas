@@ -243,9 +243,7 @@ class AwesomeSchemas:
                 if hasattr(inner_type, "__forward_arg__"):
                     class_name = inner_type.__forward_arg__
                     resolved_class = self._resolve_forward_ref(class_name)
-                    return (
-                        Optional[resolved_class] if resolved_class else Optional[Any]
-                    )
+                    return Optional[resolved_class] if resolved_class else Optional[Any]
 
                 # Recursively resolve inner type
                 resolved_inner = self._get_field_type(field_name, inner_type, relationships)
@@ -264,7 +262,7 @@ class AwesomeSchemas:
             # Only resolve ForwardRef for custom classes that need importing
             if hasattr(inner_type, "__name__") and not isinstance(inner_type, type(None)):
                 # Check if this is a built-in type or standard library type
-                if inner_type.__module__ in ('builtins', 'datetime', 'uuid', 'decimal'):
+                if inner_type.__module__ in ("builtins", "datetime", "uuid", "decimal"):
                     return List[inner_type]
                 else:
                     # This might be a custom class, try to resolve it
@@ -330,7 +328,9 @@ class AwesomeSchemas:
         field_definitions = self._get_field_definitions(
             fields, relationships, formatted_permissions, optional
         )
-        filtered_fields = self._filter_fields_by_permissions(field_definitions, optional)
+        filtered_fields, computed_fields = self._filter_fields_by_permissions(
+            field_definitions, optional
+        )
 
         schema_class_name = f"{self.model_cls.__name__}Schema{snake_to_camel(name)}"
         if permissions:
@@ -344,6 +344,30 @@ class AwesomeSchemas:
             __base__=AwesomeBaseModel,
             **filtered_fields,
         )
+
+        # Add computed fields to the new model
+        if computed_fields:
+            # Initialize model_computed_fields if it doesn't exist
+            if not hasattr(base_model, "model_computed_fields"):
+                base_model.model_computed_fields = {}
+
+            # Add computed fields to the model_computed_fields dict and as properties
+            for field_name, computed_field_info in computed_fields.items():
+                base_model.model_computed_fields[field_name] = computed_field_info
+
+                # For properties with computed field decorator, copy the property directly
+                if (
+                    hasattr(computed_field_info, "wrapped_property")
+                    and computed_field_info.wrapped_property
+                ):
+                    # This is a property decorated with @computed_field
+                    setattr(base_model, field_name, computed_field_info.wrapped_property)
+                else:
+                    # Fallback for other types of computed fields
+                    setattr(base_model, field_name, computed_field_info)
+
+            # Rebuild model to properly register computed fields
+            base_model.model_rebuild()
 
         self._setup_schema_model(base_model, fields, relationships, name, formatted_permissions)
 
@@ -418,7 +442,9 @@ class AwesomeSchemas:
 
             # Prefer type annotation over model_field_info to avoid SQLAlchemy column types
             if hasattr(self.model_cls, "__annotations__") and f in self.model_cls.__annotations__:
-                field_type = self._get_field_type(f, self.model_cls.__annotations__[f], relationships)
+                field_type = self._get_field_type(
+                    f, self.model_cls.__annotations__[f], relationships
+                )
             else:
                 field_type = self._get_field_type(f, model_field_info[f], relationships)
             field_definitions[f] = (field_type, None)
@@ -488,11 +514,22 @@ class AwesomeSchemas:
         self,
         field_definitions: Dict[str, Any],
         optional: Optional[bool | List[str]] = None,
-    ) -> Dict[str, Any]:
+    ) -> tuple[Dict[str, Any], Dict[str, Any]]:
         filtered_fields = {}
+        computed_fields = {}
+
         for f, (t, _) in field_definitions.items():
             if self._is_computed_field(f):
-                filtered_fields[f] = (t, None)
+                # Get the actual computed field from the model class
+                if (
+                    hasattr(self.model_cls, "model_computed_fields")
+                    and f in self.model_cls.model_computed_fields
+                ):
+                    computed_fields[f] = self.model_cls.model_computed_fields[f]
+                elif hasattr(self.model_cls, f):
+                    field = getattr(self.model_cls, f)
+                    if isinstance(field, property) and hasattr(field, "__computed_field__"):
+                        computed_fields[f] = field
                 continue
 
             if f not in self.model_cls.model_fields or not isinstance(
@@ -514,7 +551,8 @@ class AwesomeSchemas:
             params = self._get_field_info_params(f, field_info, optional)
             new_field_info = self._build_new_field_info(t, field_info, params)
             filtered_fields[f] = (t, new_field_info)
-        return filtered_fields
+
+        return filtered_fields, computed_fields
 
     def _setup_schema_model(
         self,

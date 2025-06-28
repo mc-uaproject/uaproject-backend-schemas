@@ -43,38 +43,38 @@ class TicketMessageSchemas:
 class TicketMessageSchemaCreate(AwesomeBaseModel):
     """create schema for TicketMessage model"""
 
+    attachment_file_ids: Optional[list[int]]
     ticket_id: Optional[int]
     content: Optional[str]
-    attachment_file_ids: Optional[list[int]]
 
 class TicketMessageSchemaRedis(AwesomeBaseModel):
     """redis schema for TicketMessage model"""
 
     id: Optional[int]
-    is_system_message: Optional[bool]
-    ticket_id: Optional[int]
-    content: Optional[str]
-    author: Optional[User]
-    edited_at: Optional[str]
-    created_at: Optional[datetime]
     author_id: Optional[int]
-    updated_at: Optional[datetime]
-    attachment_files: Optional[list[File]]
-    ticket: Optional[Ticket]
+    edited_at: Optional[str]
     attachment_file_ids: Optional[list[int]]
+    author: Optional[User]
+    attachment_files: Optional[list[File]]
+    updated_at: Optional[datetime]
+    ticket_id: Optional[int]
+    is_system_message: Optional[bool]
+    content: Optional[str]
+    ticket: Optional[Ticket]
+    created_at: datetime
 
 class TicketMessageSchemaResponse(AwesomeBaseModel):
     """response schema for TicketMessage model"""
 
     id: Optional[int]
-    is_system_message: Optional[bool]
-    ticket_id: int
-    content: str
-    edited_at: Optional[str]
-    created_at: Optional[datetime]
     author_id: int
-    updated_at: Optional[datetime]
+    edited_at: Optional[str]
     attachment_file_ids: Optional[list[int]]
+    updated_at: Optional[datetime]
+    ticket_id: int
+    is_system_message: Optional[bool]
+    content: str
+    created_at: datetime
 
 class TicketMessageSchemaResponseWithAuthor(AwesomeBaseModel):
     """response_with_author schema for TicketMessage model"""
@@ -86,8 +86,8 @@ class TicketMessageSchemaResponseWithAuthor(AwesomeBaseModel):
     attachment_file_ids: Optional[list[int]]
     is_system_message: Optional[bool]
     edited_at: Optional[str]
-    created_at: Optional[datetime]
     updated_at: Optional[datetime]
+    created_at: datetime
 
 class TicketMessageSchemaUpdate(AwesomeBaseModel):
     """update schema for TicketMessage model"""

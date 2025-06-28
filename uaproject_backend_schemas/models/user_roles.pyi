@@ -40,18 +40,18 @@ class UserRolesSchemaRedis(AwesomeBaseModel):
 
     id: Optional[int]
     role_id: Optional[int]
-    user_id: Optional[int]
-    created_at: Optional[datetime]
     updated_at: Optional[datetime]
+    user_id: Optional[int]
+    created_at: datetime
 
 class UserRolesSchemaResponse(AwesomeBaseModel):
     """response schema for UserRoles model"""
 
     id: Optional[int]
     role_id: int
-    user_id: int
-    created_at: Optional[datetime]
     updated_at: Optional[datetime]
+    user_id: int
+    created_at: datetime
 
 class UserRolesSchemaUpdate(AwesomeBaseModel):
     """update schema for UserRoles model"""

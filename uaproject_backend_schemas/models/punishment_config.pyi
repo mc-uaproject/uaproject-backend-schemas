@@ -38,49 +38,49 @@ class PunishmentConfigSchemas:
 class PunishmentConfigSchemaCreate(AwesomeBaseModel):
     """create schema for PunishmentConfig model"""
 
-    is_active: Optional[bool]
-    warn_threshold: Optional[int]
-    warn_decay_days: Optional[int]
-    config_data: Optional[dict[str, Any]]
-    name: Optional[str]
     description: Optional[str]
+    warn_decay_days: Optional[int]
+    is_active: Optional[bool]
+    name: Optional[str]
+    config_data: Optional[dict[str, Any]]
+    warn_threshold: Optional[int]
 
 class PunishmentConfigSchemaRedis(AwesomeBaseModel):
     """redis schema for PunishmentConfig model"""
 
+    description: Optional[str]
     id: Optional[int]
-    is_active: Optional[bool]
-    warn_threshold: Optional[int]
-    punishments: Optional[list[Punishment]]
-    created_at: Optional[datetime]
     warn_decay_days: Optional[int]
     updated_at: Optional[datetime]
-    config_data: Optional[dict[str, Any]]
+    is_active: Optional[bool]
     name: Optional[str]
-    description: Optional[str]
+    config_data: Optional[dict[str, Any]]
+    punishments: Optional[list[Punishment]]
+    warn_threshold: Optional[int]
+    created_at: datetime
 
 class PunishmentConfigSchemaResponse(AwesomeBaseModel):
     """response schema for PunishmentConfig model"""
 
+    description: Optional[str]
     id: Optional[int]
-    is_active: Optional[bool]
-    warn_threshold: Optional[int]
-    created_at: Optional[datetime]
     warn_decay_days: Optional[int]
     updated_at: Optional[datetime]
-    config_data: dict[str, Any]
+    is_active: Optional[bool]
     name: str
-    description: Optional[str]
+    config_data: dict[str, Any]
+    warn_threshold: Optional[int]
+    created_at: datetime
 
 class PunishmentConfigSchemaUpdate(AwesomeBaseModel):
     """update schema for PunishmentConfig model"""
 
-    is_active: Optional[bool]
-    warn_threshold: Optional[int]
-    warn_decay_days: Optional[int]
-    config_data: Optional[dict[str, Any]]
-    name: Optional[str]
     description: Optional[str]
+    warn_decay_days: Optional[int]
+    is_active: Optional[bool]
+    name: Optional[str]
+    config_data: Optional[dict[str, Any]]
+    warn_threshold: Optional[int]
 
 class PunishmentConfigFilter(BaseModel):
     """Pydantic-class for filtering the PunishmentConfig model."""

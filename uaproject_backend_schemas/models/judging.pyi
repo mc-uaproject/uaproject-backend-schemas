@@ -45,24 +45,24 @@ class JudgingSchemaCreate(AwesomeBaseModel):
 class JudgingSchemaRedis(AwesomeBaseModel):
     """redis schema for Judging model"""
 
+    decision: Optional[str]
     id: Optional[int]
+    judge: Optional[User]
     verdict: Optional[JudgingVerdict]
+    updated_at: Optional[datetime]
     judge_id: Optional[int]
     claims: Optional[list[Claim]]
-    created_at: Optional[datetime]
-    updated_at: Optional[datetime]
-    judge: Optional[User]
-    decision: Optional[str]
+    created_at: datetime
 
 class JudgingSchemaResponse(AwesomeBaseModel):
     """response schema for Judging model"""
 
+    decision: str
     id: Optional[int]
     verdict: JudgingVerdict
-    judge_id: int
-    created_at: Optional[datetime]
     updated_at: Optional[datetime]
-    decision: str
+    judge_id: int
+    created_at: datetime
 
 class JudgingSchemaUpdate(AwesomeBaseModel):
     """update schema for Judging model"""

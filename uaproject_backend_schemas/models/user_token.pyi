@@ -39,18 +39,8 @@ class UserTokenSchemaCreate(AwesomeBaseModel):
     user_id: Optional[int]
 
     def with_permissions(
-        self, permissions: list[Literal["token.write", "token.read"]]
+        self, permissions: list[Literal["token.read", "token.write"]]
     ) -> UserTokenSchemaCreate: ...
-
-class UserTokenSchemaCreateWithPermissionsTokenWrite(AwesomeBaseModel):
-    """create schema for UserToken model with permissions token.write"""
-
-    token: Optional[UUID]
-    user_id: int
-
-    def with_permissions(
-        self, permissions: list[Literal["token.write", "token.read"]]
-    ) -> UserTokenSchemaCreateWithPermissionsTokenWrite: ...
 
 class UserTokenSchemaCreateWithPermissionsTokenRead(AwesomeBaseModel):
     """create schema for UserToken model with permissions token.read"""
@@ -59,89 +49,99 @@ class UserTokenSchemaCreateWithPermissionsTokenRead(AwesomeBaseModel):
     user_id: int
 
     def with_permissions(
-        self, permissions: list[Literal["token.write", "token.read"]]
+        self, permissions: list[Literal["token.read", "token.write"]]
     ) -> UserTokenSchemaCreateWithPermissionsTokenRead: ...
+
+class UserTokenSchemaCreateWithPermissionsTokenWrite(AwesomeBaseModel):
+    """create schema for UserToken model with permissions token.write"""
+
+    token: Optional[UUID]
+    user_id: int
+
+    def with_permissions(
+        self, permissions: list[Literal["token.read", "token.write"]]
+    ) -> UserTokenSchemaCreateWithPermissionsTokenWrite: ...
 
 class UserTokenSchemaRedis(AwesomeBaseModel):
     """redis schema for UserToken model"""
 
+    token: Optional[UUID]
     id: Optional[int]
     user: Optional[User]
-    token: Optional[UUID]
+    updated_at: Optional[datetime]
     user_id: Optional[int]
-    created_at: Optional[datetime]
-    updated_at: Optional[datetime]
+    created_at: datetime
 
     def with_permissions(
-        self, permissions: list[Literal["token.write", "token.read"]]
+        self, permissions: list[Literal["token.read", "token.write"]]
     ) -> UserTokenSchemaRedis: ...
-
-class UserTokenSchemaRedisWithPermissionsTokenWrite(AwesomeBaseModel):
-    """redis schema for UserToken model with permissions token.write"""
-
-    id: Optional[int]
-    user: Optional[User]
-    token: Optional[UUID]
-    user_id: int
-    created_at: Optional[datetime]
-    updated_at: Optional[datetime]
-
-    def with_permissions(
-        self, permissions: list[Literal["token.write", "token.read"]]
-    ) -> UserTokenSchemaRedisWithPermissionsTokenWrite: ...
 
 class UserTokenSchemaRedisWithPermissionsTokenRead(AwesomeBaseModel):
     """redis schema for UserToken model with permissions token.read"""
 
+    token: Optional[UUID]
     id: Optional[int]
     user: Optional[User]
-    token: Optional[UUID]
-    user_id: int
-    created_at: Optional[datetime]
     updated_at: Optional[datetime]
+    user_id: int
+    created_at: datetime
 
     def with_permissions(
-        self, permissions: list[Literal["token.write", "token.read"]]
+        self, permissions: list[Literal["token.read", "token.write"]]
     ) -> UserTokenSchemaRedisWithPermissionsTokenRead: ...
+
+class UserTokenSchemaRedisWithPermissionsTokenWrite(AwesomeBaseModel):
+    """redis schema for UserToken model with permissions token.write"""
+
+    token: Optional[UUID]
+    id: Optional[int]
+    user: Optional[User]
+    updated_at: Optional[datetime]
+    user_id: int
+    created_at: datetime
+
+    def with_permissions(
+        self, permissions: list[Literal["token.read", "token.write"]]
+    ) -> UserTokenSchemaRedisWithPermissionsTokenWrite: ...
 
 class UserTokenSchemaResponse(AwesomeBaseModel):
     """response schema for UserToken model"""
 
-    id: Optional[int]
     token: Optional[UUID]
-    user_id: int
-    created_at: Optional[datetime]
+    id: Optional[int]
     updated_at: Optional[datetime]
+    user_id: int
+    created_at: datetime
 
     def with_permissions(
-        self, permissions: list[Literal["token.write", "token.read"]]
+        self, permissions: list[Literal["token.read", "token.write"]]
     ) -> UserTokenSchemaResponse: ...
-
-class UserTokenSchemaResponseWithPermissionsTokenWrite(AwesomeBaseModel):
-    """response schema for UserToken model with permissions token.write"""
-
-    id: Optional[int]
-    token: Optional[UUID]
-    user_id: int
-    created_at: Optional[datetime]
-    updated_at: Optional[datetime]
-
-    def with_permissions(
-        self, permissions: list[Literal["token.write", "token.read"]]
-    ) -> UserTokenSchemaResponseWithPermissionsTokenWrite: ...
 
 class UserTokenSchemaResponseWithPermissionsTokenRead(AwesomeBaseModel):
     """response schema for UserToken model with permissions token.read"""
 
-    id: Optional[int]
     token: Optional[UUID]
-    user_id: int
-    created_at: Optional[datetime]
+    id: Optional[int]
     updated_at: Optional[datetime]
+    user_id: int
+    created_at: datetime
 
     def with_permissions(
-        self, permissions: list[Literal["token.write", "token.read"]]
+        self, permissions: list[Literal["token.read", "token.write"]]
     ) -> UserTokenSchemaResponseWithPermissionsTokenRead: ...
+
+class UserTokenSchemaResponseWithPermissionsTokenWrite(AwesomeBaseModel):
+    """response schema for UserToken model with permissions token.write"""
+
+    token: Optional[UUID]
+    id: Optional[int]
+    updated_at: Optional[datetime]
+    user_id: int
+    created_at: datetime
+
+    def with_permissions(
+        self, permissions: list[Literal["token.read", "token.write"]]
+    ) -> UserTokenSchemaResponseWithPermissionsTokenWrite: ...
 
 class UserTokenSchemaUpdate(AwesomeBaseModel):
     """update schema for UserToken model"""
@@ -150,18 +150,8 @@ class UserTokenSchemaUpdate(AwesomeBaseModel):
     user_id: Optional[int]
 
     def with_permissions(
-        self, permissions: list[Literal["token.write", "token.read"]]
+        self, permissions: list[Literal["token.read", "token.write"]]
     ) -> UserTokenSchemaUpdate: ...
-
-class UserTokenSchemaUpdateWithPermissionsTokenWrite(AwesomeBaseModel):
-    """update schema for UserToken model with permissions token.write"""
-
-    token: Optional[UUID]
-    user_id: int
-
-    def with_permissions(
-        self, permissions: list[Literal["token.write", "token.read"]]
-    ) -> UserTokenSchemaUpdateWithPermissionsTokenWrite: ...
 
 class UserTokenSchemaUpdateWithPermissionsTokenRead(AwesomeBaseModel):
     """update schema for UserToken model with permissions token.read"""
@@ -170,8 +160,18 @@ class UserTokenSchemaUpdateWithPermissionsTokenRead(AwesomeBaseModel):
     user_id: int
 
     def with_permissions(
-        self, permissions: list[Literal["token.write", "token.read"]]
+        self, permissions: list[Literal["token.read", "token.write"]]
     ) -> UserTokenSchemaUpdateWithPermissionsTokenRead: ...
+
+class UserTokenSchemaUpdateWithPermissionsTokenWrite(AwesomeBaseModel):
+    """update schema for UserToken model with permissions token.write"""
+
+    token: Optional[UUID]
+    user_id: int
+
+    def with_permissions(
+        self, permissions: list[Literal["token.read", "token.write"]]
+    ) -> UserTokenSchemaUpdateWithPermissionsTokenWrite: ...
 
 class UserTokenFilter(BaseModel):
     """Pydantic-class for filtering the UserToken model."""
