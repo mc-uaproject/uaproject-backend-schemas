@@ -27,7 +27,7 @@ class Balance(AwesomeModel, IDMixin, TimestampsMixin, table=True):
 
     class Schemas(AwesomeModel.Schemas):
         class Create(SchemaDefinition):
-            fields_exclude = ["id", "created_at", "updated_at", "user_id", "identifier"]
+            fields_exclude = ["id", "created_at", "updated_at", "identifier"]
             permissions = [".admin"]
 
         class Update(SchemaDefinition):

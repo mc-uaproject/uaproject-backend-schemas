@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import StrEnum
-from typing import Optional
+from typing import List, Optional
 
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
 
@@ -26,3 +26,16 @@ class ServiceDiscount(AwesomeBaseModel):
     start_date: datetime
     end_date: Optional[datetime] = None
     reason: Optional[str] = None
+
+
+class ServerAvailabilityMode(StrEnum):
+    """How service availability works across servers"""
+    ALL = "all"  # Available on all servers simultaneously (e.g., toy)
+    SPECIFIC = "specific"  # Only available on specific servers (e.g., survival graylist)
+    SELECTABLE = "selectable"  # User selects which server to activate on (e.g., wealth)
+
+
+class ServerAvailability(AwesomeBaseModel):
+    """Configuration for service availability across servers"""
+    mode: ServerAvailabilityMode
+    servers: Optional[List[str]] = None  # List of servers where available (null = current server only)

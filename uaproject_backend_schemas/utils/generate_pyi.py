@@ -359,11 +359,11 @@ def _get_schema_fields(
 
         # Get fields from the actual generated schema (both regular and computed)
         fields = list(schema_instance.model_fields.keys())
-        
+
         # Add computed fields if they exist
-        if hasattr(schema_instance, 'model_computed_fields'):
+        if hasattr(schema_instance, "model_computed_fields"):
             fields.extend(schema_instance.model_computed_fields.keys())
-            
+
         return fields
     except AttributeError:
         # Fallback if schema doesn't exist yet
@@ -396,20 +396,23 @@ def _get_fallback_field_lines(model_cls, schema_name, _type):
     schema_fields = _get_schema_fields(model_cls, schema_name, _type)
     schema_definition = _get_schema_definition(model_cls, schema_name, _type)
     optional_setting = getattr(schema_definition, "optional", None) if schema_definition else None
-    
+
     for field_name in schema_fields:
         ann = _get_field_annotation(model_cls, field_name)
         field_type_str = _extract_clean_type(ann)
-        
+
         # Check if this is a computed field
         is_computed_field = False
-        if hasattr(model_cls, 'model_computed_fields') and field_name in model_cls.model_computed_fields:
+        if (
+            hasattr(model_cls, "model_computed_fields")
+            and field_name in model_cls.model_computed_fields
+        ):
             is_computed_field = True
         elif hasattr(model_cls, field_name):
             field_attr = getattr(model_cls, field_name)
-            if isinstance(field_attr, property) and hasattr(field_attr, '__computed_field__'):
+            if isinstance(field_attr, property) and hasattr(field_attr, "__computed_field__"):
                 is_computed_field = True
-        
+
         is_optional = False
         # Computed fields are typically not optional as they are always computed
         if not is_computed_field:
@@ -417,54 +420,63 @@ def _get_fallback_field_lines(model_cls, schema_name, _type):
                 is_optional = True
             elif isinstance(optional_setting, list) and field_name in optional_setting:
                 is_optional = True
-        
+
         lines.append(_format_field_line(field_name, field_type_str, is_optional))
     return lines
 
 
-def _get_class_fields_for_pyi(model_cls, schema_name, permissions, _type):
+def _get_regular_fields_for_pyi(schema_instance):
     fields = []
+    for field_name, field_info in schema_instance.model_fields.items():
+        field_type = field_info.annotation
+        field_type_str = _extract_clean_type(field_type)
+        is_optional = False
+        if hasattr(field_info, "is_required") and not field_info.is_required():
+            is_optional = True
+        elif hasattr(field_info, "required") and not field_info.required:
+            is_optional = True
+        fields.append(_format_field_line(field_name, field_type_str, is_optional))
+    return fields
+
+
+def _get_computed_fields_for_pyi(schema_instance):
+    fields = []
+    if hasattr(schema_instance, "model_computed_fields"):
+        for field_name, computed_field_info in schema_instance.model_computed_fields.items():
+            if hasattr(computed_field_info, "return_type") and computed_field_info.return_type:
+                field_type_str = _extract_clean_type(computed_field_info.return_type)
+            else:
+                if (
+                    hasattr(computed_field_info, "wrapped_property")
+                    and computed_field_info.wrapped_property
+                ):
+                    property_func = computed_field_info.wrapped_property.fget
+                    if (
+                        hasattr(property_func, "__annotations__")
+                        and "return" in property_func.__annotations__
+                    ):
+                        field_type_str = _extract_clean_type(
+                            property_func.__annotations__["return"]
+                        )
+                    else:
+                        field_type_str = "Any"
+                else:
+                    field_type_str = "Any"
+            fields.append(_format_field_line(field_name, field_type_str, False))
+    return fields
+
+
+def _get_class_fields_for_pyi(model_cls, schema_name, permissions, _type):
     try:
-        # Get the actual generated schema instance
         if _type.lower() == "schema":
             schema_instance = getattr(model_cls.schemas, schema_name)
             if permissions:
                 schema_instance = schema_instance.with_permissions(permissions)
         else:
             schema_instance = getattr(model_cls.scopes, schema_name)
-
-        # Extract regular fields from the actual schema
-        for field_name, field_info in schema_instance.model_fields.items():
-            field_type = field_info.annotation
-            field_type_str = _extract_clean_type(field_type)
-            is_optional = False
-            if hasattr(field_info, "is_required") and not field_info.is_required():
-                is_optional = True
-            elif hasattr(field_info, "required") and not field_info.required:
-                is_optional = True
-            fields.append(_format_field_line(field_name, field_type_str, is_optional))
-
-        # Extract computed fields from the actual schema
-        if hasattr(schema_instance, 'model_computed_fields'):
-            for field_name, computed_field_info in schema_instance.model_computed_fields.items():
-                if hasattr(computed_field_info, 'return_type') and computed_field_info.return_type:
-                    field_type_str = _extract_clean_type(computed_field_info.return_type)
-                else:
-                    # Fallback to extracting from the wrapped property if available
-                    if hasattr(computed_field_info, 'wrapped_property') and computed_field_info.wrapped_property:
-                        property_func = computed_field_info.wrapped_property.fget
-                        if hasattr(property_func, '__annotations__') and 'return' in property_func.__annotations__:
-                            field_type_str = _extract_clean_type(property_func.__annotations__['return'])
-                        else:
-                            field_type_str = "Any"
-                    else:
-                        field_type_str = "Any"
-                
-                # Computed fields are typically not optional as they are always computed
-                fields.append(_format_field_line(field_name, field_type_str, False))
-
+        fields = _get_regular_fields_for_pyi(schema_instance)
+        fields += _get_computed_fields_for_pyi(schema_instance)
     except AttributeError:
-        # Fallback to old logic if schema doesn't exist yet
         fields = _get_fallback_field_lines(model_cls, schema_name, _type)
     return fields
 
@@ -700,6 +712,7 @@ def get_all_subclasses(cls):
         subclasses.add(subclass)
         subclasses.update(get_all_subclasses(subclass))
     return subclasses
+
 
 def _collect_computed_fields(cls: Type[AwesomeModel]) -> dict[str, Any]:
     """Get computed field objects (not just names). Used for type annotation extraction."""

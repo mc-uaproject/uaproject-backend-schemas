@@ -1,7 +1,7 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from sqlalchemy import JSON, BigInteger, Column, DateTime, Enum, ForeignKey
+from sqlalchemy import ARRAY, JSON, BigInteger, Column, DateTime, Enum, ForeignKey, String
 from sqlmodel import Field, Relationship
 
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
@@ -39,6 +39,10 @@ class PurchasedItem(
     )
     quantity: int = Field(default=1, ge=1)
     expires_at: Optional[datetime] = Field(sa_column=Column(DateTime(timezone=True), nullable=True))
+    servers: List[str] = Field(
+        sa_column=Column(ARRAY(String), nullable=False),
+        description="List of servers where this purchase is active"
+    )
     purchase_metadata: Optional[Dict[str, Any]] = Field(sa_column=Column(JSON), default=None)
 
     user: Optional["User"] = Relationship(back_populates="purchased_items")

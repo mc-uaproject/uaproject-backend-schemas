@@ -7,6 +7,7 @@ from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.models.schemas.service import (
+    ServerAvailability,
     ServiceDiscount,
     ServicePoint,
     ServiceType,
@@ -35,6 +36,11 @@ class Service(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     upgrade_to: Optional[str] = AwesomeField(max_length=100, nullable=True)
     service_metadata: Optional[Dict[str, Any]] = AwesomeField(sa_column=Column(JSON), default=None)
     discounts: Optional[List[ServiceDiscount]] = AwesomeField(sa_column=Column(JSON), default=None)
+    server_availability: Optional[ServerAvailability] = AwesomeField(
+        sa_column=Column(JSON),
+        default=None,
+        description="Configuration for service availability across servers",
+    )
 
     # MinIO file relationship (one-to-one)
     icon_file: Optional["File"] = Relationship(back_populates="service")
