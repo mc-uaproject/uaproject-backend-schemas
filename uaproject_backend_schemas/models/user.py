@@ -2,7 +2,7 @@ import re
 from typing import TYPE_CHECKING, Dict, List, Optional
 
 from pydantic import computed_field, model_validator
-from sqlmodel import BigInteger, Column, Relationship
+from sqlmodel import BigInteger, Column, Index, Relationship
 
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
@@ -28,6 +28,9 @@ if TYPE_CHECKING:
 class User(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "users"
     __scope_prefix__ = "user"
+    __table_args__ = (
+        Index("ix_users_superuser", "is_superuser"),
+    )
 
     discord_id: Optional[int] = AwesomeField(
         default=None, sa_column=Column(BigInteger(), index=True, unique=True)

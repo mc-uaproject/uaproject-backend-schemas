@@ -1,7 +1,7 @@
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
-from sqlmodel import DECIMAL, JSON, BigInteger, Column, Enum, ForeignKey, Relationship
+from sqlmodel import DECIMAL, JSON, BigInteger, Column, Enum, ForeignKey, Index, Relationship
 
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
@@ -17,6 +17,13 @@ if TYPE_CHECKING:
 class Transaction(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "transactions"
     __scope_prefix__ = "transaction"
+    __table_args__ = (
+        Index("ix_transactions_user_updated", "user_id", "updated_at"),
+        Index("ix_transactions_recipient_id", "recipient_id"),
+        Index("ix_transactions_type", "type"),
+        Index("ix_transactions_service_id", "service_id"),
+        Index("ix_transactions_user_id", "user_id"),
+    )
 
     user_id: int = AwesomeField(
         sa_column=Column(BigInteger(), ForeignKey("users.id"), nullable=False)

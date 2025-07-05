@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from sqlalchemy import ARRAY, JSON, BigInteger, Column, DateTime, Enum, ForeignKey, String
+from sqlalchemy import ARRAY, JSON, BigInteger, Column, DateTime, Enum, ForeignKey, Index, String
 from sqlmodel import Field, Relationship
 
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
@@ -22,6 +22,12 @@ class PurchasedItem(
 ):
     __tablename__ = "purchased_items"
     __scope_prefix__ = "purchased_item"
+    __table_args__ = (
+        Index("ix_purchased_items_user_status", "user_id", "status"),
+        Index("ix_purchased_items_service_id", "service_id"),
+        Index("ix_purchased_items_transaction_id", "transaction_id"),
+        Index("ix_purchased_items_expires_at", "expires_at"),
+    )
 
     user_id: int = Field(sa_column=Column(BigInteger(), ForeignKey("users.id"), nullable=False))
     service_id: int = Field(

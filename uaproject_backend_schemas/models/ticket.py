@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, List, Optional
 
-from sqlmodel import ARRAY, BigInteger, Column, Enum, ForeignKey, Relationship, select
+from sqlmodel import ARRAY, BigInteger, Column, Enum, ForeignKey, Index, Relationship, select
 
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
@@ -16,6 +16,13 @@ if TYPE_CHECKING:
 class Ticket(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "tickets"
     __scope_prefix__ = "ticket"
+    __table_args__ = (
+        Index("ix_tickets_status_priority", "status", "priority"),
+        Index("ix_tickets_author_id", "author_id"),
+        Index("ix_tickets_assigned_to_id", "assigned_to_id"),
+        Index("ix_tickets_status", "status"),
+        Index("ix_tickets_priority", "priority"),
+    )
 
     title: str = AwesomeField(max_length=255)
     description: str = AwesomeField(max_length=4096)

@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from pydantic import model_validator
-from sqlmodel import ARRAY, BigInteger, Column, ForeignKey, Relationship, String
+from sqlmodel import ARRAY, BigInteger, Column, ForeignKey, Index, Relationship, String
 
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
@@ -50,6 +50,10 @@ EVERVAULT_EDITABLE_FIELDS = [
 class Application(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "applications"
     __scope_prefix__ = "application"
+    __table_args__ = (
+        Index("ix_applications_user_id", "user_id"),
+        Index("ix_applications_version", "version"),
+    )
     # Core fields
     user_id: int = AwesomeField(
         sa_column=Column(BigInteger(), ForeignKey("users.id"), nullable=False, unique=True)

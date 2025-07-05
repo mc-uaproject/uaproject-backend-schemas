@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
 from sqlalchemy import BigInteger
-from sqlmodel import Column, ForeignKey, Relationship
+from sqlmodel import Column, ForeignKey, Index, Relationship
 
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
@@ -15,6 +15,10 @@ if TYPE_CHECKING:
 class UserToken(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "user_tokens"
     __scope_prefix__ = "token"
+    __table_args__ = (
+        Index("ix_user_tokens_user_id", "user_id"),
+        Index("ix_user_tokens_token", "token"),
+    )
 
     token: UUID = AwesomeField(
         read_permissions=["token.read"],

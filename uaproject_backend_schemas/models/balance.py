@@ -2,7 +2,7 @@ from decimal import Decimal
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
-from sqlmodel import BigInteger, Column, ForeignKey, Relationship
+from sqlmodel import BigInteger, Column, ForeignKey, Index, Relationship
 
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
@@ -16,6 +16,11 @@ if TYPE_CHECKING:
 class Balance(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "balances"
     __scope_prefix__ = "balance"
+    __table_args__ = (
+        Index("ix_balances_user_id", "user_id"),
+        Index("ix_balances_amount", "amount"),
+        Index("ix_balances_identifier", "identifier"),
+    )
 
     user_id: int = AwesomeField(
         sa_column=Column(BigInteger(), ForeignKey("users.id"), nullable=False, unique=True)

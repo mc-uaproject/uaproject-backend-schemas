@@ -1,7 +1,7 @@
 from enum import StrEnum
 from typing import List, Optional
 
-from sqlmodel import BigInteger, Column, Enum, ForeignKey, Relationship, Table
+from sqlmodel import BigInteger, Column, Enum, ForeignKey, Index, Relationship, Table
 
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
@@ -35,6 +35,10 @@ claim_defendant_link = Table(
 class Claim(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "claims"
     __scope_prefix__ = "claim"
+    __table_args__ = (
+        Index("ix_claims_status", "status"),
+        Index("ix_claims_judging_id", "judging_id"),
+    )
 
     title: str = AwesomeField(max_length=255, nullable=False)
     description: str = AwesomeField(max_length=2000, nullable=True)

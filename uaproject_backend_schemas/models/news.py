@@ -8,6 +8,7 @@ from sqlmodel import (
     DateTime,
     Enum,
     ForeignKey,
+    Index,
     Relationship,
 )
 
@@ -25,6 +26,14 @@ if TYPE_CHECKING:
 class News(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "news"
     __scope_prefix__ = "news"
+    __table_args__ = (
+        Index("ix_news_published_updated", "is_published", "updated_at"),
+        Index("ix_news_author_id", "author_id"),
+        Index("ix_news_type", "type"),
+        Index("ix_news_importance", "importance"),
+        Index("ix_news_pinned", "is_pinned"),
+        Index("ix_news_archived", "is_archived"),
+    )
 
     title: str = AwesomeField(max_length=255, nullable=False)
     summary: Optional[str] = AwesomeField(max_length=500, nullable=True)

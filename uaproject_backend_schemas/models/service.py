@@ -1,7 +1,7 @@
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from sqlmodel import DECIMAL, JSON, Column, Enum, Relationship
+from sqlmodel import DECIMAL, JSON, Column, Enum, Index, Relationship
 
 from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
@@ -21,6 +21,13 @@ if TYPE_CHECKING:
 class Service(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "services"
     __scope_prefix__ = "service"
+    __table_args__ = (
+        Index("ix_services_active", "is_active"),
+        Index("ix_services_category", "category"),
+        Index("ix_services_type", "type"),
+        Index("ix_services_name", "name"),
+        Index("ix_services_price", "price"),
+    )
     name: str = AwesomeField(max_length=255, unique=True, nullable=False)
     display_name: Optional[str] = AwesomeField(max_length=255, nullable=True)
     description: Optional[str] = AwesomeField(max_length=1000, nullable=True)
