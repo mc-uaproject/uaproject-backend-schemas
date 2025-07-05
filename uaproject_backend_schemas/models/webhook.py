@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
+from pydantic import field_serializer, field_validator
 from sqlmodel import (
     JSON,
     BigInteger,
@@ -121,6 +122,93 @@ class Webhook(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     webhook_metadata: Optional[Dict[str, Any]] = AwesomeField(
         sa_column=Column(JSON, default=None), description="Additional metadata"
     )
+
+    # Custom serializers for complex fields
+    @field_serializer("triggers")
+    def serialize_triggers(self, value: List[WebhookTrigger]) -> List[Dict[str, Any]]:
+        """Serialize triggers to dict for JSON storage"""
+        if not value:
+            return []
+        return [trigger.model_dump() if hasattr(trigger, 'model_dump') else trigger for trigger in value]
+    
+    @field_validator("triggers", mode="before")
+    @classmethod
+    def validate_triggers(cls, value) -> List[WebhookTrigger]:
+        """Validate and convert triggers from dict/list to WebhookTrigger objects"""
+        if not value:
+            return []
+        
+        result = []
+        for item in value:
+            if isinstance(item, WebhookTrigger):
+                result.append(item)
+            elif isinstance(item, dict):
+                result.append(WebhookTrigger(**item))
+            else:
+                # Try to convert to dict first
+                try:
+                    if hasattr(item, 'model_dump'):
+                        result.append(WebhookTrigger(**item.model_dump()))
+                    else:
+                        result.append(WebhookTrigger(**item))
+                except Exception:
+                    # Skip invalid items
+                    continue
+        return result
+    
+    @field_serializer("payload_config")
+    def serialize_payload_config(self, value: WebhookPayloadTemplate) -> Dict[str, Any]:
+        """Serialize payload_config to dict for JSON storage"""
+        if not value:
+            return {}
+        return value.model_dump() if hasattr(value, 'model_dump') else value
+    
+    @field_validator("payload_config", mode="before")
+    @classmethod
+    def validate_payload_config(cls, value) -> WebhookPayloadTemplate:
+        """Validate and convert payload_config from dict to WebhookPayloadTemplate"""
+        if not value:
+            return WebhookPayloadTemplate()
+        
+        if isinstance(value, WebhookPayloadTemplate):
+            return value
+        elif isinstance(value, dict):
+            return WebhookPayloadTemplate(**value)
+        else:
+            try:
+                if hasattr(value, 'model_dump'):
+                    return WebhookPayloadTemplate(**value.model_dump())
+                else:
+                    return WebhookPayloadTemplate(**value)
+            except Exception:
+                return WebhookPayloadTemplate()
+    
+    @field_serializer("retry_policy")
+    def serialize_retry_policy(self, value: WebhookRetryPolicy) -> Dict[str, Any]:
+        """Serialize retry_policy to dict for JSON storage"""
+        if not value:
+            return {}
+        return value.model_dump() if hasattr(value, 'model_dump') else value
+    
+    @field_validator("retry_policy", mode="before") 
+    @classmethod
+    def validate_retry_policy(cls, value) -> WebhookRetryPolicy:
+        """Validate and convert retry_policy from dict to WebhookRetryPolicy"""
+        if not value:
+            return WebhookRetryPolicy()
+        
+        if isinstance(value, WebhookRetryPolicy):
+            return value
+        elif isinstance(value, dict):
+            return WebhookRetryPolicy(**value)
+        else:
+            try:
+                if hasattr(value, 'model_dump'):
+                    return WebhookRetryPolicy(**value.model_dump())
+                else:
+                    return WebhookRetryPolicy(**value)
+            except Exception:
+                return WebhookRetryPolicy()
 
     # Relationships
     user: Optional["User"] = Relationship(
