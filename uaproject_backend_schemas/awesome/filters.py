@@ -134,6 +134,14 @@ class AwesomeFilters:
         if hasattr(typ, "__origin__"):
             return True
 
+        try:
+            if hasattr(typ, "__bases__") and any(
+                base.__name__ == "BaseModel" for base in typ.__mro__
+            ):
+                return True
+        except Exception:
+            pass
+
         return False
 
     @classmethod
