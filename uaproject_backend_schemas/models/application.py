@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from pydantic import model_validator
 from sqlmodel import ARRAY, BigInteger, Column, ForeignKey, Index, Relationship, String
@@ -8,7 +8,6 @@ from uaproject_backend_schemas.awesome.fields import AwesomeField
 from uaproject_backend_schemas.awesome.mixins import IDMixin, TimestampsMixin
 from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.awesome.schemas import SchemaDefinition
-from uaproject_backend_schemas.models.schemas.server import ServerAccessStatus, ServerType
 
 if TYPE_CHECKING:
     from uaproject_backend_schemas.models.application_section import ApplicationSection
@@ -209,61 +208,3 @@ class Application(AwesomeModel, IDMixin, TimestampsMixin, table=True):
                     )
 
         return self
-
-    # Helper methods for server access management
-    def get_section(self, server_type: ServerType) -> Optional["ApplicationSection"]:
-        """Get section for specific server type."""
-        return next((s for s in self.sections if s.server_type == server_type), None)
-
-    def get_server_access_status(self, server_type: ServerType) -> ServerAccessStatus:
-        """Get access status for specific server."""
-        section = self.get_section(server_type)
-        return section.status if section else ServerAccessStatus.NOT_APPLIED
-
-    def get_accessible_servers(self) -> List[ServerType]:
-        """Get list of servers user has access to."""
-        return [s.server_type for s in self.sections if s.status == ServerAccessStatus.APPROVED]
-
-    def get_pending_servers(self) -> List[ServerType]:
-        """Get list of servers with pending applications."""
-        return [s.server_type for s in self.sections if s.status == ServerAccessStatus.PENDING]
-
-    def get_rejected_servers(self) -> List[ServerType]:
-        """Get list of servers with rejected applications."""
-        return [s.server_type for s in self.sections if s.status == ServerAccessStatus.REJECTED]
-
-    def can_access_server(self, server_type: ServerType) -> bool:
-        """Check if user can access specific server."""
-        return self.get_server_access_status(server_type) == ServerAccessStatus.APPROVED
-
-    def get_available_servers_to_apply(self) -> List[ServerType]:
-        """Get list of servers user can still apply to."""
-        applied_servers = {s.server_type for s in self.sections}
-        return [server for server in ServerType if server not in applied_servers]
-
-    def get_server_access_summary(self) -> Dict[str, Any]:
-        """Get comprehensive server access summary."""
-        return {
-            "accessible_servers": [s.value for s in self.get_accessible_servers()],
-            "pending_servers": [s.value for s in self.get_pending_servers()],
-            "rejected_servers": [s.value for s in self.get_rejected_servers()],
-            "available_to_apply": [s.value for s in self.get_available_servers_to_apply()],
-            "overall_status": self._get_overall_access_status(),
-        }
-
-    def _get_overall_access_status(self) -> str:
-        """Get overall access status description."""
-        accessible = self.get_accessible_servers()
-        rejected = self.get_rejected_servers()
-        pending = self.get_pending_servers()
-
-        if not self.sections:
-            return "no_applications"
-        elif accessible and not rejected and not pending:
-            return "full_access"
-        elif accessible:
-            return "partial_access"
-        elif rejected and not accessible and not pending:
-            return "all_rejected"
-        else:
-            return "under_review"
