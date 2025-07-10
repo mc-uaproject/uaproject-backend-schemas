@@ -30,6 +30,7 @@ class ServiceDiscount(AwesomeBaseModel):
 
 class ServerAvailabilityMode(StrEnum):
     """How service availability works across servers"""
+
     ALL = "all"  # Available on all servers simultaneously (e.g., toy)
     SPECIFIC = "specific"  # Only available on specific servers (e.g., survival graylist)
     SELECTABLE = "selectable"  # User selects which server to activate on (e.g., wealth)
@@ -37,5 +38,8 @@ class ServerAvailabilityMode(StrEnum):
 
 class ServerAvailability(AwesomeBaseModel):
     """Configuration for service availability across servers"""
+
     mode: ServerAvailabilityMode
-    servers: Optional[List[str]] = None  # List of servers where available (null = current server only)
+    servers: Optional[List[str]] = (
+        None  # List of servers where available (null = current server only)
+    )

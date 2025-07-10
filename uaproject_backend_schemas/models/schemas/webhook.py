@@ -1,5 +1,5 @@
 from enum import StrEnum
-from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -81,22 +81,6 @@ class WebhookConditionGroup(BaseModel):
     )
 
 
-class RelationshipConfig(BaseModel):
-    """Configuration for loading related data"""
-
-    path: str = Field(description="Path to relationship (e.g. 'user' or 'user.profile')")
-    fields: Optional[List[str]] = Field(
-        default=None, description="List of fields to load. None = all fields"
-    )
-    conditions: Optional[WebhookConditionGroup] = Field(
-        default=None, description="Conditions for filtering related data"
-    )
-    limit: Optional[int] = Field(default=None, description="Limit for collections")
-    order_by: Optional[str] = Field(default=None, description="Sorting for collections")
-    include_count: bool = Field(default=False, description="Add counter for collections")
-    recursive_depth: int = Field(default=0, description="Recursive depth (0 = only this level)")
-
-
 class WebhookFieldMapping(BaseModel):
     """Field mapping for sending"""
 
@@ -130,11 +114,6 @@ class WebhookTrigger(BaseModel):
     fields: List[WebhookFieldMapping] = Field(default_factory=list, description="Field mapping")
     include_all_fields: bool = Field(default=False, description="Include all fields")
     exclude_fields: Optional[List[str]] = Field(default=None, description="Exclude these fields")
-
-    # Related data
-    relationships: Optional[List[RelationshipConfig]] = Field(
-        default=None, description="Configuration for loading related data"
-    )
 
     # Additional settings
     include_changes_diff: bool = Field(

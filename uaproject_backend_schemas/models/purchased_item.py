@@ -47,7 +47,7 @@ class PurchasedItem(
     expires_at: Optional[datetime] = Field(sa_column=Column(DateTime(timezone=True), nullable=True))
     servers: List[str] = Field(
         sa_column=Column(ARRAY(String), nullable=False),
-        description="List of servers where this purchase is active"
+        description="List of servers where this purchase is active",
     )
     purchase_metadata: Optional[Dict[str, Any]] = Field(sa_column=Column(JSON), default=None)
 

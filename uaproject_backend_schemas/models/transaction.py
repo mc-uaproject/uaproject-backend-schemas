@@ -57,5 +57,6 @@ class Transaction(AwesomeModel, IDMixin, TimestampsMixin, table=True):
         sa_relationship_kwargs={"foreign_keys": "[PurchasedItem.transaction_id]", "uselist": False},
     )
 
+
 if __name__ == "__main__":
     Transaction.schemas.create()
