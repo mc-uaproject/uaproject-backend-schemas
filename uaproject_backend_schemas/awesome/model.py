@@ -1,7 +1,18 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, Callable, ClassVar, Dict, Optional, Type, TypeVar
+from typing import (
+    Any,
+    Callable,
+    ClassVar,
+    Dict,
+    List,
+    Optional,
+    Type,
+    TypeVar,
+    get_args,
+    get_origin,
+)
 
 from pydantic import BaseModel
 from sqlmodel import SQLModel
@@ -94,6 +105,92 @@ class AwesomeModel(SQLModel):
         for field_perms in field_permissions_gen:
             permissions.update(field_perms)
         return permissions
+
+    @classmethod
+    def _is_json_field(cls, field_name: str) -> bool:
+        """Check if field is a JSON field that needs deserialization."""
+        if not hasattr(cls, "model_fields") or field_name not in cls.model_fields:
+            return False
+
+        field_info = cls.model_fields[field_name]
+        if not hasattr(field_info, "sa_column"):
+            return False
+
+        sa_column = field_info.sa_column
+        if sa_column is None:
+            return False
+
+        # Check if it's a JSON column
+        return hasattr(sa_column, "type") and "JSON" in str(sa_column.type)
+
+    @classmethod
+    def _get_field_type(cls, field_name: str) -> Optional[Type]:
+        """Get the expected type for a field from annotations."""
+        if not hasattr(cls, "__annotations__"):
+            return None
+
+        annotations = cls.__annotations__
+        if field_name not in annotations:
+            return None
+
+        return annotations[field_name]
+
+    @classmethod
+    def _deserialize_list_field(cls, item_type, value):
+        if hasattr(item_type, "model_validate") and isinstance(value, list):
+            return [
+                item_type.model_validate(item) if isinstance(item, dict) else item for item in value
+            ]
+        return value
+
+    @classmethod
+    def _deserialize_optional_field(cls, args, value):
+        for arg in args:
+            if arg is not type(None) and hasattr(arg, "model_validate"):
+                if isinstance(value, dict):
+                    return arg.model_validate(value)
+        return value
+
+    @classmethod
+    def _deserialize_json_field(cls, field_name: str, value: Any) -> Any:
+        """Deserialize JSON field value to appropriate Pydantic model."""
+        if value is None:
+            return value
+
+        field_type = cls._get_field_type(field_name)
+        if field_type is None:
+            return value
+
+        origin = get_origin(field_type)
+        if origin is list or origin is List:
+            args = get_args(field_type)
+            if not args:
+                return value
+            item_type = args[0]
+            return cls._deserialize_list_field(item_type, value)
+
+        if hasattr(field_type, "model_validate"):
+            if isinstance(value, dict):
+                return field_type.model_validate(value)
+            return value
+
+        if origin is not None and hasattr(origin, "__name__") and origin.__name__ == "Union":
+            args = get_args(field_type)
+            return cls._deserialize_optional_field(args, value)
+
+        return value
+
+    def model_post_init(self, __context: Any) -> None:
+        """Post-initialization hook to deserialize JSON fields."""
+        super().model_post_init(__context)
+
+        # Deserialize JSON fields
+        for field_name in self.model_fields.keys():
+            if self._is_json_field(field_name):
+                value = getattr(self, field_name, None)
+                if value is not None:
+                    deserialized_value = self._deserialize_json_field(field_name, value)
+                    setattr(self, field_name, deserialized_value)
 
     @classproperty
     def schemas(cls) -> AwesomeSchemas | Type[AwesomeSchemas]:
