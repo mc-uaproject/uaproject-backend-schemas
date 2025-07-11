@@ -36,7 +36,7 @@ class Service(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     price: Decimal = AwesomeField(sa_column=Column(DECIMAL(10, 2), nullable=False))
     is_active: bool = AwesomeField(default=True)
     category: Optional[str] = AwesomeField(max_length=100, nullable=True)
-    type: ServiceType = AwesomeField(sa_column=Column(Enum(ServiceType, native_enum=False)))
+    type: ServiceType = AwesomeField(sa_column=Column(Enum(ServiceType, native_enum=False)), nullable=False)
     duration_months: Optional[int] = AwesomeField(nullable=True)
     is_upgradable: bool = AwesomeField(default=False)
     upgrade_from: Optional[str] = AwesomeField(max_length=100, nullable=True)

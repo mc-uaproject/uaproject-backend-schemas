@@ -15,9 +15,6 @@ if TYPE_CHECKING:
 
 # Legacy fields (v1) - keeping for backward compatibility
 LEGACY_EDITABLE_FIELDS: List[str] = [
-    "birth_date",
-    "launcher",
-    "server_source",
     "private_server_experience",
     "useful_skills",
     "conflict_reaction",
@@ -26,9 +23,6 @@ LEGACY_EDITABLE_FIELDS: List[str] = [
 
 # V2 fields - simplified set
 V2_EDITABLE_FIELDS: List[str] = [
-    "birth_date",
-    "launcher",
-    "server_source",
     "russian_word_reaction",
     "admin_decision_attitude",
     "new_rule_reaction",
