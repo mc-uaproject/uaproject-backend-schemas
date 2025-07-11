@@ -40,36 +40,36 @@ class PunishmentConfigSchemaCreate(AwesomeBaseModel):
 
     description: Optional[str]
     warn_decay_days: Optional[int]
-    is_active: Optional[bool]
-    name: Optional[str]
-    config_data: Optional[dict[str, Any]]
     warn_threshold: Optional[int]
+    is_active: Optional[bool]
+    config_data: Optional[dict[str, Any]]
+    name: Optional[str]
 
 class PunishmentConfigSchemaRedis(AwesomeBaseModel):
     """redis schema for PunishmentConfig model"""
 
     description: Optional[str]
-    id: Optional[int]
     warn_decay_days: Optional[int]
-    updated_at: Optional[datetime]
-    is_active: Optional[bool]
-    name: Optional[str]
-    config_data: Optional[dict[str, Any]]
-    punishments: Optional[list[Punishment]]
     warn_threshold: Optional[int]
+    is_active: Optional[bool]
+    punishments: Optional[list[Punishment]]
+    config_data: Optional[dict[str, Any]]
+    updated_at: Optional[datetime]
+    id: Optional[int]
+    name: Optional[str]
     created_at: datetime
 
 class PunishmentConfigSchemaResponse(AwesomeBaseModel):
     """response schema for PunishmentConfig model"""
 
     description: Optional[str]
-    id: Optional[int]
     warn_decay_days: Optional[int]
-    updated_at: Optional[datetime]
-    is_active: Optional[bool]
-    name: str
-    config_data: dict[str, Any]
     warn_threshold: Optional[int]
+    is_active: Optional[bool]
+    config_data: dict[str, Any]
+    updated_at: Optional[datetime]
+    id: Optional[int]
+    name: str
     created_at: datetime
 
 class PunishmentConfigSchemaUpdate(AwesomeBaseModel):
@@ -77,10 +77,10 @@ class PunishmentConfigSchemaUpdate(AwesomeBaseModel):
 
     description: Optional[str]
     warn_decay_days: Optional[int]
-    is_active: Optional[bool]
-    name: Optional[str]
-    config_data: Optional[dict[str, Any]]
     warn_threshold: Optional[int]
+    is_active: Optional[bool]
+    config_data: Optional[dict[str, Any]]
+    name: Optional[str]
 
 class PunishmentConfigFilter(BaseModel):
     """Pydantic-class for filtering the PunishmentConfig model."""

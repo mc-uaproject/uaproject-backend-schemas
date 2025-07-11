@@ -44,36 +44,36 @@ class TicketMessageSchemaCreate(AwesomeBaseModel):
     """create schema for TicketMessage model"""
 
     attachment_file_ids: Optional[list[int]]
-    ticket_id: Optional[int]
     content: Optional[str]
+    ticket_id: Optional[int]
 
 class TicketMessageSchemaRedis(AwesomeBaseModel):
     """redis schema for TicketMessage model"""
 
-    id: Optional[int]
-    author_id: Optional[int]
-    edited_at: Optional[str]
     attachment_file_ids: Optional[list[int]]
-    author: Optional[User]
-    attachment_files: Optional[list[File]]
-    updated_at: Optional[datetime]
-    ticket_id: Optional[int]
-    is_system_message: Optional[bool]
-    content: Optional[str]
+    edited_at: Optional[str]
     ticket: Optional[Ticket]
+    attachment_files: Optional[list[File]]
+    author_id: Optional[int]
+    updated_at: Optional[datetime]
+    content: Optional[str]
+    is_system_message: Optional[bool]
+    author: Optional[User]
+    id: Optional[int]
+    ticket_id: Optional[int]
     created_at: datetime
 
 class TicketMessageSchemaResponse(AwesomeBaseModel):
     """response schema for TicketMessage model"""
 
-    id: Optional[int]
-    author_id: int
-    edited_at: Optional[str]
     attachment_file_ids: Optional[list[int]]
+    edited_at: Optional[str]
+    author_id: int
     updated_at: Optional[datetime]
-    ticket_id: int
-    is_system_message: Optional[bool]
     content: str
+    is_system_message: Optional[bool]
+    id: Optional[int]
+    ticket_id: int
     created_at: datetime
 
 class TicketMessageSchemaResponseWithAuthor(AwesomeBaseModel):

@@ -12,6 +12,7 @@ from uaproject_backend_schemas.awesome.model import AwesomeModel
 from uaproject_backend_schemas.models.file import File
 from uaproject_backend_schemas.models.purchased_item import PurchasedItem
 from uaproject_backend_schemas.models.schemas.service import (
+    ServerAvailability,
     ServiceDiscount,
     ServicePoint,
     ServiceType,
@@ -35,6 +36,7 @@ class Service(AwesomeModel):
     points: Optional[list[ServicePoint]]
     price: Decimal
     purchased_items: list[PurchasedItem]
+    server_availability: Optional[ServerAvailability]
     service_metadata: Optional[dict[str, Any]]
     type: ServiceType
     updated_at: datetime
@@ -55,86 +57,90 @@ class ServiceSchemas:
 class ServiceSchemaCreate(AwesomeBaseModel):
     """create schema for Service model"""
 
-    type: Optional[ServiceType]
-    upgrade_to: Optional[str]
     description: Optional[str]
-    is_upgradable: Optional[bool]
-    upgrade_from: Optional[str]
-    duration_months: Optional[int]
+    points: Optional[list[ServicePoint]]
     discounts: Optional[list[ServiceDiscount]]
     is_active: Optional[bool]
-    name: Optional[str]
-    service_metadata: Optional[dict[str, Any]]
-    category: Optional[str]
-    image: Optional[str]
-    display_name: Optional[str]
+    is_upgradable: Optional[bool]
     price: Optional[Decimal]
-    points: Optional[list[ServicePoint]]
+    category: Optional[str]
+    upgrade_to: Optional[str]
+    image: Optional[str]
+    name: Optional[str]
+    upgrade_from: Optional[str]
+    service_metadata: Optional[dict[str, Any]]
+    display_name: Optional[str]
+    server_availability: Optional[ServerAvailability]
+    duration_months: Optional[int]
+    type: Optional[ServiceType]
 
 class ServiceSchemaRedis(AwesomeBaseModel):
     """redis schema for Service model"""
 
-    upgrade_to: Optional[str]
-    duration_months: Optional[int]
-    updated_at: Optional[datetime]
-    name: Optional[str]
-    purchased_items: Optional[list[PurchasedItem]]
-    category: Optional[str]
-    points: Optional[list[ServicePoint]]
-    type: Optional[ServiceType]
-    is_upgradable: Optional[bool]
-    icon_file: Optional[File]
-    is_active: Optional[bool]
     description: Optional[str]
-    id: Optional[int]
-    upgrade_from: Optional[str]
+    points: Optional[list[ServicePoint]]
     discounts: Optional[list[ServiceDiscount]]
-    service_metadata: Optional[dict[str, Any]]
-    image: Optional[str]
-    display_name: Optional[str]
+    is_active: Optional[bool]
+    is_upgradable: Optional[bool]
     price: Optional[Decimal]
+    category: Optional[str]
+    purchased_items: Optional[list[PurchasedItem]]
+    upgrade_to: Optional[str]
+    image: Optional[str]
+    name: Optional[str]
+    upgrade_from: Optional[str]
+    updated_at: Optional[datetime]
+    service_metadata: Optional[dict[str, Any]]
+    display_name: Optional[str]
+    server_availability: Optional[ServerAvailability]
+    icon_file: Optional[File]
+    duration_months: Optional[int]
+    type: Optional[ServiceType]
+    id: Optional[int]
     created_at: datetime
 
 class ServiceSchemaResponse(AwesomeBaseModel):
     """response schema for Service model"""
 
-    type: ServiceType
-    upgrade_to: Optional[str]
     description: Optional[str]
-    id: Optional[int]
-    is_upgradable: Optional[bool]
-    upgrade_from: Optional[str]
-    duration_months: Optional[int]
-    discounts: Optional[list[ServiceDiscount]]
-    updated_at: Optional[datetime]
-    is_active: Optional[bool]
-    name: str
-    service_metadata: Optional[dict[str, Any]]
-    category: Optional[str]
-    image: Optional[str]
-    display_name: Optional[str]
-    price: Decimal
     points: Optional[list[ServicePoint]]
+    discounts: Optional[list[ServiceDiscount]]
+    is_active: Optional[bool]
+    is_upgradable: Optional[bool]
+    price: Decimal
+    category: Optional[str]
+    upgrade_to: Optional[str]
+    image: Optional[str]
+    name: str
+    upgrade_from: Optional[str]
+    updated_at: Optional[datetime]
+    service_metadata: Optional[dict[str, Any]]
+    display_name: Optional[str]
+    server_availability: Optional[ServerAvailability]
+    duration_months: Optional[int]
+    type: ServiceType
+    id: Optional[int]
     created_at: datetime
 
 class ServiceSchemaUpdate(AwesomeBaseModel):
     """update schema for Service model"""
 
-    type: Optional[ServiceType]
-    upgrade_to: Optional[str]
     description: Optional[str]
-    is_upgradable: Optional[bool]
-    upgrade_from: Optional[str]
-    duration_months: Optional[int]
+    points: Optional[list[ServicePoint]]
     discounts: Optional[list[ServiceDiscount]]
     is_active: Optional[bool]
-    name: Optional[str]
-    service_metadata: Optional[dict[str, Any]]
-    category: Optional[str]
-    image: Optional[str]
-    display_name: Optional[str]
+    is_upgradable: Optional[bool]
     price: Optional[Decimal]
-    points: Optional[list[ServicePoint]]
+    category: Optional[str]
+    upgrade_to: Optional[str]
+    image: Optional[str]
+    name: Optional[str]
+    upgrade_from: Optional[str]
+    service_metadata: Optional[dict[str, Any]]
+    display_name: Optional[str]
+    server_availability: Optional[ServerAvailability]
+    duration_months: Optional[int]
+    type: Optional[ServiceType]
 
 class ServiceFilter(BaseModel):
     """Pydantic-class for filtering the Service model."""

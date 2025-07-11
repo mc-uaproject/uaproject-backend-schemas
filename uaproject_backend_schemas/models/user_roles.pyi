@@ -32,32 +32,32 @@ class UserRolesSchemas:
 class UserRolesSchemaCreate(AwesomeBaseModel):
     """create schema for UserRoles model"""
 
-    role_id: Optional[int]
     user_id: Optional[int]
+    role_id: Optional[int]
 
 class UserRolesSchemaRedis(AwesomeBaseModel):
     """redis schema for UserRoles model"""
 
-    id: Optional[int]
-    role_id: Optional[int]
-    updated_at: Optional[datetime]
     user_id: Optional[int]
+    updated_at: Optional[datetime]
+    role_id: Optional[int]
+    id: Optional[int]
     created_at: datetime
 
 class UserRolesSchemaResponse(AwesomeBaseModel):
     """response schema for UserRoles model"""
 
-    id: Optional[int]
-    role_id: int
-    updated_at: Optional[datetime]
     user_id: int
+    updated_at: Optional[datetime]
+    role_id: int
+    id: Optional[int]
     created_at: datetime
 
 class UserRolesSchemaUpdate(AwesomeBaseModel):
     """update schema for UserRoles model"""
 
-    role_id: Optional[int]
     user_id: Optional[int]
+    role_id: Optional[int]
 
 class UserRolesFilter(BaseModel):
     """Pydantic-class for filtering the UserRoles model."""
