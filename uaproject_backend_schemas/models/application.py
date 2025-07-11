@@ -13,6 +13,12 @@ if TYPE_CHECKING:
     from uaproject_backend_schemas.models.application_section import ApplicationSection
     from uaproject_backend_schemas.models.user import User
 
+BASE_EDITABLE_FIELDS: List[str] = [
+    "birth_date",
+    "launcher",
+    "server_source",
+]
+
 # Legacy fields (v1) - keeping for backward compatibility
 LEGACY_EDITABLE_FIELDS: List[str] = [
     "private_server_experience",
@@ -144,6 +150,14 @@ class Application(AwesomeModel, IDMixin, TimestampsMixin, table=True):
             ]
             optional = True
             permissions = [".admin"]
+
+        class CreateBase(SchemaDefinition):
+            """Schema for creating base applications."""
+
+            fields = BASE_EDITABLE_FIELDS
+            fields_exclude = ["id", "created_at", "updated_at"]
+            optional = True
+            permissions = [".write.self"]
 
         class CreateLegacy(SchemaDefinition):
             """Schema for creating legacy v1 applications."""
