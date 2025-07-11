@@ -163,7 +163,7 @@ class WebhookPayloadTemplate(BaseModel):
 class WebhookRetryPolicy(BaseModel):
     """Retry policy"""
 
-    max_retries: int = Field(default=3, description="Max number of retries")
+    max_attempts: int = Field(default=3, description="Max number of retries", alias="max_retries")
     retry_delay: int = Field(default=60, description="Base delay between retries (seconds)")
     retry_multiplier: float = Field(default=2.0, description="Multiplier for exponential delay")
     max_retry_delay: int = Field(default=3600, description="Max delay between retries (seconds)")
