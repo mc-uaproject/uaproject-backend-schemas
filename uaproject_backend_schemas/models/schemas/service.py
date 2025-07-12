@@ -3,6 +3,7 @@ from enum import StrEnum
 from typing import List, Optional
 
 from uaproject_backend_schemas.awesome.base_model import AwesomeBaseModel
+from uaproject_backend_schemas.models.schemas.server import ServerType
 
 
 class ServiceCategory(StrEnum):
@@ -40,6 +41,4 @@ class ServerAvailability(AwesomeBaseModel):
     """Configuration for service availability across servers"""
 
     mode: ServerAvailabilityMode
-    servers: Optional[List[str]] = (
-        None  # List of servers where available (null = current server only)
-    )
+    servers: List[ServerType] = []
