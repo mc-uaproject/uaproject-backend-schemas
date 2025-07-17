@@ -354,8 +354,6 @@ def _get_schema_fields(
     try:
         if _type.lower() == "schema":
             schema_instance = getattr(model_cls.schemas, schema_name)
-        else:
-            schema_instance = getattr(model_cls.scopes, schema_name)
 
         # Get fields from the actual generated schema (both regular and computed)
         fields = list(schema_instance.model_fields.keys())
@@ -497,7 +495,7 @@ def _get_class_docstring_and_permissions(model_cls, schema_name, permissions, _t
 def generate_class(
     model_cls: Type[AwesomeModel],
     schema_name: str,
-    permissions: list[str] = None,
+    permissions: list[str] = [],
     _type: str = "Schema",
 ) -> str:
     """Generate schema class with permissions."""
@@ -540,11 +538,11 @@ def generate_filters_class(model_cls: Type[AwesomeModel]) -> str:
     content = f"class {model_cls.__name__}Filters:\n"
     content += f'    """Declarative filters for the {model_cls.__name__} model."""\n'
     for filter_key in model_cls.filters.list():
-        filter_cls = getattr(model_cls.Filters, filter_key)
+        filter_cls = getattr(model_cls.filters, filter_key)
         content += f"    {filter_key}: type\n"
     content += "\n"
     for filter_key in model_cls.filters.list():
-        filter_cls = getattr(model_cls.Filters, filter_key)
+        filter_cls = getattr(model_cls.filters, filter_key)
         content += f"class {model_cls.__name__}Filter{filter_key}(FilterDefinition):\n"
         content += f'    """{getattr(filter_cls, "description", "")}"""\n'
         content += f"    field: str = '{getattr(filter_cls, 'field', '')}'\n"
@@ -560,11 +558,11 @@ def generate_sorts_class(model_cls: Type[AwesomeModel]) -> str:
     content = f"class {model_cls.__name__}Sorts:\n"
     content += f'    """Declarative sorts for the {model_cls.__name__} model."""\n'
     for sort_key in model_cls.sorts.list():
-        sort_cls = getattr(model_cls.Sorts, sort_key)
+        sort_cls = getattr(model_cls.sorts, sort_key)
         content += f"    {sort_key}: type\n"
     content += "\n"
     for sort_key in model_cls.sorts.list():
-        sort_cls = getattr(model_cls.Sorts, sort_key)
+        sort_cls = getattr(model_cls.sorts, sort_key)
         content += f"class {model_cls.__name__}Sort{sort_key}(SortDefinition):\n"
         content += f'    """{getattr(sort_cls, "description", "")}"""\n'
         content += f"    field: str = '{getattr(sort_cls, 'field', '')}'\n"

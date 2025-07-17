@@ -37,40 +37,40 @@ class RoleSchemaCreate(AwesomeBaseModel):
     """create schema for Role model"""
 
     display_name: Optional[str]
-    weight: Optional[int]
     permissions: Optional[dict[str, bool]]
     name: Optional[str]
+    weight: Optional[int]
 
 class RoleSchemaRedis(AwesomeBaseModel):
     """redis schema for Role model"""
 
     display_name: Optional[str]
-    weight: Optional[int]
     permissions: Optional[dict[str, bool]]
     updated_at: Optional[datetime]
-    users: Optional[list[User]]
     id: Optional[int]
+    users: Optional[list[User]]
     name: Optional[str]
+    weight: Optional[int]
     created_at: datetime
 
 class RoleSchemaResponse(AwesomeBaseModel):
     """response schema for Role model"""
 
     display_name: Optional[str]
-    weight: Optional[int]
     permissions: Optional[dict[str, bool]]
     updated_at: Optional[datetime]
     id: Optional[int]
     name: str
+    weight: Optional[int]
     created_at: datetime
 
 class RoleSchemaUpdate(AwesomeBaseModel):
     """update schema for Role model"""
 
     display_name: Optional[str]
-    weight: Optional[int]
     permissions: Optional[dict[str, bool]]
     name: Optional[str]
+    weight: Optional[int]
 
 class RoleFilter(BaseModel):
     """Pydantic-class for filtering the Role model."""
