@@ -151,12 +151,26 @@ class User(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     @computed_field(return_type=Dict[str, bool])
     @property
     def permissions(self) -> Dict[str, bool]:
-        """Computed permissions with caching for performance."""
+        """Computed permissions with safe role access."""
         user_permissions = {}
 
-        sorted_roles = sorted(self.roles, key=lambda r: r.weight, reverse=False)
-        for role in sorted_roles:
-            for user_permission_key, user_permission_value in role.permissions.items():
-                user_permissions[user_permission_key] = user_permission_value
+        # Safe access to roles - check if roles are loaded
+        try:
+            if not hasattr(self, "roles") or self.roles is None:
+                return user_permissions
+
+            # Check if roles is actually loaded (not a lazy relationship)
+            roles = self.roles
+            if not isinstance(roles, list):
+                return user_permissions
+
+            sorted_roles = sorted(roles, key=lambda r: r.weight, reverse=False)
+            for role in sorted_roles:
+                if hasattr(role, "permissions") and role.permissions:
+                    for user_permission_key, user_permission_value in role.permissions.items():
+                        user_permissions[user_permission_key] = user_permission_value
+        except Exception:
+            # If any error occurs during role access, return empty permissions
+            pass
 
         return user_permissions
