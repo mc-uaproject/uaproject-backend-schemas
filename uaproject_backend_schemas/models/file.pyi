@@ -57,47 +57,47 @@ class FileSchemas:
 class FileSchemaCreate(AwesomeBaseModel):
     """create schema for File model"""
 
+    original_name: Optional[str]
     user_id: Optional[int]
-    checksum: Optional[str]
     bucket: Optional[str]
-    news_id: Optional[int]
-    model_id: Optional[int]
-    ticket_message_id: Optional[int]
     content_type: Optional[str]
+    checksum: Optional[str]
+    ticket_message_id: Optional[int]
+    model_id: Optional[int]
+    news_id: Optional[int]
     path: Optional[str]
     service_id: Optional[int]
-    model_name: Optional[str]
-    checksum_type: Optional[str]
     size: Optional[int]
-    original_name: Optional[str]
+    checksum_type: Optional[str]
+    model_name: Optional[str]
     created_at: datetime
 
 class FileSchemaRedis(AwesomeBaseModel):
     """redis schema for File model"""
 
     news: Optional[News]
-    webhook_logs_as_response: Optional[list[WebhookLog]]
-    uploaded_at: Optional[datetime]
-    checksum: Optional[str]
-    bucket: Optional[str]
-    id: Optional[int]
-    path: Optional[str]
-    model_name: Optional[str]
-    checksum_type: Optional[str]
-    model_id: Optional[int]
-    service: Optional[Service]
-    news_id: Optional[int]
-    status: Optional[str]
-    size: Optional[int]
-    original_name: Optional[str]
-    ticket_message: Optional[TicketMessage]
-    user_id: Optional[int]
-    updated_at: Optional[datetime]
-    ticket_message_id: Optional[int]
-    content_type: Optional[str]
     webhook_logs_as_request: Optional[list[WebhookLog]]
-    service_id: Optional[int]
+    bucket: Optional[str]
+    content_type: Optional[str]
+    ticket_message_id: Optional[int]
+    news_id: Optional[int]
+    path: Optional[str]
+    checksum_type: Optional[str]
+    status: Optional[str]
+    id: Optional[int]
+    original_name: Optional[str]
+    updated_at: Optional[datetime]
+    ticket_message: Optional[TicketMessage]
+    checksum: Optional[str]
+    model_id: Optional[int]
+    size: Optional[int]
+    service: Optional[Service]
     user: Optional[User]
+    uploaded_at: Optional[datetime]
+    user_id: Optional[int]
+    webhook_logs_as_response: Optional[list[WebhookLog]]
+    service_id: Optional[int]
+    model_name: Optional[str]
     created_at: datetime
 
 class FileSchemaRequestUpload(AwesomeBaseModel):
@@ -114,23 +114,23 @@ class FileSchemaRequestUpload(AwesomeBaseModel):
 class FileSchemaResponse(AwesomeBaseModel):
     """response schema for File model"""
 
-    user_id: int
-    checksum: Optional[str]
-    bucket: str
-    news_id: Optional[int]
-    model_id: Optional[int]
-    updated_at: Optional[datetime]
-    ticket_message_id: Optional[int]
     id: Optional[int]
-    status: str
-    content_type: str
-    path: str
-    uploaded_at: Optional[datetime]
-    service_id: Optional[int]
-    model_name: Optional[str]
-    checksum_type: Optional[str]
-    size: int
     original_name: str
+    user_id: int
+    updated_at: Optional[datetime]
+    bucket: str
+    content_type: str
+    checksum: Optional[str]
+    ticket_message_id: Optional[int]
+    model_id: Optional[int]
+    news_id: Optional[int]
+    path: str
+    service_id: Optional[int]
+    size: int
+    checksum_type: Optional[str]
+    uploaded_at: Optional[datetime]
+    status: str
+    model_name: Optional[str]
     created_at: datetime
 
 class FileSchemaUpdate(AwesomeBaseModel):

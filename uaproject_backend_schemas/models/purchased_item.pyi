@@ -45,60 +45,60 @@ class PurchasedItemSchemas:
 class PurchasedItemSchemaCreate(AwesomeBaseModel):
     """create schema for PurchasedItem model"""
 
+    purchase_metadata: Optional[dict[str, Any]]
     user_id: int
     servers: list[str]
-    quantity: Optional[int]
-    expires_at: Optional[datetime]
-    purchase_metadata: Optional[dict[str, Any]]
-    status: PurchasedItemStatus
     service_id: int
     transaction_id: int
+    expires_at: Optional[datetime]
+    quantity: Optional[int]
+    status: PurchasedItemStatus
     created_at: datetime
 
 class PurchasedItemSchemaRedis(AwesomeBaseModel):
     """redis schema for PurchasedItem model"""
 
+    id: Optional[int]
+    purchase_metadata: Optional[dict[str, Any]]
     user_id: int
+    updated_at: Optional[datetime]
+    transaction: Optional[Transaction]
     servers: list[str]
+    service_id: int
+    transaction_id: int
+    expires_at: Optional[datetime]
     service: Optional[Service]
     quantity: Optional[int]
-    expires_at: Optional[datetime]
-    purchase_metadata: Optional[dict[str, Any]]
-    updated_at: Optional[datetime]
-    id: Optional[int]
-    status: PurchasedItemStatus
-    transaction: Optional[Transaction]
-    service_id: int
     user: Optional[User]
-    transaction_id: int
+    status: PurchasedItemStatus
     created_at: datetime
 
 class PurchasedItemSchemaResponse(AwesomeBaseModel):
     """response schema for PurchasedItem model"""
 
-    user_id: int
-    servers: list[str]
-    quantity: Optional[int]
-    expires_at: Optional[datetime]
-    purchase_metadata: Optional[dict[str, Any]]
-    updated_at: Optional[datetime]
     id: Optional[int]
-    status: PurchasedItemStatus
+    purchase_metadata: Optional[dict[str, Any]]
+    user_id: int
+    updated_at: Optional[datetime]
+    servers: list[str]
     service_id: int
     transaction_id: int
+    expires_at: Optional[datetime]
+    quantity: Optional[int]
+    status: PurchasedItemStatus
     created_at: datetime
 
 class PurchasedItemSchemaUpdate(AwesomeBaseModel):
     """update schema for PurchasedItem model"""
 
+    purchase_metadata: Optional[dict[str, Any]]
     user_id: int
     servers: list[str]
-    quantity: Optional[int]
-    expires_at: Optional[datetime]
-    purchase_metadata: Optional[dict[str, Any]]
-    status: PurchasedItemStatus
     service_id: int
     transaction_id: int
+    expires_at: Optional[datetime]
+    quantity: Optional[int]
+    status: PurchasedItemStatus
     created_at: datetime
 
 class PurchasedItemFilter(BaseModel):

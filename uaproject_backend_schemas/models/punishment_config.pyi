@@ -38,50 +38,50 @@ class PunishmentConfigSchemas:
 class PunishmentConfigSchemaCreate(AwesomeBaseModel):
     """create schema for PunishmentConfig model"""
 
-    config_data: Optional[dict[str, Any]]
-    warn_threshold: Optional[int]
     name: Optional[str]
     warn_decay_days: Optional[int]
     is_active: Optional[bool]
+    warn_threshold: Optional[int]
     description: Optional[str]
+    config_data: Optional[dict[str, Any]]
     created_at: datetime
 
 class PunishmentConfigSchemaRedis(AwesomeBaseModel):
     """redis schema for PunishmentConfig model"""
 
-    config_data: Optional[dict[str, Any]]
-    warn_threshold: Optional[int]
+    id: Optional[int]
     name: Optional[str]
+    warn_decay_days: Optional[int]
     updated_at: Optional[datetime]
     punishments: Optional[list[Punishment]]
-    id: Optional[int]
-    warn_decay_days: Optional[int]
     is_active: Optional[bool]
+    warn_threshold: Optional[int]
     description: Optional[str]
+    config_data: Optional[dict[str, Any]]
     created_at: datetime
 
 class PunishmentConfigSchemaResponse(AwesomeBaseModel):
     """response schema for PunishmentConfig model"""
 
-    config_data: dict[str, Any]
-    warn_threshold: Optional[int]
-    name: str
-    updated_at: Optional[datetime]
     id: Optional[int]
+    name: str
     warn_decay_days: Optional[int]
+    updated_at: Optional[datetime]
     is_active: Optional[bool]
+    warn_threshold: Optional[int]
     description: Optional[str]
+    config_data: dict[str, Any]
     created_at: datetime
 
 class PunishmentConfigSchemaUpdate(AwesomeBaseModel):
     """update schema for PunishmentConfig model"""
 
-    config_data: Optional[dict[str, Any]]
-    warn_threshold: Optional[int]
     name: Optional[str]
     warn_decay_days: Optional[int]
     is_active: Optional[bool]
+    warn_threshold: Optional[int]
     description: Optional[str]
+    config_data: Optional[dict[str, Any]]
     created_at: datetime
 
 class PunishmentConfigFilter(BaseModel):

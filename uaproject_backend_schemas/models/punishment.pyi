@@ -45,59 +45,59 @@ class PunishmentSchemaCreate(AwesomeBaseModel):
     """create schema for Punishment model"""
 
     user_id: Optional[int]
-    punishment_metadata: Optional[dict[str, Any]]
     reason: Optional[str]
+    punishment_metadata: Optional[dict[str, Any]]
     expires_at: Optional[datetime]
-    type: Optional[PunishmentType]
-    status: Optional[PunishmentStatus]
     config_id: Optional[int]
+    type: Optional[PunishmentType]
     admin_id: Optional[int]
+    status: Optional[PunishmentStatus]
     created_at: datetime
 
 class PunishmentSchemaRedis(AwesomeBaseModel):
     """redis schema for Punishment model"""
 
-    user_id: Optional[int]
-    punishment_metadata: Optional[dict[str, Any]]
-    reason: Optional[str]
-    expires_at: Optional[datetime]
-    admin: Optional[User]
-    type: Optional[PunishmentType]
-    updated_at: Optional[datetime]
     id: Optional[int]
-    status: Optional[PunishmentStatus]
-    config_id: Optional[int]
-    user: Optional[User]
+    user_id: Optional[int]
+    updated_at: Optional[datetime]
+    reason: Optional[str]
+    admin: Optional[User]
     config: Optional[PunishmentConfig]
+    punishment_metadata: Optional[dict[str, Any]]
+    expires_at: Optional[datetime]
+    config_id: Optional[int]
+    type: Optional[PunishmentType]
+    user: Optional[User]
     admin_id: Optional[int]
+    status: Optional[PunishmentStatus]
     created_at: datetime
 
 class PunishmentSchemaResponse(AwesomeBaseModel):
     """response schema for Punishment model"""
 
-    user_id: int
-    punishment_metadata: Optional[dict[str, Any]]
-    reason: Optional[str]
-    expires_at: Optional[datetime]
-    type: PunishmentType
-    updated_at: Optional[datetime]
     id: Optional[int]
-    status: PunishmentStatus
+    user_id: int
+    updated_at: Optional[datetime]
+    reason: Optional[str]
+    punishment_metadata: Optional[dict[str, Any]]
+    expires_at: Optional[datetime]
     config_id: Optional[int]
+    type: PunishmentType
     admin_id: Optional[int]
+    status: PunishmentStatus
     created_at: datetime
 
 class PunishmentSchemaUpdate(AwesomeBaseModel):
     """update schema for Punishment model"""
 
     user_id: Optional[int]
-    punishment_metadata: Optional[dict[str, Any]]
     reason: Optional[str]
+    punishment_metadata: Optional[dict[str, Any]]
     expires_at: Optional[datetime]
-    type: Optional[PunishmentType]
-    status: Optional[PunishmentStatus]
     config_id: Optional[int]
+    type: Optional[PunishmentType]
     admin_id: Optional[int]
+    status: Optional[PunishmentStatus]
     created_at: datetime
 
 class PunishmentFilter(BaseModel):

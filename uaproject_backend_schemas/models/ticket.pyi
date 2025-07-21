@@ -45,56 +45,56 @@ class TicketSchemas:
 class TicketSchemaCreate(AwesomeBaseModel):
     """create schema for Ticket model"""
 
-    priority: Optional[TicketPriority]
-    status: Optional[TicketStatus]
-    title: Optional[str]
     author_id: Optional[int]
+    priority: Optional[TicketPriority]
+    title: Optional[str]
+    status: Optional[TicketStatus]
     description: Optional[str]
     created_at: datetime
 
 class TicketSchemaRedis(AwesomeBaseModel):
     """redis schema for Ticket model"""
 
-    priority: Optional[TicketPriority]
-    updated_at: Optional[datetime]
     id: Optional[int]
-    status: Optional[TicketStatus]
-    title: Optional[str]
     author_id: Optional[int]
-    assigned_to: Optional[User]
+    updated_at: Optional[datetime]
+    priority: Optional[TicketPriority]
+    added_user_ids: Optional[list[int]]
     author: Optional[User]
+    title: Optional[str]
+    assigned_to_id: Optional[int]
+    assigned_to: Optional[User]
+    status: Optional[TicketStatus]
     messages: Optional[list[TicketMessage]]
     description: Optional[str]
-    added_user_ids: Optional[list[int]]
-    assigned_to_id: Optional[int]
     created_at: datetime
 
 class TicketSchemaResponse(AwesomeBaseModel):
     """response schema for Ticket model"""
 
-    priority: TicketPriority
-    updated_at: Optional[datetime]
     id: Optional[int]
-    status: TicketStatus
-    title: str
     author_id: int
-    description: str
+    updated_at: Optional[datetime]
+    priority: TicketPriority
     added_user_ids: list[int]
+    title: str
     assigned_to_id: Optional[int]
+    status: TicketStatus
+    description: str
     created_at: datetime
 
 class TicketSchemaResponseSelf(AwesomeBaseModel):
     """response_self schema for Ticket model"""
 
-    priority: TicketPriority
-    updated_at: Optional[datetime]
     id: Optional[int]
-    status: TicketStatus
-    title: str
     author_id: int
-    description: str
+    updated_at: Optional[datetime]
+    priority: TicketPriority
     added_user_ids: list[int]
+    title: str
     assigned_to_id: Optional[int]
+    status: TicketStatus
+    description: str
     created_at: datetime
 
 class TicketSchemaUpdate(AwesomeBaseModel):

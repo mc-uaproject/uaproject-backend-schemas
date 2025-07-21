@@ -49,26 +49,26 @@ class ClaimSchemaCreate(AwesomeBaseModel):
 class ClaimSchemaRedis(AwesomeBaseModel):
     """redis schema for Claim model"""
 
-    defendants: Optional[list[User]]
-    updated_at: Optional[datetime]
-    claimants: Optional[list[User]]
     id: Optional[int]
-    status: Optional[ClaimStatus]
-    title: Optional[str]
+    claimants: Optional[list[User]]
     description: Optional[str]
-    judging: Optional[Judging]
+    updated_at: Optional[datetime]
     judging_id: Optional[int]
+    judging: Optional[Judging]
+    title: Optional[str]
+    status: Optional[ClaimStatus]
+    defendants: Optional[list[User]]
     created_at: datetime
 
 class ClaimSchemaResponse(AwesomeBaseModel):
     """response schema for Claim model"""
 
-    updated_at: Optional[datetime]
     id: Optional[int]
-    status: ClaimStatus
-    title: str
     description: str
+    updated_at: Optional[datetime]
     judging_id: Optional[int]
+    title: str
+    status: ClaimStatus
     created_at: datetime
 
 class ClaimSchemaUpdate(AwesomeBaseModel):

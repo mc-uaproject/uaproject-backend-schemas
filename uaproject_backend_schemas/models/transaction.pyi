@@ -46,57 +46,57 @@ class TransactionSchemas:
 class TransactionSchemaCreate(AwesomeBaseModel):
     """create schema for Transaction model"""
 
-    user_id: Optional[int]
-    type: Optional[TransactionType]
     transaction_metadata: Optional[dict[str, Any]]
+    user_id: Optional[int]
     amount: Optional[Decimal]
     service_id: Optional[int]
-    description: Optional[str]
     recipient_id: Optional[int]
+    type: Optional[TransactionType]
+    description: Optional[str]
     created_at: datetime
 
 class TransactionSchemaRedis(AwesomeBaseModel):
     """redis schema for Transaction model"""
 
-    user_id: Optional[int]
-    service: Optional[Service]
-    type: Optional[TransactionType]
-    updated_at: Optional[datetime]
     id: Optional[int]
     transaction_metadata: Optional[dict[str, Any]]
-    amount: Optional[Decimal]
-    service_id: Optional[int]
-    description: Optional[str]
+    user_id: Optional[int]
+    updated_at: Optional[datetime]
     purchased_item: Optional[PurchasedItem]
     user: Optional[User]
+    amount: Optional[Decimal]
+    service_id: Optional[int]
+    service: Optional[Service]
     recipient_id: Optional[int]
+    type: Optional[TransactionType]
     recipient: Optional[User]
+    description: Optional[str]
     created_at: datetime
 
 class TransactionSchemaResponse(AwesomeBaseModel):
     """response schema for Transaction model"""
 
-    user_id: int
-    type: TransactionType
-    updated_at: Optional[datetime]
     id: Optional[int]
     transaction_metadata: Optional[dict[str, Any]]
+    user_id: int
+    updated_at: Optional[datetime]
     amount: Decimal
     service_id: Optional[int]
-    description: Optional[str]
     recipient_id: int
+    type: TransactionType
+    description: Optional[str]
     created_at: datetime
 
 class TransactionSchemaUpdate(AwesomeBaseModel):
     """update schema for Transaction model"""
 
-    user_id: Optional[int]
-    type: Optional[TransactionType]
     transaction_metadata: Optional[dict[str, Any]]
+    user_id: Optional[int]
     amount: Optional[Decimal]
     service_id: Optional[int]
-    description: Optional[str]
     recipient_id: Optional[int]
+    type: Optional[TransactionType]
+    description: Optional[str]
     created_at: datetime
 
 class TransactionFilter(BaseModel):
