@@ -38,6 +38,7 @@ class User(AwesomeModel, IDMixin, TimestampsMixin, table=True):
         index=True,
         nullable=True,
         max_length=16,
+        min_length=3,
         unique=True,
         write_permissions=[".write.nickname"],
     )
@@ -135,17 +136,10 @@ class User(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     @model_validator(mode="before")
     def validate_fields(cls, values: Optional[dict[str, str]]) -> Optional[dict[str, str]]:
         if minecraft_nickname := values.get("minecraft_nickname", None):
-            if not 3 <= len(minecraft_nickname) <= 16:
-                raise ValueError("Minecraft nickname must be between 3 and 16 characters.")
             if not re.match(r"^[a-zA-Z0-9_]+$", minecraft_nickname):
                 raise ValueError(
                     "Minecraft nickname can only contain letters, numbers, and underscores."
                 )
-
-        if biography := values.get("biography", None):
-            if len(biography) > 2048:
-                raise ValueError("Biography must be less than 2048 characters.")
-
         return values
 
     @computed_field(return_type=Dict[str, bool])

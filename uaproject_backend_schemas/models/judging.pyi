@@ -41,27 +41,28 @@ class JudgingSchemaCreate(AwesomeBaseModel):
     decision: str
     verdict: JudgingVerdict
     judge_id: int
+    created_at: datetime
 
 class JudgingSchemaRedis(AwesomeBaseModel):
     """redis schema for Judging model"""
 
-    claims: Optional[list[Claim]]
-    updated_at: Optional[datetime]
     decision: Optional[str]
-    judge_id: Optional[int]
-    judge: Optional[User]
-    id: Optional[int]
     verdict: Optional[JudgingVerdict]
+    updated_at: Optional[datetime]
+    judge_id: Optional[int]
+    id: Optional[int]
+    claims: Optional[list[Claim]]
+    judge: Optional[User]
     created_at: datetime
 
 class JudgingSchemaResponse(AwesomeBaseModel):
     """response schema for Judging model"""
 
-    updated_at: Optional[datetime]
     decision: str
+    verdict: JudgingVerdict
+    updated_at: Optional[datetime]
     judge_id: int
     id: Optional[int]
-    verdict: JudgingVerdict
     created_at: datetime
 
 class JudgingSchemaUpdate(AwesomeBaseModel):
@@ -70,6 +71,7 @@ class JudgingSchemaUpdate(AwesomeBaseModel):
     id: Optional[int]
     decision: Optional[str]
     verdict: Optional[JudgingVerdict]
+    created_at: datetime
 
 class JudgingFilter(BaseModel):
     """Pydantic-class for filtering the Judging model."""

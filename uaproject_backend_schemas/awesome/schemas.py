@@ -366,8 +366,22 @@ class AwesomeSchemas:
                     # Fallback for other types of computed fields
                     setattr(base_model, field_name, computed_field_info)
 
-            # Rebuild model to properly register computed fields
-            base_model.model_rebuild()
+        # Copy model-level validators from the source model
+        self._copy_model_validators(base_model)
+
+        # Rebuild model to properly register computed fields and validators
+        # This is crucial for validators to be properly registered
+        base_model.model_rebuild()
+        
+        # Force recreation of validator schema to include model validators
+        # This ensures that copied model validators are properly compiled
+        if hasattr(base_model, '__pydantic_core_schema__'):
+            delattr(base_model, '__pydantic_core_schema__')
+        if hasattr(base_model, '__pydantic_validator__'):
+            delattr(base_model, '__pydantic_validator__')
+        
+        # Force recompilation by rebuilding again after clearing cache
+        base_model.model_rebuild(force=True)
 
         self._setup_schema_model(base_model, fields, relationships, name, formatted_permissions)
 
@@ -447,7 +461,18 @@ class AwesomeSchemas:
                 )
             else:
                 field_type = self._get_field_type(f, model_field_info[f], relationships)
-            field_definitions[f] = (field_type, None)
+            
+            # Pass the original field info if it exists so metadata can be preserved
+            original_field_info = None
+            if hasattr(self.model_cls, "model_fields") and f in self.model_cls.model_fields:
+                original_field_info = self.model_cls.model_fields[f]
+                
+                # If field has metadata, create an Annotated type to preserve validators
+                if hasattr(original_field_info, 'metadata') and original_field_info.metadata:
+                    from typing import Annotated
+                    field_type = Annotated[field_type, *original_field_info.metadata]
+            
+            field_definitions[f] = (field_type, original_field_info)
         return field_definitions
 
     def _is_computed_field(self, field_name: str) -> bool:
@@ -508,6 +533,11 @@ class AwesomeSchemas:
             "write_permissions",
         }
         field_args.update({k: v for k, v in field_info.__dict__.items() if k not in excluded_keys})
+        
+        # Copy metadata which contains validators and constraints
+        if hasattr(field_info, "metadata"):
+            field_args["metadata"] = field_info.metadata
+            
         return AwesomeFieldInfo(**field_args)
 
     def _filter_fields_by_permissions(
@@ -532,7 +562,13 @@ class AwesomeSchemas:
                         computed_fields[f] = field
                 continue
 
-            if f not in self.model_cls.model_fields or not isinstance(
+            # Check if we have original field info passed from _get_field_definitions
+            if _ is not None and isinstance(_, AwesomeFieldInfo):
+                # We have original field info, use it to build new field info with metadata
+                params = self._get_field_info_params(f, _, optional)
+                new_field_info = self._build_new_field_info(t, _, params)
+                filtered_fields[f] = (t, new_field_info)
+            elif f not in self.model_cls.model_fields or not isinstance(
                 self.model_cls.model_fields[f], AwesomeFieldInfo
             ):
                 if _ is not None:
@@ -543,16 +579,62 @@ class AwesomeSchemas:
                         AwesomeFieldInfo(annotation=t, required=False, default=None),
                     )
                 continue
+            else:
+                field_info = self.model_cls.model_fields[f]
 
-            field_info = self.model_cls.model_fields[f]
-
-            # Note: We include all fields in schema, but field permission filtering
-            # happens at runtime in PermissionChecker.apply_field_permissions_to_data
-            params = self._get_field_info_params(f, field_info, optional)
-            new_field_info = self._build_new_field_info(t, field_info, params)
-            filtered_fields[f] = (t, new_field_info)
+                # Note: We include all fields in schema, but field permission filtering
+                # happens at runtime in PermissionChecker.apply_field_permissions_to_data
+                params = self._get_field_info_params(f, field_info, optional)
+                new_field_info = self._build_new_field_info(t, field_info, params)
+                filtered_fields[f] = (t, new_field_info)
 
         return filtered_fields, computed_fields
+
+    def _copy_model_validators(self, target_model: Type[AwesomeBaseModel]) -> None:
+        """Copy model-level validators from source model to target model"""
+        
+        # Copy the full __pydantic_decorators__ registry
+        if hasattr(self.model_cls, '__pydantic_decorators__'):
+            source_decorators = self.model_cls.__pydantic_decorators__
+            
+            # Initialize target decorators if not exists
+            if not hasattr(target_model, '__pydantic_decorators__'):
+                from pydantic._internal._decorators import DecoratorInfos
+                target_model.__pydantic_decorators__ = DecoratorInfos()
+            
+            target_decorators = target_model.__pydantic_decorators__
+            
+            # Copy model validators
+            if hasattr(source_decorators, 'model_validators') and source_decorators.model_validators:
+                target_decorators.model_validators.update(source_decorators.model_validators)
+                
+                # Also copy the actual validator methods
+                for validator_name, decorator_info in source_decorators.model_validators.items():
+                    if hasattr(self.model_cls, validator_name):
+                        validator_method = getattr(self.model_cls, validator_name)
+                        setattr(target_model, validator_name, validator_method)
+            
+            # Copy field validators
+            if hasattr(source_decorators, 'field_validators') and source_decorators.field_validators:
+                target_decorators.field_validators.update(source_decorators.field_validators)
+                
+                # Also copy the actual validator methods
+                for field_name, field_validators in source_decorators.field_validators.items():
+                    for decorator_info in field_validators:
+                        validator_name = decorator_info.cls_var_name
+                        if hasattr(self.model_cls, validator_name):
+                            validator_method = getattr(self.model_cls, validator_name)
+                            setattr(target_model, validator_name, validator_method)
+            
+            # Copy other decorators like computed fields, serializers, etc.
+            if hasattr(source_decorators, 'computed_fields') and source_decorators.computed_fields:
+                target_decorators.computed_fields.update(source_decorators.computed_fields)
+            
+            if hasattr(source_decorators, 'field_serializers') and source_decorators.field_serializers:
+                target_decorators.field_serializers.update(source_decorators.field_serializers)
+            
+            if hasattr(source_decorators, 'model_serializers') and source_decorators.model_serializers:
+                target_decorators.model_serializers.update(source_decorators.model_serializers)
 
     def _setup_schema_model(
         self,

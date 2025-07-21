@@ -38,49 +38,51 @@ class PunishmentConfigSchemas:
 class PunishmentConfigSchemaCreate(AwesomeBaseModel):
     """create schema for PunishmentConfig model"""
 
-    is_active: Optional[bool]
-    description: Optional[str]
-    warn_threshold: Optional[int]
     config_data: Optional[dict[str, Any]]
+    warn_threshold: Optional[int]
     name: Optional[str]
     warn_decay_days: Optional[int]
+    is_active: Optional[bool]
+    description: Optional[str]
+    created_at: datetime
 
 class PunishmentConfigSchemaRedis(AwesomeBaseModel):
     """redis schema for PunishmentConfig model"""
 
+    config_data: Optional[dict[str, Any]]
+    warn_threshold: Optional[int]
+    name: Optional[str]
+    updated_at: Optional[datetime]
+    punishments: Optional[list[Punishment]]
+    id: Optional[int]
+    warn_decay_days: Optional[int]
     is_active: Optional[bool]
     description: Optional[str]
-    updated_at: Optional[datetime]
-    warn_threshold: Optional[int]
-    id: Optional[int]
-    punishments: Optional[list[Punishment]]
-    config_data: Optional[dict[str, Any]]
-    name: Optional[str]
-    warn_decay_days: Optional[int]
     created_at: datetime
 
 class PunishmentConfigSchemaResponse(AwesomeBaseModel):
     """response schema for PunishmentConfig model"""
 
+    config_data: dict[str, Any]
+    warn_threshold: Optional[int]
+    name: str
+    updated_at: Optional[datetime]
+    id: Optional[int]
+    warn_decay_days: Optional[int]
     is_active: Optional[bool]
     description: Optional[str]
-    updated_at: Optional[datetime]
-    warn_threshold: Optional[int]
-    id: Optional[int]
-    config_data: dict[str, Any]
-    name: str
-    warn_decay_days: Optional[int]
     created_at: datetime
 
 class PunishmentConfigSchemaUpdate(AwesomeBaseModel):
     """update schema for PunishmentConfig model"""
 
-    is_active: Optional[bool]
-    description: Optional[str]
-    warn_threshold: Optional[int]
     config_data: Optional[dict[str, Any]]
+    warn_threshold: Optional[int]
     name: Optional[str]
     warn_decay_days: Optional[int]
+    is_active: Optional[bool]
+    description: Optional[str]
+    created_at: datetime
 
 class PunishmentConfigFilter(BaseModel):
     """Pydantic-class for filtering the PunishmentConfig model."""

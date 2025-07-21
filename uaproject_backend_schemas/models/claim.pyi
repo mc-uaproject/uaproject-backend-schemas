@@ -44,30 +44,31 @@ class ClaimSchemaCreate(AwesomeBaseModel):
     description: str
     claimants: Optional[list[User]]
     defendants: Optional[list[User]]
+    created_at: datetime
 
 class ClaimSchemaRedis(AwesomeBaseModel):
     """redis schema for Claim model"""
 
+    defendants: Optional[list[User]]
+    updated_at: Optional[datetime]
+    claimants: Optional[list[User]]
+    id: Optional[int]
+    status: Optional[ClaimStatus]
+    title: Optional[str]
     description: Optional[str]
     judging: Optional[Judging]
-    updated_at: Optional[datetime]
-    status: Optional[ClaimStatus]
     judging_id: Optional[int]
-    id: Optional[int]
-    defendants: Optional[list[User]]
-    title: Optional[str]
-    claimants: Optional[list[User]]
     created_at: datetime
 
 class ClaimSchemaResponse(AwesomeBaseModel):
     """response schema for Claim model"""
 
-    description: str
     updated_at: Optional[datetime]
-    status: ClaimStatus
-    judging_id: Optional[int]
     id: Optional[int]
+    status: ClaimStatus
     title: str
+    description: str
+    judging_id: Optional[int]
     created_at: datetime
 
 class ClaimSchemaUpdate(AwesomeBaseModel):
@@ -77,6 +78,7 @@ class ClaimSchemaUpdate(AwesomeBaseModel):
     title: Optional[str]
     description: Optional[str]
     status: Optional[ClaimStatus]
+    created_at: datetime
 
 class ClaimFilter(BaseModel):
     """Pydantic-class for filtering the Claim model."""

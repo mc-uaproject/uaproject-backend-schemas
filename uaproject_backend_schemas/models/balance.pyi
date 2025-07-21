@@ -38,38 +38,39 @@ class BalanceSchemas:
 class BalanceSchemaCreate(AwesomeBaseModel):
     """create schema for Balance model"""
 
-    amount: Optional[Decimal]
     user_id: int
+    amount: Optional[Decimal]
+    created_at: datetime
 
 class BalanceSchemaRedis(AwesomeBaseModel):
     """redis schema for Balance model"""
 
-    user: Optional[User]
-    identifier: Optional[UUID]
+    user_id: Optional[int]
     updated_at: Optional[datetime]
     id: Optional[int]
+    identifier: Optional[UUID]
     amount: Optional[Decimal]
-    user_id: Optional[int]
+    user: Optional[User]
     created_at: datetime
 
 class BalanceSchemaResponse(AwesomeBaseModel):
     """response schema for Balance model"""
 
-    identifier: Optional[UUID]
+    user_id: int
     updated_at: Optional[datetime]
     id: Optional[int]
+    identifier: Optional[UUID]
     amount: Optional[Decimal]
-    user_id: int
     created_at: datetime
 
 class BalanceSchemaResponseSelf(AwesomeBaseModel):
     """response_self schema for Balance model"""
 
-    identifier: Optional[UUID]
+    user_id: int
     updated_at: Optional[datetime]
     id: Optional[int]
+    identifier: Optional[UUID]
     amount: Optional[Decimal]
-    user_id: int
     created_at: datetime
 
 class BalanceSchemaUpdate(AwesomeBaseModel):
@@ -77,6 +78,7 @@ class BalanceSchemaUpdate(AwesomeBaseModel):
 
     id: Optional[int]
     amount: Optional[Decimal]
+    created_at: datetime
 
 class BalanceFilter(BaseModel):
     """Pydantic-class for filtering the Balance model."""
