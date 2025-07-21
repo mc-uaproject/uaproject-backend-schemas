@@ -50,18 +50,17 @@ class NewsSchemas:
 class NewsSchemaCreate(AwesomeBaseModel):
     """create schema for News model"""
 
-    summary: Optional[str]
-    telegram_message_id: Optional[str]
-    event_time: Optional[datetime]
-    discord_message_id: Optional[str]
     title: Optional[str]
-    content: Optional[str]
-    importance: Optional[ImportanceType]
-    is_archived: Optional[bool]
-    type: Optional[NewsType]
     is_pinned: Optional[bool]
+    summary: Optional[str]
+    is_archived: Optional[bool]
     tags: Optional[list[str]]
-    created_at: datetime
+    discord_message_id: Optional[str]
+    event_time: Optional[datetime]
+    telegram_message_id: Optional[str]
+    content: Optional[str]
+    type: Optional[NewsType]
+    importance: Optional[ImportanceType]
 
 class NewsSchemaPublish(AwesomeBaseModel):
     """publish schema for News model"""
@@ -73,62 +72,61 @@ class NewsSchemaPublish(AwesomeBaseModel):
 class NewsSchemaRedis(AwesomeBaseModel):
     """redis schema for News model"""
 
+    is_published: Optional[bool]
     id: Optional[int]
+    title: Optional[str]
+    is_pinned: Optional[bool]
+    summary: Optional[str]
+    is_archived: Optional[bool]
+    author: Optional[User]
+    tags: Optional[list[str]]
+    updated_at: Optional[datetime]
+    discord_message_id: Optional[str]
+    event_time: Optional[datetime]
+    telegram_message_id: Optional[str]
     author_id: Optional[int]
     images: Optional[list[File]]
-    updated_at: Optional[datetime]
-    summary: Optional[str]
-    telegram_message_id: Optional[str]
-    event_time: Optional[datetime]
-    author: Optional[User]
-    discord_message_id: Optional[str]
-    title: Optional[str]
     content: Optional[str]
-    importance: Optional[ImportanceType]
-    is_archived: Optional[bool]
     type: Optional[NewsType]
-    is_published: Optional[bool]
-    is_pinned: Optional[bool]
-    tags: Optional[list[str]]
+    importance: Optional[ImportanceType]
     created_at: datetime
 
 class NewsSchemaResponse(AwesomeBaseModel):
     """response schema for News model"""
 
-    id: Optional[int]
-    author_id: int
-    updated_at: Optional[datetime]
-    summary: Optional[str]
-    telegram_message_id: Optional[str]
-    event_time: Optional[datetime]
-    discord_message_id: Optional[str]
-    title: str
-    content: str
-    importance: ImportanceType
-    is_archived: Optional[bool]
-    type: NewsType
     is_published: Optional[bool]
+    id: Optional[int]
+    title: str
     is_pinned: Optional[bool]
+    summary: Optional[str]
+    is_archived: Optional[bool]
     tags: list[str]
+    updated_at: Optional[datetime]
+    discord_message_id: Optional[str]
+    event_time: Optional[datetime]
+    telegram_message_id: Optional[str]
+    author_id: int
+    content: str
+    type: NewsType
+    importance: ImportanceType
     created_at: datetime
 
 class NewsSchemaUpdate(AwesomeBaseModel):
     """update schema for News model"""
 
-    author_id: Optional[int]
-    summary: Optional[str]
-    telegram_message_id: Optional[str]
-    event_time: Optional[datetime]
-    discord_message_id: Optional[str]
-    title: Optional[str]
-    content: Optional[str]
-    importance: Optional[ImportanceType]
-    is_archived: Optional[bool]
-    type: Optional[NewsType]
     is_published: Optional[bool]
+    title: Optional[str]
     is_pinned: Optional[bool]
+    summary: Optional[str]
+    is_archived: Optional[bool]
     tags: Optional[list[str]]
-    created_at: datetime
+    discord_message_id: Optional[str]
+    event_time: Optional[datetime]
+    telegram_message_id: Optional[str]
+    author_id: Optional[int]
+    content: Optional[str]
+    type: Optional[NewsType]
+    importance: Optional[ImportanceType]
 
 class NewsSchemaUpdateMeta(AwesomeBaseModel):
     """update_meta schema for News model"""

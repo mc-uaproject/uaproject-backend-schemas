@@ -315,6 +315,48 @@ class AwesomeSchemas:
             return permissions
         return [p.format(model_cls=self.model_cls) for p in permissions]
 
+    def _computed_field_depends_on_excluded(
+        self, field_name: str, fields_exclude: Optional[List[str]]
+    ) -> bool:
+        """Check if computed field depends on excluded fields."""
+        if not fields_exclude:
+            return False
+
+        # Get the computed field property/method from the model
+        if not hasattr(self.model_cls, field_name):
+            return False
+
+        computed_field_property = getattr(self.model_cls, field_name)
+
+        # Check if it's a property and get its source code
+        import inspect
+
+        try:
+            if isinstance(computed_field_property, property) and computed_field_property.fget:
+                source = inspect.getsource(computed_field_property.fget)
+            elif hasattr(computed_field_property, "func"):
+                # For computed field decorators
+                source = inspect.getsource(computed_field_property.func)
+            else:
+                # Try to get source directly
+                source = inspect.getsource(computed_field_property)
+
+            # Check if any excluded field is referenced in the source code
+            for excluded_field in fields_exclude:
+                # Look for self.field_name patterns
+                if f"self.{excluded_field}" in source:
+                    return True
+
+        except (OSError, TypeError):
+            # Can't get source code, check known patterns
+            pass
+
+        # Special case for known timestamp fields that depend on id
+        if field_name in ("created_at", "updated_at") and "id" in fields_exclude:
+            return True
+
+        return False
+
     def _create_schema_model(
         self,
         fields: List[str],
@@ -367,7 +409,14 @@ class AwesomeSchemas:
                     setattr(base_model, field_name, computed_field_info)
 
         # Copy model-level validators from the source model
-        self._copy_model_validators(base_model)
+        # First, find the schema class being used
+        schema_cls = None
+        for attr in dir(self._home):
+            if camel_to_snake(attr) == name.lower():
+                schema_cls = getattr(self._home, attr)
+                break
+
+        self._copy_model_validators(base_model, schema_cls)
 
         # Rebuild model to properly register computed fields and validators
         # This is crucial for validators to be properly registered
@@ -591,7 +640,9 @@ class AwesomeSchemas:
 
         return filtered_fields, computed_fields
 
-    def _copy_model_validators(self, target_model: Type[AwesomeBaseModel]) -> None:
+    def _copy_model_validators(
+        self, target_model: Type[AwesomeBaseModel], schema_cls: Optional[Any] = None
+    ) -> None:
         """Copy model-level validators from source model to target model"""
 
         # Copy the full __pydantic_decorators__ registry
@@ -637,6 +688,19 @@ class AwesomeSchemas:
             # Copy other decorators like computed fields, serializers, etc.
             if hasattr(source_decorators, "computed_fields") and source_decorators.computed_fields:
                 for field_name, computed_field_info in source_decorators.computed_fields.items():
+                    # Get fields_exclude from schema_cls
+                    fields_exclude = (
+                        getattr(schema_cls, "fields_exclude", None) if schema_cls else None
+                    )
+
+                    # Skip computed fields that are explicitly excluded
+                    if fields_exclude and field_name in fields_exclude:
+                        continue
+
+                    # Skip computed fields that depend on excluded fields
+                    if self._computed_field_depends_on_excluded(field_name, fields_exclude):
+                        continue
+
                     target_decorators.computed_fields[field_name] = computed_field_info
 
                     # Copy the actual computed field property/method from source model

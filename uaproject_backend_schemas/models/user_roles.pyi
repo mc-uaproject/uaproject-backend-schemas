@@ -34,7 +34,6 @@ class UserRolesSchemaCreate(AwesomeBaseModel):
 
     user_id: Optional[int]
     role_id: Optional[int]
-    created_at: datetime
 
 class UserRolesSchemaRedis(AwesomeBaseModel):
     """redis schema for UserRoles model"""
@@ -59,7 +58,6 @@ class UserRolesSchemaUpdate(AwesomeBaseModel):
 
     user_id: Optional[int]
     role_id: Optional[int]
-    created_at: datetime
 
 class UserRolesFilter(BaseModel):
     """Pydantic-class for filtering the UserRoles model."""

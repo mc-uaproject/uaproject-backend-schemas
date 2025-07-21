@@ -39,50 +39,48 @@ class PunishmentConfigSchemaCreate(AwesomeBaseModel):
     """create schema for PunishmentConfig model"""
 
     name: Optional[str]
-    warn_decay_days: Optional[int]
-    is_active: Optional[bool]
-    warn_threshold: Optional[int]
     description: Optional[str]
     config_data: Optional[dict[str, Any]]
-    created_at: datetime
+    is_active: Optional[bool]
+    warn_decay_days: Optional[int]
+    warn_threshold: Optional[int]
 
 class PunishmentConfigSchemaRedis(AwesomeBaseModel):
     """redis schema for PunishmentConfig model"""
 
-    id: Optional[int]
     name: Optional[str]
-    warn_decay_days: Optional[int]
-    updated_at: Optional[datetime]
-    punishments: Optional[list[Punishment]]
-    is_active: Optional[bool]
-    warn_threshold: Optional[int]
+    id: Optional[int]
     description: Optional[str]
+    updated_at: Optional[datetime]
     config_data: Optional[dict[str, Any]]
+    is_active: Optional[bool]
+    warn_decay_days: Optional[int]
+    punishments: Optional[list[Punishment]]
+    warn_threshold: Optional[int]
     created_at: datetime
 
 class PunishmentConfigSchemaResponse(AwesomeBaseModel):
     """response schema for PunishmentConfig model"""
 
-    id: Optional[int]
     name: str
-    warn_decay_days: Optional[int]
-    updated_at: Optional[datetime]
-    is_active: Optional[bool]
-    warn_threshold: Optional[int]
+    id: Optional[int]
     description: Optional[str]
+    updated_at: Optional[datetime]
     config_data: dict[str, Any]
+    is_active: Optional[bool]
+    warn_decay_days: Optional[int]
+    warn_threshold: Optional[int]
     created_at: datetime
 
 class PunishmentConfigSchemaUpdate(AwesomeBaseModel):
     """update schema for PunishmentConfig model"""
 
     name: Optional[str]
-    warn_decay_days: Optional[int]
-    is_active: Optional[bool]
-    warn_threshold: Optional[int]
     description: Optional[str]
     config_data: Optional[dict[str, Any]]
-    created_at: datetime
+    is_active: Optional[bool]
+    warn_decay_days: Optional[int]
+    warn_threshold: Optional[int]
 
 class PunishmentConfigFilter(BaseModel):
     """Pydantic-class for filtering the PunishmentConfig model."""

@@ -40,16 +40,15 @@ class BalanceSchemaCreate(AwesomeBaseModel):
 
     user_id: int
     amount: Optional[Decimal]
-    created_at: datetime
 
 class BalanceSchemaRedis(AwesomeBaseModel):
     """redis schema for Balance model"""
 
     id: Optional[int]
     user_id: Optional[int]
-    updated_at: Optional[datetime]
-    identifier: Optional[UUID]
     amount: Optional[Decimal]
+    identifier: Optional[UUID]
+    updated_at: Optional[datetime]
     user: Optional[User]
     created_at: datetime
 
@@ -58,9 +57,9 @@ class BalanceSchemaResponse(AwesomeBaseModel):
 
     id: Optional[int]
     user_id: int
-    updated_at: Optional[datetime]
-    identifier: Optional[UUID]
     amount: Optional[Decimal]
+    identifier: Optional[UUID]
+    updated_at: Optional[datetime]
     created_at: datetime
 
 class BalanceSchemaResponseSelf(AwesomeBaseModel):
@@ -68,9 +67,9 @@ class BalanceSchemaResponseSelf(AwesomeBaseModel):
 
     id: Optional[int]
     user_id: int
-    updated_at: Optional[datetime]
-    identifier: Optional[UUID]
     amount: Optional[Decimal]
+    identifier: Optional[UUID]
+    updated_at: Optional[datetime]
     created_at: datetime
 
 class BalanceSchemaUpdate(AwesomeBaseModel):
