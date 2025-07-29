@@ -17,6 +17,7 @@ BASE_EDITABLE_FIELDS: List[str] = [
     "birth_date",
     "launcher",
     "server_source",
+    "editable_fields",
 ]
 
 # Legacy fields (v1) - keeping for backward compatibility
@@ -25,6 +26,7 @@ LEGACY_EDITABLE_FIELDS: List[str] = [
     "useful_skills",
     "conflict_reaction",
     "quiz_answer",
+    "editable_fields",
 ]
 
 # V2 fields - simplified set
@@ -34,6 +36,7 @@ V2_EDITABLE_FIELDS: List[str] = [
     "new_rule_reaction",
     "useful_skills_detailed",
     "server_experience_negative",
+    "editable_fields",
 ]
 
 # All editable fields combined
@@ -43,6 +46,7 @@ EVERVAULT_EDITABLE_FIELDS = [
     "community_projects_readiness",
     "healthy_community_definition",
     "ideal_server_description",
+    "editable_fields",
 ]
 
 
