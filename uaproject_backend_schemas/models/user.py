@@ -134,13 +134,13 @@ class User(AwesomeModel, IDMixin, TimestampsMixin, table=True):
             permissions = [".read.other"]
 
     @model_validator(mode="before")
-    def validate_fields(cls, values: Optional[dict[str, str]]) -> Optional[dict[str, str]]:
-        if minecraft_nickname := values.get("minecraft_nickname", None):
+    def validate_fields(cls, model: "User") -> Optional[dict[str, str]]:
+        if minecraft_nickname := model.minecraft_nickname:
             if not re.match(r"^[a-zA-Z0-9_]+$", minecraft_nickname):
                 raise ValueError(
                     "Minecraft nickname can only contain letters, numbers, and underscores."
                 )
-        return values
+        return minecraft_nickname
 
     @computed_field(return_type=Dict[str, bool])
     @property
