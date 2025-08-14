@@ -14,6 +14,9 @@ poetry.lock
 # Editor and IDE settings
 .vscode/
 .idea/
+.claude/
+.qodo
+.claude
 *.iml
 
 # Logs and databases
@@ -27,11 +30,10 @@ Thumbs.db
 
 # Ruff & Vulture exclusions (already in config, but adding here just in case)
 versions/
+.ruff_cache/
 
 # Build artifacts
 dist/
 build/
 *.egg-info/
-.qodo
-
 *test*
