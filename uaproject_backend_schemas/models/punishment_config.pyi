@@ -38,49 +38,49 @@ class PunishmentConfigSchemas:
 class PunishmentConfigSchemaCreate(AwesomeBaseModel):
     """create schema for PunishmentConfig model"""
 
+    warn_threshold: Optional[int]
+    is_active: Optional[bool]
     name: Optional[str]
     description: Optional[str]
-    config_data: Optional[dict[str, Any]]
-    is_active: Optional[bool]
     warn_decay_days: Optional[int]
-    warn_threshold: Optional[int]
+    config_data: Optional[dict[str, Any]]
 
 class PunishmentConfigSchemaRedis(AwesomeBaseModel):
     """redis schema for PunishmentConfig model"""
 
-    name: Optional[str]
-    id: Optional[int]
-    description: Optional[str]
-    updated_at: Optional[datetime]
-    config_data: Optional[dict[str, Any]]
-    is_active: Optional[bool]
-    warn_decay_days: Optional[int]
     punishments: Optional[list[Punishment]]
     warn_threshold: Optional[int]
+    id: Optional[int]
+    is_active: Optional[bool]
+    name: Optional[str]
+    description: Optional[str]
+    warn_decay_days: Optional[int]
+    updated_at: Optional[datetime]
+    config_data: Optional[dict[str, Any]]
     created_at: datetime
 
 class PunishmentConfigSchemaResponse(AwesomeBaseModel):
     """response schema for PunishmentConfig model"""
 
-    name: str
+    warn_threshold: Optional[int]
     id: Optional[int]
+    is_active: Optional[bool]
+    name: str
     description: Optional[str]
+    warn_decay_days: Optional[int]
     updated_at: Optional[datetime]
     config_data: dict[str, Any]
-    is_active: Optional[bool]
-    warn_decay_days: Optional[int]
-    warn_threshold: Optional[int]
     created_at: datetime
 
 class PunishmentConfigSchemaUpdate(AwesomeBaseModel):
     """update schema for PunishmentConfig model"""
 
+    warn_threshold: Optional[int]
+    is_active: Optional[bool]
     name: Optional[str]
     description: Optional[str]
-    config_data: Optional[dict[str, Any]]
-    is_active: Optional[bool]
     warn_decay_days: Optional[int]
-    warn_threshold: Optional[int]
+    config_data: Optional[dict[str, Any]]
 
 class PunishmentConfigFilter(BaseModel):
     """Pydantic-class for filtering the PunishmentConfig model."""

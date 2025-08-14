@@ -46,56 +46,56 @@ class TransactionSchemas:
 class TransactionSchemaCreate(AwesomeBaseModel):
     """create schema for Transaction model"""
 
-    user_id: Optional[int]
-    amount: Optional[Decimal]
-    description: Optional[str]
-    type: Optional[TransactionType]
     service_id: Optional[int]
-    recipient_id: Optional[int]
     transaction_metadata: Optional[dict[str, Any]]
+    user_id: Optional[int]
+    type: Optional[TransactionType]
+    description: Optional[str]
+    amount: Optional[Decimal]
+    recipient_id: Optional[int]
 
 class TransactionSchemaRedis(AwesomeBaseModel):
     """redis schema for Transaction model"""
 
-    id: Optional[int]
+    service_id: Optional[int]
+    transaction_metadata: Optional[dict[str, Any]]
+    purchased_item: Optional[PurchasedItem]
+    user: Optional[User]
     user_id: Optional[int]
-    amount: Optional[Decimal]
+    type: Optional[TransactionType]
+    id: Optional[int]
+    recipient: Optional[User]
     description: Optional[str]
     updated_at: Optional[datetime]
-    recipient: Optional[User]
     service: Optional[Service]
-    type: Optional[TransactionType]
-    service_id: Optional[int]
-    user: Optional[User]
-    purchased_item: Optional[PurchasedItem]
+    amount: Optional[Decimal]
     recipient_id: Optional[int]
-    transaction_metadata: Optional[dict[str, Any]]
     created_at: datetime
 
 class TransactionSchemaResponse(AwesomeBaseModel):
     """response schema for Transaction model"""
 
-    id: Optional[int]
+    service_id: Optional[int]
+    transaction_metadata: Optional[dict[str, Any]]
     user_id: int
-    amount: Decimal
+    type: TransactionType
+    id: Optional[int]
     description: Optional[str]
     updated_at: Optional[datetime]
-    type: TransactionType
-    service_id: Optional[int]
+    amount: Decimal
     recipient_id: int
-    transaction_metadata: Optional[dict[str, Any]]
     created_at: datetime
 
 class TransactionSchemaUpdate(AwesomeBaseModel):
     """update schema for Transaction model"""
 
-    user_id: Optional[int]
-    amount: Optional[Decimal]
-    description: Optional[str]
-    type: Optional[TransactionType]
     service_id: Optional[int]
-    recipient_id: Optional[int]
     transaction_metadata: Optional[dict[str, Any]]
+    user_id: Optional[int]
+    type: Optional[TransactionType]
+    description: Optional[str]
+    amount: Optional[Decimal]
+    recipient_id: Optional[int]
 
 class TransactionFilter(BaseModel):
     """Pydantic-class for filtering the Transaction model."""

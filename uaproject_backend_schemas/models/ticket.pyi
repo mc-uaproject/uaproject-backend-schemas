@@ -46,39 +46,39 @@ class TicketSchemaCreate(AwesomeBaseModel):
     """create schema for Ticket model"""
 
     priority: Optional[TicketPriority]
-    title: Optional[str]
-    status: Optional[TicketStatus]
-    description: Optional[str]
     author_id: Optional[int]
+    status: Optional[TicketStatus]
+    title: Optional[str]
+    description: Optional[str]
 
 class TicketSchemaRedis(AwesomeBaseModel):
     """redis schema for Ticket model"""
 
     priority: Optional[TicketPriority]
-    id: Optional[int]
-    title: Optional[str]
+    author_id: Optional[int]
+    added_user_ids: Optional[list[int]]
     status: Optional[TicketStatus]
+    title: Optional[str]
+    id: Optional[int]
+    description: Optional[str]
+    updated_at: Optional[datetime]
+    assigned_to_id: Optional[int]
+    assigned_to: Optional[User]
     author: Optional[User]
     messages: Optional[list[TicketMessage]]
-    description: Optional[str]
-    added_user_ids: Optional[list[int]]
-    updated_at: Optional[datetime]
-    assigned_to: Optional[User]
-    author_id: Optional[int]
-    assigned_to_id: Optional[int]
     created_at: datetime
 
 class TicketSchemaResponse(AwesomeBaseModel):
     """response schema for Ticket model"""
 
     priority: TicketPriority
-    id: Optional[int]
-    title: str
-    status: TicketStatus
-    description: str
-    added_user_ids: list[int]
-    updated_at: Optional[datetime]
     author_id: int
+    added_user_ids: list[int]
+    status: TicketStatus
+    title: str
+    id: Optional[int]
+    description: str
+    updated_at: Optional[datetime]
     assigned_to_id: Optional[int]
     created_at: datetime
 
@@ -86,13 +86,13 @@ class TicketSchemaResponseSelf(AwesomeBaseModel):
     """response_self schema for Ticket model"""
 
     priority: TicketPriority
-    id: Optional[int]
-    title: str
-    status: TicketStatus
-    description: str
-    added_user_ids: list[int]
-    updated_at: Optional[datetime]
     author_id: int
+    added_user_ids: list[int]
+    status: TicketStatus
+    title: str
+    id: Optional[int]
+    description: str
+    updated_at: Optional[datetime]
     assigned_to_id: Optional[int]
     created_at: datetime
 

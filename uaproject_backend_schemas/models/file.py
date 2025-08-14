@@ -41,31 +41,8 @@ class File(AwesomeModel, IDMixin, TimestampsMixin, table=True):
         description="Full path in bucket (with date prefix)",
     )
 
-    # Metadata
-    original_name: str = AwesomeField(
-        max_length=255,
-        nullable=False,
-        description="Original filename",
-    )
-    content_type: str = AwesomeField(
-        max_length=100,
-        nullable=False,
-        description="MIME type",
-    )
-    size: int = AwesomeField(
-        sa_column=Column(BigInteger, nullable=False),
-        description="File size in bytes",
-    )
-    checksum: Optional[str] = AwesomeField(
-        max_length=64,
-        nullable=True,
-        description="SHA256 checksum",
-    )
-    checksum_type: str = AwesomeField(
-        max_length=20,
-        default="sha256",
-        description="Checksum algorithm",
-    )
+    # Note: original_name, content_type, size, and checksum are stored in MinIO metadata
+    # Only kept in DB for quick filtering/sorting without MinIO calls
 
     # Relations
     user_id: int = AwesomeField(
@@ -86,6 +63,16 @@ class File(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     status: str = AwesomeField(
         sa_column=Column(String(20), default="pending"),
         description="File status: pending, uploaded, failed, deleted",
+    )
+
+    # Access control
+    is_public: bool = AwesomeField(
+        default=False,
+        description="Whether file is publicly accessible via CDN",
+    )
+    access_level: str = AwesomeField(
+        sa_column=Column(String(20), default="private"),
+        description="Access level: private, public, restricted",
     )
 
     # Additional timestamps
@@ -135,12 +122,12 @@ class File(AwesomeModel, IDMixin, TimestampsMixin, table=True):
 
     class Schemas(AwesomeModel.Schemas):
         class Create(SchemaDefinition):
-            fields_exclude = ["id", "created_at", "updated_at", "uploaded_at", "status"]
+            fields_exclude = ["id", "created_at", "updated_at", "uploaded_at"]
             optional = True
             permissions = [".write"]
 
         class Update(SchemaDefinition):
-            fields = ["status", "checksum"]
+            fields = ["status", "is_public", "access_level"]
             optional = True
             permissions = [".write"]
 
@@ -148,5 +135,5 @@ class File(AwesomeModel, IDMixin, TimestampsMixin, table=True):
             permissions = [".read"]
 
         class RequestUpload(SchemaDefinition):
-            fields = ["model_name", "model_id", "original_name", "content_type", "size"]
+            fields = ["model_name", "model_id", "is_public"]
             permissions = [".write"]

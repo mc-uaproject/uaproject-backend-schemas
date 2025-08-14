@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from uaproject_backend_schemas.models.news import News
     from uaproject_backend_schemas.models.punishment import Punishment
     from uaproject_backend_schemas.models.purchased_item import PurchasedItem
+    from uaproject_backend_schemas.models.session_token import SessionToken
     from uaproject_backend_schemas.models.ticket import Ticket
     from uaproject_backend_schemas.models.ticket_message import TicketMessage
     from uaproject_backend_schemas.models.transaction import Transaction
@@ -102,6 +103,9 @@ class User(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     )
     purchased_items: List["PurchasedItem"] = Relationship(
         back_populates="user", sa_relationship_kwargs={"foreign_keys": "[PurchasedItem.user_id]"}
+    )
+    sessions: List["SessionToken"] = Relationship(
+        back_populates="user", sa_relationship_kwargs={"foreign_keys": "[SessionToken.user_id]"}
     )
 
     class Schemas(AwesomeModel.Schemas):

@@ -50,79 +50,79 @@ class WebhookLogSchemas:
 class WebhookLogSchemaCreate(AwesomeBaseModel):
     """create schema for WebhookLog model"""
 
-    request_payload: Optional[dict[str, Any]]
-    request_payload_file_id: Optional[int]
-    status: Optional[WebhookLogStatus]
-    event_id: Optional[UUID]
-    triggered_by_event: Optional[WebhookEvent]
-    response_status_code: Optional[int]
-    attempt: Optional[int]
-    webhook_id: Optional[int]
-    execution_duration_ms: Optional[int]
-    response_headers: Optional[dict[str, Any]]
-    request_headers: Optional[dict[str, Any]]
-    response_body_file_id: Optional[int]
     response_body: Optional[str]
+    attempt: Optional[int]
+    status: Optional[WebhookLogStatus]
+    request_headers: Optional[dict[str, Any]]
+    response_status_code: Optional[int]
+    request_payload_file_id: Optional[int]
+    event_id: Optional[UUID]
+    response_headers: Optional[dict[str, Any]]
+    triggered_by_event: Optional[WebhookEvent]
+    response_body_file_id: Optional[int]
+    execution_duration_ms: Optional[int]
+    webhook_id: Optional[int]
+    request_payload: Optional[dict[str, Any]]
 
 class WebhookLogSchemaRedis(AwesomeBaseModel):
     """redis schema for WebhookLog model"""
 
-    request_payload_file_id: Optional[int]
-    status: Optional[WebhookLogStatus]
-    webhook: Optional[Webhook]
-    response_body: Optional[str]
-    request_payload: Optional[dict[str, Any]]
-    response_headers: Optional[dict[str, Any]]
-    response_body_file_id: Optional[int]
-    triggered_by_event: Optional[WebhookEvent]
-    webhook_id: Optional[int]
-    updated_at: Optional[datetime]
     request_headers: Optional[dict[str, Any]]
-    id: Optional[int]
-    request_payload_file: Optional[File]
-    event_id: Optional[UUID]
     response_status_code: Optional[int]
+    event_id: Optional[UUID]
+    webhook: Optional[Webhook]
+    request_payload_file: Optional[File]
+    request_payload: Optional[dict[str, Any]]
+    request_payload_file_id: Optional[int]
+    response_headers: Optional[dict[str, Any]]
+    status: Optional[WebhookLogStatus]
+    updated_at: Optional[datetime]
+    triggered_by_event: Optional[WebhookEvent]
+    response_body_file_id: Optional[int]
+    webhook_id: Optional[int]
+    response_body: Optional[str]
     attempt: Optional[int]
-    execution_duration_ms: Optional[int]
     response_body_file: Optional[File]
+    id: Optional[int]
+    execution_duration_ms: Optional[int]
     created_at: datetime
 
 class WebhookLogSchemaResponse(AwesomeBaseModel):
     """response schema for WebhookLog model"""
 
-    request_payload: Optional[dict[str, Any]]
+    response_body: Optional[str]
+    attempt: Optional[int]
+    status: WebhookLogStatus
+    request_headers: dict[str, Any]
+    response_status_code: Optional[int]
     request_payload_file_id: Optional[int]
     id: Optional[int]
-    status: WebhookLogStatus
     event_id: Optional[UUID]
-    triggered_by_event: WebhookEvent
-    response_status_code: Optional[int]
-    attempt: Optional[int]
-    webhook_id: int
-    updated_at: Optional[datetime]
-    execution_duration_ms: Optional[int]
     response_headers: Optional[dict[str, Any]]
-    request_headers: dict[str, Any]
+    updated_at: Optional[datetime]
+    triggered_by_event: WebhookEvent
     response_body_file_id: Optional[int]
-    response_body: Optional[str]
+    execution_duration_ms: Optional[int]
+    webhook_id: int
+    request_payload: Optional[dict[str, Any]]
     created_at: datetime
 
 class WebhookLogSchemaUpdate(AwesomeBaseModel):
     """update schema for WebhookLog model"""
 
-    request_payload: Optional[dict[str, Any]]
-    request_payload_file_id: Optional[int]
-    status: Optional[WebhookLogStatus]
-    event_id: Optional[UUID]
-    triggered_by_event: Optional[WebhookEvent]
-    response_status_code: Optional[int]
-    attempt: Optional[int]
-    webhook_id: Optional[int]
-    execution_duration_ms: Optional[int]
-    response_headers: Optional[dict[str, Any]]
-    request_headers: Optional[dict[str, Any]]
-    response_body_file_id: Optional[int]
     response_body: Optional[str]
+    attempt: Optional[int]
+    status: Optional[WebhookLogStatus]
+    request_headers: Optional[dict[str, Any]]
+    response_status_code: Optional[int]
+    request_payload_file_id: Optional[int]
+    event_id: Optional[UUID]
+    response_headers: Optional[dict[str, Any]]
+    triggered_by_event: Optional[WebhookEvent]
+    response_body_file_id: Optional[int]
+    execution_duration_ms: Optional[int]
+    webhook_id: Optional[int]
+    request_payload: Optional[dict[str, Any]]
 
 class WebhookLogFilter(BaseModel):
     """Pydantic-class for filtering the WebhookLog model."""
