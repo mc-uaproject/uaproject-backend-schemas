@@ -645,80 +645,65 @@ class AwesomeSchemas:
     ) -> None:
         """Copy model-level validators from source model to target model"""
 
-        # Copy the full __pydantic_decorators__ registry
-        if hasattr(self.model_cls, "__pydantic_decorators__"):
-            source_decorators = self.model_cls.__pydantic_decorators__
+        source_owner = None
+        if schema_cls is not None and hasattr(schema_cls, "__pydantic_decorators__"):
+            source_owner = schema_cls
+        elif hasattr(self.model_cls, "__pydantic_decorators__"):
+            source_owner = self.model_cls
+        else:
+            return
 
-            # Initialize target decorators if not exists
-            if not hasattr(target_model, "__pydantic_decorators__"):
-                from pydantic._internal._decorators import DecoratorInfos
+        source_decorators = source_owner.__pydantic_decorators__
 
-                target_model.__pydantic_decorators__ = DecoratorInfos()
+        # Initialize target decorators if not exists
+        if not hasattr(target_model, "__pydantic_decorators__"):
+            from pydantic._internal._decorators import DecoratorInfos
 
-            target_decorators = target_model.__pydantic_decorators__
+            target_model.__pydantic_decorators__ = DecoratorInfos()
 
-            # Copy model validators
-            if (
-                hasattr(source_decorators, "model_validators")
-                and source_decorators.model_validators
-            ):
-                target_decorators.model_validators.update(source_decorators.model_validators)
+        target_decorators = target_model.__pydantic_decorators__
 
-                # Also copy the actual validator methods
-                for validator_name, decorator_info in source_decorators.model_validators.items():
-                    if hasattr(self.model_cls, validator_name):
-                        validator_method = getattr(self.model_cls, validator_name)
-                        setattr(target_model, validator_name, validator_method)
+        if getattr(source_decorators, "model_validators", None):
+            target_decorators.model_validators.update(source_decorators.model_validators)
+            for validator_name, _ in source_decorators.model_validators.items():
+                if hasattr(source_owner, validator_name):
+                    setattr(target_model, validator_name, getattr(source_owner, validator_name))
 
-            # Copy field validators
-            if (
-                hasattr(source_decorators, "field_validators")
-                and source_decorators.field_validators
-            ):
-                target_decorators.field_validators.update(source_decorators.field_validators)
-
-                # Also copy the actual validator methods
-                for field_name, field_validators in source_decorators.field_validators.items():
-                    for decorator_info in field_validators:
-                        validator_name = decorator_info.cls_var_name
-                        if hasattr(self.model_cls, validator_name):
-                            validator_method = getattr(self.model_cls, validator_name)
-                            setattr(target_model, validator_name, validator_method)
-
-            # Copy other decorators like computed fields, serializers, etc.
-            if hasattr(source_decorators, "computed_fields") and source_decorators.computed_fields:
-                for field_name, computed_field_info in source_decorators.computed_fields.items():
-                    # Get fields_exclude from schema_cls
-                    fields_exclude = (
-                        getattr(schema_cls, "fields_exclude", None) if schema_cls else None
+        fv_map = getattr(source_decorators, "field_validators", None) or {}
+        if isinstance(fv_map, dict) and fv_map:
+            target_decorators.field_validators.update(fv_map)
+            for field_name, validators in fv_map.items():
+                if isinstance(validators, dict):
+                    validators = list(validators.values())
+                elif not isinstance(validators, (list, tuple)):
+                    validators = [validators]
+                for decorator_info in validators:
+                    validator_name = (
+                        getattr(decorator_info, "cls_var_name", None)
+                        or getattr(getattr(decorator_info, "func", None), "__name__", None)
                     )
-
-                    # Skip computed fields that are explicitly excluded
-                    if fields_exclude and field_name in fields_exclude:
+                    if not validator_name:
                         continue
+                    if hasattr(source_owner, validator_name) and not hasattr(target_model, validator_name):
+                        setattr(target_model, validator_name, getattr(source_owner, validator_name))
 
-                    # Skip computed fields that depend on excluded fields
-                    if self._computed_field_depends_on_excluded(field_name, fields_exclude):
-                        continue
+        # Copy other decorators like computed fields, serializers, etc.
+        if hasattr(source_decorators, "computed_fields") and source_decorators.computed_fields:
+            for field_name, computed_field_info in source_decorators.computed_fields.items():
+                fields_exclude = getattr(schema_cls, "fields_exclude", None) if schema_cls else None
+                if fields_exclude and field_name in fields_exclude:
+                    continue
+                if self._computed_field_depends_on_excluded(field_name, fields_exclude):
+                    continue
+                target_decorators.computed_fields[field_name] = computed_field_info
+                if hasattr(source_owner, field_name) and not hasattr(target_model, field_name):
+                    setattr(target_model, field_name, getattr(source_owner, field_name))
 
-                    target_decorators.computed_fields[field_name] = computed_field_info
+        if getattr(source_decorators, "field_serializers", None):
+            target_decorators.field_serializers.update(source_decorators.field_serializers)
 
-                    # Copy the actual computed field property/method from source model
-                    if hasattr(self.model_cls, field_name):
-                        computed_field_property = getattr(self.model_cls, field_name)
-                        setattr(target_model, field_name, computed_field_property)
-
-            if (
-                hasattr(source_decorators, "field_serializers")
-                and source_decorators.field_serializers
-            ):
-                target_decorators.field_serializers.update(source_decorators.field_serializers)
-
-            if (
-                hasattr(source_decorators, "model_serializers")
-                and source_decorators.model_serializers
-            ):
-                target_decorators.model_serializers.update(source_decorators.model_serializers)
+        if getattr(source_decorators, "model_serializers", None):
+            target_decorators.model_serializers.update(source_decorators.model_serializers)
 
     def _setup_schema_model(
         self,
