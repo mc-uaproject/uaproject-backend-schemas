@@ -1,7 +1,7 @@
 import re
 from typing import TYPE_CHECKING, Dict, List, Optional
 
-from pydantic import computed_field, model_validator
+from pydantic import computed_field, field_validator
 from sqlmodel import BigInteger, Column, Index, Relationship
 
 from uaproject_backend_schemas.awesome.fields import AwesomeField
@@ -137,16 +137,19 @@ class User(AwesomeModel, IDMixin, TimestampsMixin, table=True):
             ]
             permissions = [".read.other"]
 
-    @model_validator(mode="before")
+    @field_validator("minecraft_nickname", mode="before")
     @classmethod
-    def validate_fields(cls, values: dict) -> dict:
-        if isinstance(values, dict):
-            if minecraft_nickname := values.get("minecraft_nickname"):
-                if not re.match(r"^[a-zA-Z0-9_]+$", minecraft_nickname):
-                    raise ValueError(
-                        "Minecraft nickname can only contain letters, numbers, and underscores."
-                    )
-        return values
+    def validate_nick(cls, value: str) -> str:
+        """Validate Minecraft nickname."""
+        if value is None:
+            return value
+        if not isinstance(value, str):
+            msg = "minecraftnickname must be a string"
+            raise TypeError(msg)
+        if not re.fullmatch(r"[A-Za-z0-9]+", value):
+            msg = "Minecraft nickname can only contain letters, numbers, and underscores."
+            raise ValueError(msg)
+        return value
 
     @computed_field(return_type=Dict[str, bool])
     @property
