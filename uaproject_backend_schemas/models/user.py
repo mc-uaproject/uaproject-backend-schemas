@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from uaproject_backend_schemas.models.transaction import Transaction
     from uaproject_backend_schemas.models.webhook import Webhook
 
+MINECRAFT_NICKNAME_REGEX = re.compile(r"^[A-Za-z0-9_]+$")
 
 class User(AwesomeModel, IDMixin, TimestampsMixin, table=True):
     __tablename__ = "users"
@@ -144,10 +145,10 @@ class User(AwesomeModel, IDMixin, TimestampsMixin, table=True):
         if value is None:
             return value
         if not isinstance(value, str):
-            msg = "minecraftnickname must be a string"
+            msg = "minecraft_nickname must be a string"
             raise TypeError(msg)
-        if not re.fullmatch(r"[A-Za-z0-9]+", value):
-            msg = "Minecraft nickname can only contain letters, numbers, and underscores."
+        if not re.fullmatch(MINECRAFT_NICKNAME_REGEX, value):
+            msg = "Minecraft nickname can only contain letters, numbers, and underscores. Must be between 3 and 16 characters."
             raise ValueError(msg)
         return value
 
